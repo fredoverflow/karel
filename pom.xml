@@ -1,0 +1,143 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>fredoverflow</groupId>
+    <artifactId>karel</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+
+    <properties>
+        <kotlin.version>1.1.51</kotlin.version>
+        <!-- freditor targets Java 7 -->
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <main.class>MainKt</main.class>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>fredoverflow</groupId>
+            <artifactId>freditor</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
+
+        <plugins>
+            <plugin>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <version>${kotlin.version}</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+
+                    <execution>
+                        <id>test-compile</id>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>${main.class}</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.wvengen</groupId>
+                <artifactId>proguard-maven-plugin</artifactId>
+                <version>2.0.14</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>proguard</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <injar>${project.build.finalName}-jar-with-dependencies.jar</injar>
+                    <inFilter>!**TokenGenerator.class</inFilter>
+                    <outFilter>META-INF/MANIFEST.MF,!META-INF/**,!kotlin/**</outFilter>
+                    <outjar>${project.artifactId}.jar</outjar>
+                    <libs>
+                        <lib>${java.home}/lib/rt.jar</lib>
+                    </libs>
+                    <options>
+                        <!-- preserve entry point, otherwise output jar would be empty -->
+                        <option>-keep public class ${main.class} { public static void main(java.lang.String[]); }</option>
+                        <!-- Karel's problems are loaded via reflective method calls -->
+                        <option>-keepclassmembers class logic.World { public logic.KarelWorld *(); }</option>
+                        <!-- remove compiler-generated null checks for unneeded Java->Kotlin interoperability -->
+                        <option>-assumenosideeffects class kotlin.jvm.internal.Intrinsics { static void checkParameterIsNotNull(java.lang.Object, java.lang.String); }</option>
+                        <!-- hide annoying but harmless reflection warnings -->
+                        <option>-dontnote kotlin.internal.PlatformImplementationsKt</option>
+                        <option>-dontnote kotlin.jvm.internal.Reflection</option>
+                        <option>-dontnote kotlin.jvm.internal.ReflectionFactory</option>
+                    </options>
+                    <!-- prevent "duplicate definition of library class" notes -->
+                    <exclusions>
+                        <exclusion>
+                            <groupId>fredoverflow</groupId>
+                            <artifactId>freditor</artifactId>
+                        </exclusion>
+
+                        <exclusion>
+                            <groupId>org.jetbrains.kotlin</groupId>
+                            <artifactId>kotlin-stdlib</artifactId>
+                        </exclusion>
+
+                        <exclusion>
+                            <groupId>org.jetbrains</groupId>
+                            <artifactId>annotations</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
