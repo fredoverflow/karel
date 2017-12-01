@@ -77,6 +77,9 @@ Complete Installation
 (o) Do not import settings
 OK
 
+JetBrains Privacy Policy
+Accept
+
 Set UI theme
 
 Next: Desktop Entry
@@ -111,6 +114,10 @@ JDK
 OK
 Next
 Finish
+
+Tip of the day
+[ ] Show tips on startup
+Close
 
 karel/src/main/kotlin/Main.kt (right-click)
 Run 'MainKt'
