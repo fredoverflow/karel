@@ -146,8 +146,8 @@ class KarelPanel(private val atomicKarel: AtomicReference<KarelWorld>) : JPanel(
             } else if (SwingUtilities.isRightMouseButton(event)) {
                 switchTileSize()
             }
+            repaint()
         }
-        repaint()
     }
 
     private fun toggleBeeper(event: MouseEvent) {
