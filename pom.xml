@@ -101,7 +101,6 @@
                 </executions>
                 <configuration>
                     <injar>${project.build.finalName}-jar-with-dependencies.jar</injar>
-                    <inFilter>!**TokenGenerator.class</inFilter>
                     <outFilter>META-INF/MANIFEST.MF,!META-INF/**,!kotlin/**</outFilter>
                     <outjar>${project.artifactId}.jar</outjar>
                     <libs>
