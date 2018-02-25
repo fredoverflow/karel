@@ -80,6 +80,9 @@ OK
 JetBrains Privacy Policy
 Accept
 
+Data Sharing Options
+OK
+
 Set UI theme
 
 Next: Desktop Entry
@@ -115,7 +118,7 @@ OK
 Next
 Finish
 
-Tip of the day
+Tip of the Day
 [ ] Show tips on startup
 Close
 
