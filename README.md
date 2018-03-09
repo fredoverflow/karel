@@ -70,7 +70,7 @@ The full path is displayed in the title bar.
 ## How do I install IntelliJ IDEA?
 
 Download the Community Edition `zip` or `tar.gz` from https://www.jetbrains.com/idea/download and extract it wherever you like.
-Navigate to the `bin` folder an run the `idea.bat` or `idea.sh` script.
+Navigate to the `bin` folder and run the `idea.bat` or `idea.sh` script.
 Then follow these instructions:
 ```
 Complete Installation
@@ -100,7 +100,8 @@ Start using IntelliJ IDEA
 ```
 Welcome to IntelliJ IDEA
 Import Project
-/home/fred/git/karel
+Linux: /home/fred/git/karel
+Windows: C:\Users\fred\git\karel
 OK
 
 Import Project
@@ -110,10 +111,11 @@ Next
 Next
 Next
 
-Please Select Project SDK
+Please select project SDK. This SDK will be used by default by all project modules.
 +
 JDK
-/usr/lib/jvm/java-8-openjdk-amd64
+Linux: /usr/lib/jvm/java-8-openjdk-amd64
+Windows: C:\Program Files\Java\jdk1.8.0_...
 OK
 Next
 Finish
@@ -121,7 +123,11 @@ Finish
 Tip of the Day
 [ ] Show tips on startup
 Close
+```
 
+## How do I start karel from within IntelliJ IDEA?
+
+```
 karel/src/main/kotlin/Main.kt (right-click)
 Run 'MainKt'
 ```
