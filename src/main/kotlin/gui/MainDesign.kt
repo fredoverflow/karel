@@ -1,6 +1,7 @@
 package gui
 
 import freditor.FreditorUI
+import freditor.JavaIndenter
 import freditor.LineNumbers
 import logic.KarelWorld
 import logic.World
@@ -18,7 +19,7 @@ open class MainDesign(val atomicKarel: AtomicReference<KarelWorld>) : JFrame(Edi
 
     val karelPanel = KarelPanel(atomicKarel)
 
-    val story = FreditorUI(Flexer(), 33, 5)
+    val story = FreditorUI(Flexer.instance, JavaIndenter(Flexer.instance), 33, 5)
 
     val left = VerticalBoxPanel(controlPanel, karelPanel, Box.createRigidArea(Dimension(0, 16)), story).apply {
         setEmptyBorder(16)
