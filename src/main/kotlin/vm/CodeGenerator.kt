@@ -39,7 +39,7 @@ class CodeGenerator(private val semantics: KarelSemantics) {
     }
 
     private fun Command.generate() {
-        start.put(id(identifier.lexeme), pc)
+        start[id(identifier.lexeme)] = pc
         body.generate()
         generateInstruction(RETURN, body.closingBrace)
     }
