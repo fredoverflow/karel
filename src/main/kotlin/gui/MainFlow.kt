@@ -82,13 +82,13 @@ open class MainFlow : MainDesign(AtomicReference(World.karelsFirstProgram)) {
     }
 
     fun update() {
-        karelPanel.repaint()
         val instruction = virtualMachine.currentInstruction
         val position = instruction.position
         if (position > 0) {
             editor.setCursorTo(position)
         }
         virtualMachinePanel.update(virtualMachine.pc, virtualMachine.stack)
+        karelPanel.repaint()
     }
 
     fun stepInto() {
