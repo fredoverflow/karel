@@ -1,4 +1,4 @@
-![hangTheLampions](http://i.imgur.com/hm4d30G.png)
+![hangTheLampions](https://i.imgur.com/lTxnXAu.png)
 
 ## Background
 

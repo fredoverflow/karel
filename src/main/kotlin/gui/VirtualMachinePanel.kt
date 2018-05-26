@@ -8,25 +8,25 @@ import javax.swing.JScrollPane
 
 class VirtualMachinePanel(font: Font) : HorizontalBoxPanel() {
 
-    private val bytecodeTable = BytecodeTable(font)
     private val stackTable = StackTable(font)
+    private val bytecodeTable = BytecodeTable()
 
     init {
-        add(JScrollPane(bytecodeTable))
         add(VerticalBoxPanel(Box.createVerticalGlue(), stackTable))
+        add(bytecodeTable)
         isVisible = false
-    }
-
-    fun setProgram(program: List<Instruction>) {
-        bytecodeTable.setProgram(program)
     }
 
     fun clearStack() {
         stackTable.setStack(Stack.Nil)
     }
 
+    fun setProgram(program: List<Instruction>) {
+        bytecodeTable.setProgram(program)
+    }
+
     fun update(pc: Int, stack: Stack<Int>) {
-        bytecodeTable.highlightLine(pc)
         stackTable.setStack(stack)
+        bytecodeTable.highlightLine(pc)
     }
 }
