@@ -25,7 +25,7 @@ The executable `karel.jar` will be located inside the `target` folder.
 
 ## How do I start the system?
 
-Karel The Robot requires Java 7 or newer to run. Make sure you have Java installed!
+Karel The Robot requires Java 8 or newer to run. Make sure you have Java installed!
 
 On most operating systems, you can simply run a jar by double-clicking on it.
 

@@ -154,8 +154,7 @@ class VirtualMachine(val program: List<Instruction>,
     }
 
     private fun execute(f: (KarelWorld) -> KarelWorld) {
-        // Note: updateAndGet isn't available in Java 7
-        atomicKarel.set(f(atomicKarel.get()))
+        atomicKarel.updateAndGet(f)
     }
 
     private fun query(p: (KarelWorld) -> Boolean) {
