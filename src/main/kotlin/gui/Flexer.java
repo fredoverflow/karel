@@ -65,7 +65,7 @@ public class Flexer extends freditor.Flexer {
     public static final int CLOSING_BRACE = -21;
 
     @Override
-    public int pickColorForLexeme(int endState) {
+    public int pickColorForLexeme(int previousState, char firstCharacter, int endState) {
         switch (endState) {
             default:
                 return 0x000000;

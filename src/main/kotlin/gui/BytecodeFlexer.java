@@ -101,7 +101,7 @@ public class BytecodeFlexer extends freditor.Flexer {
     public static final int J_ONEMP = 69;
 
     @Override
-    public int pickColorForLexeme(int endState) {
+    public int pickColorForLexeme(int previousState, char firstCharacter, int endState) {
         switch (endState) {
             default:
                 return 0x000000;
