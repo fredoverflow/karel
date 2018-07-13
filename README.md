@@ -29,13 +29,16 @@ The executable `karel.jar` will be located inside the `target` folder.
 
 Karel The Robot requires Java 8 or newer to run. Make sure you have Java installed!
 
-On most operating systems, you can simply run a jar by double-clicking on it.
+On Windows, you can simply run a jar by double-clicking on it.
 
-If double-clicking does not start the system, open a terminal where the jar lives and write:
+On other operating systems, open a terminal where the jar lives and write:
 
-```
-java -jar karel.jar
-```
+    java -jar karel.jar
+
+Java animations tend to stutter on Linux.
+Replacing `xrender` with `opengl` may help:
+
+    java -jar -Dsun.java2d.opengl=True karel.jar
 
 ## How do I save my code?
 
