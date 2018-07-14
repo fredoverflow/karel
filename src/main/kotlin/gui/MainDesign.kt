@@ -2,7 +2,7 @@ package gui
 
 import freditor.FreditorUI
 import freditor.LineNumbers
-import logic.KarelWorld
+import logic.Problem
 import logic.World
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -12,15 +12,15 @@ import javax.swing.Box
 import javax.swing.JFrame
 import javax.swing.JOptionPane
 
-open class MainDesign(val atomicKarel: AtomicReference<KarelWorld>) : JFrame(Editor.filename) {
+open class MainDesign(val atomicWorld: AtomicReference<World>) : JFrame(Editor.filename) {
 
-    val controlPanel = ControlPanel(World.problems)
+    val controlPanel = ControlPanel(Problem.problems)
 
-    val karelPanel = KarelPanel(atomicKarel)
+    val worldPanel = WorldPanel(atomicWorld)
 
     val story = FreditorUI(Flexer.instance, KarelIndenter.instance, 33, 5)
 
-    val left = VerticalBoxPanel(controlPanel, karelPanel, Box.createRigidArea(Dimension(0, 16)), story).apply {
+    val left = VerticalBoxPanel(controlPanel, worldPanel, Box.createRigidArea(Dimension(0, 16)), story).apply {
         setEmptyBorder(16)
     }
 

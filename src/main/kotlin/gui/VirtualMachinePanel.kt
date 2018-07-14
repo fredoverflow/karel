@@ -4,7 +4,6 @@ import util.Stack
 import vm.Instruction
 import java.awt.Font
 import javax.swing.Box
-import javax.swing.JScrollPane
 
 class VirtualMachinePanel(font: Font) : HorizontalBoxPanel() {
 

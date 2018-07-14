@@ -5,8 +5,8 @@ import java.awt.event.KeyEvent
 class MainHandler : MainFlow() {
     init {
         controlPanel.goal.addActionListener {
-            atomicKarel.set(initialKarel)
-            karelPanel.repaint()
+            atomicWorld.set(initialWorld)
+            worldPanel.repaint()
 
             executeGoal(currentProblem.goal)
             controlPanel.stepOver.isEnabled = false
@@ -18,10 +18,10 @@ class MainHandler : MainFlow() {
         controlPanel.problemPicker.addActionListener {
             controlPanel.start_stop_reset.text = "start"
 
-            initialKarel = currentProblem.createWorld()
-            atomicKarel.set(initialKarel)
-            karelPanel.binaryLines = currentProblem.binaryLines
-            karelPanel.repaint()
+            initialWorld = currentProblem.createWorld()
+            atomicWorld.set(initialWorld)
+            worldPanel.binaryLines = currentProblem.binaryLines
+            worldPanel.repaint()
 
             story.loadFromString(currentProblem.story)
 
@@ -39,8 +39,8 @@ class MainHandler : MainFlow() {
 
                 "reset" -> {
                     controlPanel.start_stop_reset.text = "start"
-                    atomicKarel.set(initialKarel)
-                    karelPanel.repaint()
+                    atomicWorld.set(initialWorld)
+                    worldPanel.repaint()
                 }
             }
             editor.requestFocusInWindow()

@@ -1,7 +1,6 @@
 package gui
 
 import logic.KarelError
-import logic.KarelWorld
 import logic.Problem
 import logic.World
 import parsing.Diagnostic
@@ -14,7 +13,7 @@ import vm.VirtualMachine
 import java.util.concurrent.atomic.AtomicReference
 import javax.swing.Timer
 
-open class MainFlow : MainDesign(AtomicReference(World.karelsFirstProgram.createWorld())) {
+open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.createWorld())) {
 
     val currentProblem: Problem
         get() = controlPanel.problemPicker.selectedItem as Problem
@@ -24,7 +23,7 @@ open class MainFlow : MainDesign(AtomicReference(World.karelsFirstProgram.create
         return if (logarithm < 0) logarithm else 1.shl(logarithm)
     }
 
-    var initialKarel: KarelWorld = atomicKarel.get()
+    var initialWorld: World = atomicWorld.get()
 
     lateinit var virtualMachine: VirtualMachine
 
@@ -51,7 +50,7 @@ open class MainFlow : MainDesign(AtomicReference(World.karelsFirstProgram.create
 
     fun start(instructions: List<Instruction>) {
         virtualMachinePanel.setProgram(instructions)
-        virtualMachine = VirtualMachine(instructions, atomicKarel, editor::push, editor::pop, this::infiniteLoopDetected)
+        virtualMachine = VirtualMachine(instructions, atomicWorld, editor::push, editor::pop, this::infiniteLoopDetected)
         controlPanel.executionStarted()
         update()
         if (delay() >= 0) {
@@ -78,7 +77,7 @@ open class MainFlow : MainDesign(AtomicReference(World.karelsFirstProgram.create
             editor.setCursorTo(position)
         }
         virtualMachinePanel.update(virtualMachine.pc, virtualMachine.stack)
-        karelPanel.repaint()
+        worldPanel.repaint()
     }
 
     fun stepInto() {

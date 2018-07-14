@@ -1,7 +1,7 @@
 package gui
 
 import freditor.Front
-import logic.KarelWorld
+import logic.Problem
 import logic.World
 import java.awt.Dimension
 import java.awt.Graphics
@@ -17,7 +17,7 @@ private const val TILE_SIZE_MEDIUM = 40
 private const val TILE_SIZE_LARGE = 64
 
 private fun readTile(size: Int, name: String): BufferedImage {
-    return ImageIO.read(KarelPanel::class.java.getResourceAsStream("/tiles/$size/$name.png"))
+    return ImageIO.read(WorldPanel::class.java.getResourceAsStream("/tiles/$size/$name.png"))
 }
 
 private fun BufferedImage.rotatedCounterclockwise(): BufferedImage {
@@ -37,7 +37,7 @@ private fun BufferedImage.rotatedCounterclockwise(): BufferedImage {
     return rotated
 }
 
-class KarelPanel(private val atomicKarel: AtomicReference<KarelWorld>) : JPanel() {
+class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
 
     private var tileSize: Int = Toolkit.getDefaultToolkit().screenSize.height.let { screenHeight ->
         if (screenHeight < 1000) TILE_SIZE_MEDIUM else TILE_SIZE_LARGE
@@ -52,7 +52,7 @@ class KarelPanel(private val atomicKarel: AtomicReference<KarelWorld>) : JPanel(
         initializeKarels()
         initializeWalls()
 
-        val panelSize = Dimension(tileSize * World.WIDTH, tileSize * World.HEIGHT)
+        val panelSize = Dimension(tileSize * Problem.WIDTH, tileSize * Problem.HEIGHT)
         minimumSize = panelSize
         preferredSize = panelSize
         maximumSize = panelSize
@@ -86,29 +86,29 @@ class KarelPanel(private val atomicKarel: AtomicReference<KarelWorld>) : JPanel(
     }
 
     override fun paintComponent(graphics: Graphics) {
-        val karel = atomicKarel.get()
+        val world = atomicWorld.get()
 
-        graphics.drawWallsAndBeepers(karel)
-        graphics.drawKarel(karel)
-        graphics.drawNumbers(karel)
+        graphics.drawWallsAndBeepers(world)
+        graphics.drawKarel(world)
+        graphics.drawNumbers(world)
 
         // see https://stackoverflow.com/questions/19480076
         Toolkit.getDefaultToolkit().sync()
     }
 
-    private fun Graphics.drawWallsAndBeepers(karel: KarelWorld) {
-        for (y in 0 until World.HEIGHT) {
-            for (x in 0 until World.WIDTH) {
-                drawTile(x, y, walls[karel.floorPlan.wallsAt(x, y)])
-                if (karel.beeperAt(x, y)) {
+    private fun Graphics.drawWallsAndBeepers(world: World) {
+        for (y in 0 until Problem.HEIGHT) {
+            for (x in 0 until Problem.WIDTH) {
+                drawTile(x, y, walls[world.floorPlan.wallsAt(x, y)])
+                if (world.beeperAt(x, y)) {
                     drawTile(x, y, beeper)
                 }
             }
         }
     }
 
-    private fun Graphics.drawKarel(karel: KarelWorld) {
-        drawTile(karel.x, karel.y, karels[karel.direction])
+    private fun Graphics.drawKarel(world: World) {
+        drawTile(world.x, world.y, karels[world.direction])
     }
 
     private fun Graphics.drawTile(x: Int, y: Int, tile: BufferedImage) {
@@ -117,12 +117,12 @@ class KarelPanel(private val atomicKarel: AtomicReference<KarelWorld>) : JPanel(
 
     var binaryLines = 0
 
-    private fun Graphics.drawNumbers(karel: KarelWorld) {
+    private fun Graphics.drawNumbers(world: World) {
         for (y in 0 until binaryLines) {
             var totalValue = 0
             var beeperValue = 1
             for (x in 9 downTo 2) {
-                if (karel.beeperAt(x, y)) {
+                if (world.beeperAt(x, y)) {
                     drawNumber(x, y, beeperValue, 0x000000)
                     totalValue += beeperValue
                 }
@@ -153,7 +153,7 @@ class KarelPanel(private val atomicKarel: AtomicReference<KarelWorld>) : JPanel(
     private fun toggleBeeper(event: MouseEvent) {
         val x = event.x / tileSize
         val y = event.y / tileSize
-        atomicKarel.set(atomicKarel.get().toggleBeeper(x, y))
+        atomicWorld.set(atomicWorld.get().toggleBeeper(x, y))
     }
 
     private fun switchTileSize() {

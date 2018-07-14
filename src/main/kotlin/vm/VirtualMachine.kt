@@ -1,6 +1,6 @@
 package vm
 
-import logic.KarelWorld
+import logic.World
 import util.Stack
 import util.push
 import java.util.concurrent.atomic.AtomicReference
@@ -17,7 +17,7 @@ const val START = 256
 data class IllegalBytecode(val bytecode: Int) : Exception("%04x".format(bytecode))
 
 class VirtualMachine(val program: List<Instruction>,
-                     val atomicKarel: AtomicReference<KarelWorld>,
+                     private val atomicWorld: AtomicReference<World>,
                      private val onCall: (Int, Int) -> Unit,
                      private val onReturn: () -> Unit,
                      private val onInfiniteLoop: () -> Unit) {
@@ -124,18 +124,18 @@ class VirtualMachine(val program: List<Instruction>,
         when (bytecode) {
             RETURN -> executeReturn()
 
-            MOVE_FORWARD -> execute(KarelWorld::moveForward)
-            TURN_LEFT -> execute(KarelWorld::turnLeft)
-            TURN_AROUND -> execute(KarelWorld::turnAround)
-            TURN_RIGHT -> execute(KarelWorld::turnRight)
-            PICK_BEEPER -> execute(KarelWorld::pickBeeper)
-            DROP_BEEPER -> execute(KarelWorld::dropBeeper)
+            MOVE_FORWARD -> execute(World::moveForward)
+            TURN_LEFT -> execute(World::turnLeft)
+            TURN_AROUND -> execute(World::turnAround)
+            TURN_RIGHT -> execute(World::turnRight)
+            PICK_BEEPER -> execute(World::pickBeeper)
+            DROP_BEEPER -> execute(World::dropBeeper)
 
-            ON_BEEPER -> query(KarelWorld::onBeeper)
-            BEEPER_AHEAD -> query(KarelWorld::beeperAhead)
-            LEFT_IS_CLEAR -> query(KarelWorld::leftIsClear)
-            FRONT_IS_CLEAR -> query(KarelWorld::frontIsClear)
-            RIGHT_IS_CLEAR -> query(KarelWorld::rightIsClear)
+            ON_BEEPER -> query(World::onBeeper)
+            BEEPER_AHEAD -> query(World::beeperAhead)
+            LEFT_IS_CLEAR -> query(World::leftIsClear)
+            FRONT_IS_CLEAR -> query(World::frontIsClear)
+            RIGHT_IS_CLEAR -> query(World::rightIsClear)
 
             NOT -> push(if (pop() == 0) 1 else 0)
             AND -> binaryOperation(Int::and)
@@ -153,12 +153,12 @@ class VirtualMachine(val program: List<Instruction>,
         --callDepth
     }
 
-    private fun execute(f: (KarelWorld) -> KarelWorld) {
-        atomicKarel.updateAndGet(f)
+    private fun execute(f: (World) -> World) {
+        atomicWorld.updateAndGet(f)
     }
 
-    private fun query(p: (KarelWorld) -> Boolean) {
-        push(if (p(atomicKarel.get())) 1 else 0)
+    private fun query(p: (World) -> Boolean) {
+        push(if (p(atomicWorld.get())) 1 else 0)
     }
 
     private fun binaryOperation(f: (Int, Int) -> Int) {

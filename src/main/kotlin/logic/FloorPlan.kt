@@ -25,8 +25,8 @@ open class FloorPlan(protected val walls: LongArray) {
         return FloorBuilder(walls.clone())
     }
 
-    fun world(): KarelWorld {
-        return KarelWorld(0, 0, this)
+    fun world(): World {
+        return World(0, 0, this)
     }
 
     companion object {
@@ -137,7 +137,7 @@ class FloorBuilder(walls: LongArray) : FloorPlan(walls) {
     }
 
     fun buildHorizontalWall(x: Int, y: Int): FloorBuilder {
-        if (y < World.HEIGHT) {
+        if (y < Problem.HEIGHT) {
             walls[y] = walls[y].or(bitmask(x, FloorPlan.WALL_NORTH))
         }
         if (y > 0) {
@@ -147,7 +147,7 @@ class FloorBuilder(walls: LongArray) : FloorPlan(walls) {
     }
 
     fun buildVerticalWall(x: Int, y: Int): FloorBuilder {
-        if (x < World.WIDTH) {
+        if (x < Problem.WIDTH) {
             walls[y] = walls[y].or(bitmask(x, FloorPlan.WALL_WEST))
         }
         if (x > 0) {
