@@ -7,7 +7,7 @@
     <version>0.1.0-SNAPSHOT</version>
 
     <properties>
-        <kotlin.version>1.2.40</kotlin.version>
+        <kotlin.version>1.2.51</kotlin.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <main.class>MainKt</main.class>
