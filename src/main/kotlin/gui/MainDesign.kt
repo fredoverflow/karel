@@ -14,7 +14,7 @@ import javax.swing.JOptionPane
 
 open class MainDesign(val atomicKarel: AtomicReference<KarelWorld>) : JFrame(Editor.filename) {
 
-    val controlPanel = ControlPanel(World.problemDirectory)
+    val controlPanel = ControlPanel(World.problems)
 
     val karelPanel = KarelPanel(atomicKarel)
 

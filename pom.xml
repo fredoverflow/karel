@@ -108,8 +108,6 @@
                     <options>
                         <!-- preserve entry point, otherwise output jar would be empty -->
                         <option>-keep public class ${main.class} { public static void main(java.lang.String[]); }</option>
-                        <!-- Karel's problems are loaded via reflective method calls -->
-                        <option>-keepclassmembers class logic.World { public logic.KarelWorld *(); }</option>
                         <!-- remove compiler-generated null checks for unneeded Java->Kotlin interoperability -->
                         <option>-assumenosideeffects class kotlin.jvm.internal.Intrinsics { static void checkParameterIsNotNull(java.lang.Object, java.lang.String); }</option>
                         <!-- hide annoying but harmless reflection warnings -->

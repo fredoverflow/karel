@@ -1,9 +1,5 @@
 package gui
 
-import logic.World
-import logic.binaryLinesIn
-import logic.goalFor
-import logic.storyFor
 import java.awt.event.KeyEvent
 
 class MainHandler : MainFlow() {
@@ -12,7 +8,7 @@ class MainHandler : MainFlow() {
             atomicKarel.set(initialKarel)
             karelPanel.repaint()
 
-            executeGoal(goalFor(entryPoint))
+            executeGoal(currentProblem.goal)
             controlPanel.stepOver.isEnabled = false
             controlPanel.stepReturn.isEnabled = false
 
@@ -22,14 +18,14 @@ class MainHandler : MainFlow() {
         controlPanel.problemPicker.addActionListener {
             controlPanel.start_stop_reset.text = "start"
 
-            initialKarel = World.load(currentProblem)
+            initialKarel = currentProblem.createWorld()
             atomicKarel.set(initialKarel)
-            karelPanel.binaryLines = binaryLinesIn(entryPoint)
+            karelPanel.binaryLines = currentProblem.binaryLines
             karelPanel.repaint()
 
-            story.loadFromString(storyFor(entryPoint))
+            story.loadFromString(currentProblem.story)
 
-            editor.setCursorTo("void $entryPoint()")
+            editor.setCursorTo("void ${currentProblem.name}()")
             editor.requestFocusInWindow()
         }
 

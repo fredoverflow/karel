@@ -1,10 +1,11 @@
 package gui
 
+import logic.Problem
 import javax.swing.JButton
 import javax.swing.JComboBox
 import javax.swing.JSlider
 
-class ControlPanel(problems: List<String>) : VerticalBoxPanel() {
+class ControlPanel(problems: List<Problem>) : VerticalBoxPanel() {
 
     val goal = JButton("goal")
 

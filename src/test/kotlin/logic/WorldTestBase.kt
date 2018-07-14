@@ -9,12 +9,10 @@ open class WorldTestBase {
     protected var initialKarel: KarelWorld = World.emptyWorld
     protected var karel: KarelWorld = World.emptyWorld
 
-    protected fun executeGoal(problemName: String) {
-        val goal = goalFor(problemName)
+    protected fun executeGoal(problem: Problem) {
         val instructions = vm.instructionBuffer()
-        instructions.addAll(goal.map { vm.goalInstruction(it.toInt()) })
-        val problemMethod = World.methodOrVal(problemName)
-        initialKarel = World.load(problemMethod)
+        instructions.addAll(problem.goal.map { vm.goalInstruction(it.toInt()) })
+        initialKarel = problem.createWorld()
         val atomicKarel = AtomicReference<KarelWorld>(initialKarel)
         val virtualMachine = VirtualMachine(instructions, atomicKarel, this::push, this::pop, this::infiniteLoopDetected)
         try {

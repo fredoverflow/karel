@@ -9,7 +9,7 @@ import org.junit.Test
 class Week3Test : WorldTestBase() {
     @Test
     fun partyAgain() {
-        executeGoal("partyAgain")
+        executeGoal(World.partyAgain)
         assertKarelAt(9, 8, EAST)
         assertNumberOfBeepers(10)
         assertAllBeepersTouch(FloorPlan.WALL_NORTH)
@@ -17,7 +17,7 @@ class Week3Test : WorldTestBase() {
 
     @Test
     fun fetchTheStars() {
-        executeGoal("fetchTheStars")
+        executeGoal(World.fetchTheStars)
         assertKarelAt(9, 8, EAST)
         assertNumberOfBeepers(10)
         assertNoBeepersTouch(FloorPlan.WALL_NORTH)
@@ -25,7 +25,7 @@ class Week3Test : WorldTestBase() {
 
     @Test
     fun secureTheCave() {
-        executeGoal("secureTheCave")
+        executeGoal(World.secureTheCave)
         for (x in 0..9) {
             val n = initialKarel.countBeepersInColumn(x)
             for (y in 0 until 10 - n) {
@@ -39,7 +39,7 @@ class Week3Test : WorldTestBase() {
 
     @Test
     fun layAndRemoveTiles() {
-        executeGoal("layAndRemoveTiles")
+        executeGoal(World.layAndRemoveTiles)
         assertKarelAt(0, 9, WEST)
         assertNoBeepers()
     }
