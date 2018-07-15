@@ -21,6 +21,11 @@ open class FloorPlan(protected val walls: LongArray) {
         return walls[y].ushr(shift(x)).toInt().and(WALL_ALL)
     }
 
+    fun numberOfWallsAt(x: Int, y: Int): Int {
+        val shift = wallsAt(x, y).shl(2)
+        return 0x4332_3221_3221_2110L.ushr(shift).toInt().and(7)
+    }
+
     fun builder(): FloorBuilder {
         return FloorBuilder(walls.clone())
     }

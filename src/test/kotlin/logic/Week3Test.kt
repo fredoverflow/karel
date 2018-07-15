@@ -1,9 +1,10 @@
 package logic
 
 import logic.Problem.Companion.EAST
+import logic.Problem.Companion.NORTH
+import logic.Problem.Companion.SOUTH
 import logic.Problem.Companion.WEST
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Test
 
 class Week3Test : WorldTestBase() {
@@ -42,5 +43,37 @@ class Week3Test : WorldTestBase() {
         executeGoal(Problem.layAndRemoveTiles)
         assertKarelAt(0, 9, WEST)
         assertNoBeepers()
+    }
+
+    @Test
+    fun findShelters() {
+        executeGoal(Problem.findShelters)
+        var floodWorld = initialWorld
+        val floorPlan = floodWorld.floorPlan
+
+        fun floodFill(x: Int, y: Int) {
+            if (floodWorld.beeperAt(x, y)) return
+
+            if (floorPlan.numberOfWallsAt(x, y) < 3) {
+                floodWorld = floodWorld.dropBeeper(x, y)
+            }
+
+            if (floorPlan.isClear(x, y, EAST)) {
+                floodFill(x + 1, y)
+            }
+            if (floorPlan.isClear(x, y, NORTH)) {
+                floodFill(x, y - 1)
+            }
+            if (floorPlan.isClear(x, y, WEST)) {
+                floodFill(x - 1, y)
+            }
+            if (floorPlan.isClear(x, y, SOUTH)) {
+                floodFill(x, y + 1)
+            }
+        }
+
+        floodFill(world.x, world.y)
+        assertEquals(floodWorld.beepersHi, world.beepersHi)
+        assertEquals(floodWorld.beepersLo, world.beepersLo)
     }
 }
