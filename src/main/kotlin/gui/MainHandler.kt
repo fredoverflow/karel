@@ -1,6 +1,7 @@
 package gui
 
 import java.awt.event.KeyEvent
+import javax.swing.JFrame
 
 class MainHandler : MainFlow() {
     init {
@@ -90,6 +91,8 @@ class MainHandler : MainFlow() {
                 }
             }
         }
+
+        defaultCloseOperation = JFrame.EXIT_ON_CLOSE
 
         this.onWindowClosing {
             editor.tryToSaveCode()

@@ -36,9 +36,8 @@ open class MainDesign(val atomicWorld: AtomicReference<World>) : JFrame(Editor.f
         add(left, BorderLayout.WEST)
         add(editorWithLineNumbers, BorderLayout.CENTER)
         add(virtualMachinePanel, BorderLayout.EAST)
-
         pack()
-        defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+        isVisible = true
     }
 
     fun showErrorDialog(message: String, title: String) {
