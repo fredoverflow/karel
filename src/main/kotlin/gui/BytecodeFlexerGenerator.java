@@ -2,7 +2,7 @@ package gui;
 
 public class BytecodeFlexerGenerator {
     public static void main(String[] args) {
-        new freditor.FlexerGenerator(-4, 2)
+        new freditor.FlexerGenerator(-10, 2)
                 .withIdentifierCall("END")
                 .generateTokens(
                         "@", "CODE", "MNEMONIC",
