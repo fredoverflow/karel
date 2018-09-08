@@ -106,8 +106,8 @@ class Editor : FreditorUI(Flexer.instance, JavaIndenter.instance, 60, 1) {
 
     private var lines: Stack<Line2D.Double> = Stack.Nil
 
-    private val fontHeight = FreditorUI.height
-    private val fontWidth = FreditorUI.width
+    private val fontHeight = FreditorUI.fontHeight
+    private val fontWidth = FreditorUI.fontWidth
     private val thickness = fontWidth - 2.0f
 
     private val stroke = BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
