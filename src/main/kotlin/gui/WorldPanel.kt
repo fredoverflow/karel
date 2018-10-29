@@ -153,7 +153,7 @@ class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
     private fun toggleBeeper(event: MouseEvent) {
         val x = event.x / tileSize
         val y = event.y / tileSize
-        atomicWorld.set(atomicWorld.get().toggleBeeper(x, y))
+        atomicWorld.updateAndGet { it.toggleBeeper(x, y) }
     }
 
     private fun switchTileSize() {
