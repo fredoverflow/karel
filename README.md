@@ -88,9 +88,10 @@ Complete Installation
 OK
 
 JetBrains Privacy Policy
-Accept
+[x] I confirm that I have read and accept the terms of this User Agreement
+Continue
 
-Data Sharing Options
+Data Sharing
 Don't send
 
 Skip Remaining and Set Defaults
