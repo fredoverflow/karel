@@ -51,12 +51,11 @@ class Week3Test : WorldTestBase() {
         var floodWorld = initialWorld
         val floorPlan = floodWorld.floorPlan
 
+        // mark reachable positions with beepers
         fun floodFill(x: Int, y: Int) {
             if (floodWorld.beeperAt(x, y)) return
 
-            if (floorPlan.numberOfWallsAt(x, y) < 3) {
-                floodWorld = floodWorld.dropBeeper(x, y)
-            }
+            floodWorld = floodWorld.dropBeeper(x, y)
 
             if (floorPlan.isClear(x, y, EAST)) {
                 floodFill(x + 1, y)
@@ -71,8 +70,17 @@ class Week3Test : WorldTestBase() {
                 floodFill(x, y + 1)
             }
         }
-
         floodFill(world.x, world.y)
+
+        // remove beepers from shelters
+        for (y in 0 until 10) {
+            for (x in 0 until 10) {
+                if (floodWorld.beeperAt(x, y) && floorPlan.numberOfWallsAt(x, y) >= 3) {
+                    floodWorld = floodWorld.pickBeeper(x, y)
+                }
+            }
+        }
+
         assertEquals(floodWorld.beepersHi, world.beepersHi)
         assertEquals(floodWorld.beepersLo, world.beepersLo)
     }
