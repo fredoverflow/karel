@@ -10,7 +10,7 @@ open class WorldTestBase {
     protected var world: World = Problem.emptyWorld
 
     protected fun executeGoal(problem: Problem) {
-        val instructions = vm.instructionBuffer()
+        val instructions = vm.createInstructionBuffer()
         instructions.addAll(problem.goal.map { vm.goalInstruction(it.toInt()) })
         initialWorld = problem.createWorld()
         val atomicWorld = AtomicReference<World>(initialWorld)

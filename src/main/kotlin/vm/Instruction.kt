@@ -105,7 +105,7 @@ val builtinCommands = mapOf(
 
 private val basicGoalInstructions = Array(XOR + 1) { Instruction(it, 0) }
 
-fun instructionBuffer(): MutableList<Instruction> {
+fun createInstructionBuffer(): MutableList<Instruction> {
     return MutableList(vm.START) { basicGoalInstructions[RETURN] }
 }
 

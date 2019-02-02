@@ -32,7 +32,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.crea
     }
 
     fun executeGoal(goal: String) {
-        val instructions = vm.instructionBuffer()
+        val instructions = vm.createInstructionBuffer()
         instructions.addAll(goal.map { vm.goalInstruction(it.toInt()) })
         start(instructions)
     }
