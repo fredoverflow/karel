@@ -3,6 +3,7 @@ package vm
 import logic.World
 import util.Stack
 import util.push
+
 import java.util.concurrent.atomic.AtomicReference
 
 // If "step over" or "step return" do not finish within 10 seconds,
@@ -24,7 +25,7 @@ class VirtualMachine(val program: List<Instruction>,
 
     var pc: Int = vm.START
         private set(value) {
-            if (field < vm.START) throw IllegalArgumentException("$value")
+            if (field !in vm.START..program.size) throw IllegalArgumentException("$value")
             field = value
         }
 
@@ -38,6 +39,10 @@ class VirtualMachine(val program: List<Instruction>,
 
     private fun push(x: Int) {
         stack = stack.push(x)
+    }
+
+    private fun push(x: Boolean) {
+        stack = stack.push(if (x) 1 else 0)
     }
 
     private fun pop(): Int {
@@ -103,9 +108,9 @@ class VirtualMachine(val program: List<Instruction>,
     }
 
     private fun Instruction.executeLoop() {
-        val x = pop() - 1
-        if (x > 0) {
-            push(x)
+        val remaining = pop() - 1
+        if (remaining > 0) {
+            push(remaining)
             pc = target
         } else {
             ++pc
@@ -120,48 +125,36 @@ class VirtualMachine(val program: List<Instruction>,
         pc = target
     }
 
-    private fun executeBasicInstruction(bytecode: Int) {
-        when (bytecode) {
-            RETURN -> executeReturn()
-
-            MOVE_FORWARD -> execute(World::moveForward)
-            TURN_LEFT -> execute(World::turnLeft)
-            TURN_AROUND -> execute(World::turnAround)
-            TURN_RIGHT -> execute(World::turnRight)
-            PICK_BEEPER -> execute(World::pickBeeper)
-            DROP_BEEPER -> execute(World::dropBeeper)
-
-            ON_BEEPER -> query(World::onBeeper)
-            BEEPER_AHEAD -> query(World::beeperAhead)
-            LEFT_IS_CLEAR -> query(World::leftIsClear)
-            FRONT_IS_CLEAR -> query(World::frontIsClear)
-            RIGHT_IS_CLEAR -> query(World::rightIsClear)
-
-            NOT -> push(if (pop() == 0) 1 else 0)
-            AND -> binaryOperation(Int::and)
-            OR -> binaryOperation(Int::or)
-            XOR -> binaryOperation(Int::xor)
-
-            else -> throw IllegalBytecode(bytecode)
-        }
-        ++pc
-    }
-
     private fun executeReturn() {
         onReturn()
         pc = pop()
         --callDepth
     }
 
-    private fun execute(f: (World) -> World) {
-        atomicWorld.updateAndGet(f)
-    }
+    private fun executeBasicInstruction(bytecode: Int) {
+        when (bytecode) {
+            RETURN -> executeReturn()
 
-    private fun query(p: (World) -> Boolean) {
-        push(if (p(atomicWorld.get())) 1 else 0)
-    }
+            MOVE_FORWARD -> atomicWorld.updateAndGet(World::moveForward)
+            TURN_LEFT -> atomicWorld.updateAndGet(World::turnLeft)
+            TURN_AROUND -> atomicWorld.updateAndGet(World::turnAround)
+            TURN_RIGHT -> atomicWorld.updateAndGet(World::turnRight)
+            PICK_BEEPER -> atomicWorld.updateAndGet(World::pickBeeper)
+            DROP_BEEPER -> atomicWorld.updateAndGet(World::dropBeeper)
 
-    private fun binaryOperation(f: (Int, Int) -> Int) {
-        push(f(pop(), pop()))
+            ON_BEEPER -> push(atomicWorld.get().onBeeper())
+            BEEPER_AHEAD -> push(atomicWorld.get().beeperAhead())
+            LEFT_IS_CLEAR -> push(atomicWorld.get().leftIsClear())
+            FRONT_IS_CLEAR -> push(atomicWorld.get().frontIsClear())
+            RIGHT_IS_CLEAR -> push(atomicWorld.get().rightIsClear())
+
+            NOT -> push(pop() == 0)
+            AND -> push(pop() and pop())
+            OR -> push(pop() or pop())
+            XOR -> push(pop() xor pop())
+
+            else -> throw IllegalBytecode(bytecode)
+        }
+        ++pc
     }
 }
