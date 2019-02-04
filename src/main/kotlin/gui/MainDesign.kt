@@ -5,10 +5,12 @@ import freditor.JavaIndenter
 import freditor.LineNumbers
 import logic.Problem
 import logic.World
+
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.Font
 import java.util.concurrent.atomic.AtomicReference
+
 import javax.swing.Box
 import javax.swing.JFrame
 import javax.swing.JOptionPane

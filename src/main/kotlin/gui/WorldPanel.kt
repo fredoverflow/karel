@@ -3,12 +3,14 @@ package gui
 import freditor.Front
 import logic.Problem
 import logic.World
+
 import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Toolkit
 import java.awt.event.MouseEvent
 import java.awt.image.BufferedImage
 import java.util.concurrent.atomic.AtomicReference
+
 import javax.imageio.ImageIO
 import javax.swing.JPanel
 import javax.swing.SwingUtilities

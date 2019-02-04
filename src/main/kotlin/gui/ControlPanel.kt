@@ -1,6 +1,7 @@
 package gui
 
 import logic.Problem
+
 import javax.swing.JButton
 import javax.swing.JComboBox
 import javax.swing.JSlider

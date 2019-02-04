@@ -2,6 +2,7 @@ package gui
 
 import java.awt.Component
 import java.awt.event.*
+
 import javax.swing.BoxLayout
 import javax.swing.JComponent
 import javax.swing.JFrame

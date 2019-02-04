@@ -1,8 +1,10 @@
 package gui
 
 import util.Stack
+
 import java.awt.Dimension
 import java.awt.Font
+
 import javax.swing.JTable
 import javax.swing.table.AbstractTableModel
 

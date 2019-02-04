@@ -10,7 +10,9 @@ import parsing.Parser
 import vm.CodeGenerator
 import vm.Instruction
 import vm.VirtualMachine
+
 import java.util.concurrent.atomic.AtomicReference
+
 import javax.swing.Timer
 
 open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.createWorld())) {

@@ -3,7 +3,6 @@ package parsing
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Test
-import java.util.Collections.emptyList
 
 const val whileLoop = """
 void main() {

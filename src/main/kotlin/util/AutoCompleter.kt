@@ -1,8 +1,5 @@
 package util
 
-import java.util.Collections.emptyList
-import java.util.Collections.singletonList
-
 private val command = Regex("""\p{javaJavaIdentifierStart}\p{javaJavaIdentifierPart}*\(\)""")
 private val reverse = Regex("""\)?\(?\p{javaJavaIdentifierPart}*\p{javaJavaIdentifierStart}""")
 
@@ -13,7 +10,7 @@ fun completeCommand(sourceCode: String, lineUntilCursor: String): List<String> {
     } else {
         val lcp = longestCommonPrefixOf(suffixes)
         if (!lcp.isEmpty()) {
-            singletonList(lcp)
+            listOf(lcp)
         } else {
             suffixes
         }

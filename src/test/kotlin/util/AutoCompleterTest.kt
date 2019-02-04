@@ -2,20 +2,18 @@ package util
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.util.Collections.emptyList
-import java.util.Collections.singletonList
 
 class AutoCompleterTest {
     @Test
     fun fullSuffix() {
         val actual = completeCommand("foo() bar() baz()", "f")
-        assertEquals(singletonList("oo()"), actual)
+        assertEquals(listOf("oo()"), actual)
     }
 
     @Test
     fun partialSuffix() {
         val actual = completeCommand("foo() bar() baz()", "b")
-        assertEquals(singletonList("a"), actual)
+        assertEquals(listOf("a"), actual)
     }
 
     @Test

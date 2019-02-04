@@ -3,6 +3,7 @@ package logic
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import vm.VirtualMachine
+
 import java.util.concurrent.atomic.AtomicReference
 
 open class WorldTestBase {

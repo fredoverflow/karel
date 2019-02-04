@@ -2,7 +2,9 @@ package gui
 
 import util.Stack
 import vm.Instruction
+
 import java.awt.Font
+
 import javax.swing.Box
 
 class VirtualMachinePanel(font: Font) : HorizontalBoxPanel() {

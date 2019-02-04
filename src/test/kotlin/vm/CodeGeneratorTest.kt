@@ -6,7 +6,6 @@ import parsing.Diagnostic
 import parsing.KarelSemantics
 import parsing.Lexer
 import parsing.Parser
-import java.util.Collections.emptyList
 
 class CodeGeneratorTest {
     private fun compile(sourceCode: String): List<Instruction> {

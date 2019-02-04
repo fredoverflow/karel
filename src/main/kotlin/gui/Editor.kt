@@ -5,6 +5,7 @@ import freditor.JavaIndenter
 import util.Stack
 import util.completeCommand
 import util.push
+
 import java.awt.*
 import java.awt.event.KeyEvent
 import java.awt.geom.Line2D

@@ -4,6 +4,7 @@ import logic.Problem.Companion.EAST
 import logic.Problem.Companion.NORTH
 import logic.Problem.Companion.SOUTH
 import logic.Problem.Companion.WEST
+
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorCompletionService
 import java.util.concurrent.Executors

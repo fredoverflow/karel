@@ -1,7 +1,5 @@
 package parsing
 
-import java.util.Collections.emptyList
-
 class KarelSemantics(val program: Program, entryPoint: String, val targetLevel: Int) {
 
     val commands: Map<String, Command> = program.commands.associateBy { it.identifier.lexeme }

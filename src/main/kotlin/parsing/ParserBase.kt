@@ -1,7 +1,5 @@
 package parsing
 
-import java.util.Collections.emptyList
-
 abstract class ParserBase(private val lexer: Lexer) {
 
     private var previousToken: Token = Token(END_OF_INPUT, 0, "")
@@ -50,7 +48,7 @@ abstract class ParserBase(private val lexer: Lexer) {
 
     protected inline fun <T> zeroOrMoreUntil(terminator: TokenKind, parse: () -> T): List<T> {
         return if (current == terminator) {
-            emptyList<T>()
+            emptyList()
         } else {
             atLeastOneUntil(terminator, parse)
         }

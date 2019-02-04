@@ -2,22 +2,21 @@ package parsing
 
 import org.junit.Assert.*
 import org.junit.Test
-import java.util.regex.Pattern
 
-private val keywords = Pattern.compile("[A-Za-z]+")
+private val keywords = Regex("[A-Za-z]+")
 
 class LexemesTest {
     @Test
     fun keywordsComeFirst() {
         for (lexeme in allLexemes.take(KEYWORDS)) {
-            assertTrue(lexeme, keywords.matcher(lexeme).matches())
+            assertTrue(lexeme, keywords.matches(lexeme))
         }
     }
 
     @Test
     fun firstNonKeyword() {
         val lexeme = allLexemes[KEYWORDS]
-        assertFalse(lexeme, keywords.matcher(lexeme).matches())
+        assertFalse(lexeme, keywords.matches(lexeme))
     }
 
     @Test
