@@ -12,6 +12,16 @@ class Token(val kind: TokenKind, val position: Int, val lexeme: String) {
     }
 
     override fun toString(): String = kind.show()
+
+    fun toInt(range: IntRange): Int {
+        try {
+            val n = lexeme.toInt()
+            if (n in range) return n
+        } catch (_: NumberFormatException) {
+            // intentional fallthrough
+        }
+        error("$lexeme out of range $range")
+    }
 }
 
 fun TokenKind.show(): String = allLexemes[+this]

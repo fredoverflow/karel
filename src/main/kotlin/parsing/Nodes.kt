@@ -14,10 +14,8 @@ data class Call(val target: Token) : Statement()
 
 data class Repeat(val repeat: Token, val times: Int, val body: Block) : Statement()
 
-data class IfThen(val iF: Token, val condition: Condition, val th3n: Block) : Statement()
-
-// e1se is a Statement instead of a Block in order to support else-if (see Parser::ifStatement)
-data class IfThenElse(val iF: Token, val condition: Condition, val th3n: Block, val e1se: Statement) : Statement()
+// e1se is a Statement? instead of a Block? in order to support else-if (see Parser.statement)
+data class IfThenElse(val iF: Token, val condition: Condition, val th3n: Block, val e1se: Statement?) : Statement()
 
 data class While(val whi1e: Token, val condition: Condition, val body: Block) : Statement()
 

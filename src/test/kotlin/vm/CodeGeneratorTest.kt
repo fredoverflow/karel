@@ -2,10 +2,7 @@ package vm
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import parsing.Diagnostic
-import parsing.KarelSemantics
-import parsing.Lexer
-import parsing.Parser
+import parsing.*
 
 class CodeGeneratorTest {
     private fun compile(sourceCode: String): List<Instruction> {

@@ -76,20 +76,21 @@ class CodeGenerator(private val semantics: KarelSemantics) {
             is Block -> {
                 statements.forEach { it.generate() }
             }
-            is IfThen -> {
-                condition.generate()
-                val over = prepareForwardJump(J0MP, iF)
-                th3n.generate()
-                patchForwardJump(over)
-            }
             is IfThenElse -> {
-                condition.generate()
-                val overThen = prepareForwardJump(J0MP, iF)
-                th3n.generate()
-                val overElse = prepareForwardJump(JUMP, th3n.closingBrace)
-                patchForwardJump(overThen)
-                e1se.generate()
-                patchForwardJump(overElse)
+                if (e1se == null) {
+                    condition.generate()
+                    val over = prepareForwardJump(J0MP, iF)
+                    th3n.generate()
+                    patchForwardJump(over)
+                } else {
+                    condition.generate()
+                    val overThen = prepareForwardJump(J0MP, iF)
+                    th3n.generate()
+                    val overElse = prepareForwardJump(JUMP, th3n.closingBrace)
+                    patchForwardJump(overThen)
+                    e1se.generate()
+                    patchForwardJump(overElse)
+                }
             }
             is While -> {
                 val back = pc

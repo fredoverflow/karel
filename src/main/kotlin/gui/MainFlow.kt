@@ -3,10 +3,7 @@ package gui
 import logic.KarelError
 import logic.Problem
 import logic.World
-import parsing.Diagnostic
-import parsing.KarelSemantics
-import parsing.Lexer
-import parsing.Parser
+import parsing.*
 import vm.CodeGenerator
 import vm.Instruction
 import vm.VirtualMachine

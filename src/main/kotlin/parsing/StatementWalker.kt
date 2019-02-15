@@ -18,12 +18,9 @@ class StatementWalker(private val enter: (Node) -> Unit) {
             is Repeat ->
                 body.walk()
 
-            is IfThen ->
-                th3n.walk()
-
             is IfThenElse -> {
                 th3n.walk()
-                e1se.walk()
+                e1se?.walk()
             }
 
             is While ->
