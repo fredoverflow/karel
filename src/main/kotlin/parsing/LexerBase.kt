@@ -1,17 +1,50 @@
 package parsing
 
+const val EOF = '\u0000'
+
 abstract class LexerBase(private val input: String) {
 
-    protected var start: Int = -1
-    protected var index: Int = -1
-    protected var current: Char = next()
+    var start: Int = -1
+        private set
 
-    protected fun next(): Char = nextOr('\u007f')
+    var index: Int = -1
+        private set
 
-    protected fun nextOr(end: Char): Char {
-        ++index
-        current = if (index < input.length) input[index] else end
+    fun startAtIndex() {
+        start = index
+    }
+
+    var current: Char = next()
+        private set
+
+    fun next(): Char {
+        current = try {
+            input[++index]
+        } catch (eof: StringIndexOutOfBoundsException) {
+            EOF
+        }
         return current
+    }
+
+    fun continueAfter(target: Char) {
+        current = try {
+            while (input[++index] != target) {
+            }
+            input[++index] // continue after target
+        } catch (eof: StringIndexOutOfBoundsException) {
+            EOF
+        }
+    }
+
+    fun continueAfter(before: Char, target: Char) {
+        current = try {
+            input[++index] // current shall not be compared with before
+            while (input[++index] != target || input[index - 1] != before) {
+            }
+            input[++index] // continue after target
+        } catch (eof: StringIndexOutOfBoundsException) {
+            EOF
+        }
     }
 
     protected fun lexeme(): String {
