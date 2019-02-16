@@ -24,7 +24,27 @@ class Token(val kind: TokenKind, val position: Int, val lexeme: String) {
     }
 }
 
-fun TokenKind.show(): String = allLexemes[+this]
+val lexemePool = arrayOf(
+        "beeperAhead",
+        "else",
+        "false",
+        "frontIsClear",
+        "if",
+        "leftIsClear",
+        "onBeeper",
+        "repeat",
+        "rightIsClear",
+        "true",
+        "void",
+        "while",
+        // keywords come first and must be sorted for binary search
+        "!", "&&", "(", ")", ";", "{", "||", "}",
+        "number", "identifier", "end of file"
+)
+
+const val NUM_KEYWORDS = 12
+
+fun TokenKind.show(): String = lexemePool[+this]
 
 const val BEEPER_AHEAD: TokenKind = 0
 const val ELSE: TokenKind = 1
