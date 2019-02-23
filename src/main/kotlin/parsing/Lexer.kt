@@ -1,5 +1,7 @@
 package parsing
 
+import freditor.persistent.ChampMap
+
 class Lexer(input: String) : LexerBase(input) {
 
     tailrec fun nextToken(): Token {
@@ -65,11 +67,17 @@ class Lexer(input: String) : LexerBase(input) {
 
         else -> {
             val lexeme = lexeme()
-            val keyword: TokenKind? = keywords[lexeme]
-            when {
-                keyword != null -> pooled(keyword)
-                else -> token(IDENTIFIER, lexeme.intern())
+            when (val value: Any? = identifiersOrKeywords[lexeme]) {
+                is TokenKind -> pooled(value)
+                is String -> token(IDENTIFIER, value)
+                else -> {
+                    identifiersOrKeywords = identifiersOrKeywords.put(lexeme, lexeme)
+                    token(IDENTIFIER, lexeme)
+                }
             }
         }
     }
+
+    @Suppress("UNCHECKED_CAST")
+    private var identifiersOrKeywords = keywords as ChampMap<String, Any>
 }
