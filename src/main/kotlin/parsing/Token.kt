@@ -1,5 +1,7 @@
 package parsing
 
+import freditor.persistent.ChampMap
+
 typealias TokenKind = Byte
 
 class Token(val kind: TokenKind, val position: Int, val lexeme: String) {
@@ -37,12 +39,16 @@ val lexemePool = arrayOf(
         "true",
         "void",
         "while",
-        // keywords come first and must be sorted for binary search
+        // keywords come first
         "!", "&&", "(", ")", ";", "{", "||", "}",
         "number", "identifier", "end of file"
 )
 
 const val NUM_KEYWORDS = 12
+
+val keywords: ChampMap<String, TokenKind> = lexemePool.take(NUM_KEYWORDS).foldIndexed(ChampMap.empty()) { index, map, keyword ->
+    map.put(keyword, index.toByte())
+}
 
 fun TokenKind.show(): String = lexemePool[+this]
 

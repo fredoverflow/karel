@@ -65,9 +65,9 @@ class Lexer(input: String) : LexerBase(input) {
 
         else -> {
             val lexeme = lexeme()
-            val keyword = lexemePool.binarySearch(lexeme, 0, NUM_KEYWORDS)
+            val keyword: TokenKind? = keywords[lexeme]
             when {
-                keyword >= 0 -> pooled(keyword.toByte())
+                keyword != null -> pooled(keyword)
                 else -> token(IDENTIFIER, lexeme.intern())
             }
         }
