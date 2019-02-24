@@ -14,11 +14,18 @@ class Lexer(input: String) : LexerBase(input) {
 
             '/' -> when (next()) {
                 '/' -> {
-                    continueAfter('\n')
+                    while (next() != '\n') {
+                        if (current == EOF) return pooled(END_OF_INPUT)
+                    }
+                    next() // skip '\n'
                     nextToken()
                 }
                 '*' -> {
-                    continueAfter('*', '/')
+                    next() // skip '*'
+                    do {
+                        if (current == EOF) return pooled(END_OF_INPUT)
+                    } while ((current != '*') or (next() != '/'))
+                    next() // skip '/'
                     nextToken()
                 }
                 else -> error("comments start with // or /*")

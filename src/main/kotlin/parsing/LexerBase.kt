@@ -18,33 +18,8 @@ abstract class LexerBase(private val input: String) {
         private set
 
     fun next(): Char {
-        current = try {
-            input[++index]
-        } catch (eof: StringIndexOutOfBoundsException) {
-            EOF
-        }
+        current = if (++index < input.length) input[index] else EOF
         return current
-    }
-
-    fun continueAfter(target: Char) {
-        current = try {
-            while (input[++index] != target) {
-            }
-            input[++index] // continue after target
-        } catch (eof: StringIndexOutOfBoundsException) {
-            EOF
-        }
-    }
-
-    fun continueAfter(before: Char, target: Char) {
-        current = try {
-            input[++index] // current shall not be compared with before
-            while (input[++index] != target || input[index - 1] != before) {
-            }
-            input[++index] // continue after target
-        } catch (eof: StringIndexOutOfBoundsException) {
-            EOF
-        }
     }
 
     protected fun lexeme(): String {
