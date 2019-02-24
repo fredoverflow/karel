@@ -1,6 +1,6 @@
 package parsing
 
-import freditor.persistent.ChampMap
+import freditor.persistent.StringedValueMap
 
 class Lexer(input: String) : LexerBase(input) {
 
@@ -68,10 +68,10 @@ class Lexer(input: String) : LexerBase(input) {
         else -> {
             val lexeme = lexeme()
             when (val value: Any? = identifiersOrKeywords[lexeme]) {
-                is TokenKind -> pooled(value)
+                is Keyword -> token(value.kind, value.lexeme)
                 is String -> token(IDENTIFIER, value)
                 else -> {
-                    identifiersOrKeywords = identifiersOrKeywords.put(lexeme, lexeme)
+                    identifiersOrKeywords = identifiersOrKeywords.put(lexeme)
                     token(IDENTIFIER, lexeme)
                 }
             }
@@ -79,5 +79,5 @@ class Lexer(input: String) : LexerBase(input) {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private var identifiersOrKeywords = keywords as ChampMap<String, Any>
+    private var identifiersOrKeywords = keywords as StringedValueMap<Any>
 }

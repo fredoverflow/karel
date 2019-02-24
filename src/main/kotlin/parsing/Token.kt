@@ -1,6 +1,6 @@
 package parsing
 
-import freditor.persistent.ChampMap
+import freditor.persistent.StringedValueMap
 
 typealias TokenKind = Byte
 
@@ -46,8 +46,12 @@ val lexemePool = arrayOf(
 
 const val NUM_KEYWORDS = 12
 
-val keywords: ChampMap<String, TokenKind> = lexemePool.take(NUM_KEYWORDS).foldIndexed(ChampMap.empty()) { index, map, keyword ->
-    map.put(keyword, index.toByte())
+class Keyword(val kind: TokenKind, val lexeme: String) {
+    override fun toString(): String = lexeme
+}
+
+val keywords: StringedValueMap<Keyword> = lexemePool.take(NUM_KEYWORDS).foldIndexed(StringedValueMap.empty()) { index, map, lexeme ->
+    map.put(Keyword(index.toByte(), lexeme))
 }
 
 fun TokenKind.show(): String = lexemePool[+this]
