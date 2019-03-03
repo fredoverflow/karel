@@ -36,7 +36,7 @@ class ParserNegativeTest {
 
     @Test
     fun commandMissingName() {
-        assertDiagnostic("expected identifier", """
+        assertDiagnostic("expected IDENTIFIER", """
         void () {
         }
         """)
@@ -109,6 +109,17 @@ class ParserNegativeTest {
         assertDiagnostic("expected (", """
         void main() {
             repeat 9 {
+                moveForward();
+            }
+        }
+        """)
+    }
+
+    @Test
+    fun repeatMissingNumber() {
+        assertDiagnostic("expected NUMBER", """
+        void main() {
+            repeat () {
                 moveForward();
             }
         }

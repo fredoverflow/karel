@@ -1,5 +1,7 @@
 package parsing
 
+import parsing.TokenKind.*
+
 fun Parser.disjunction(): Condition {
     val left = conjunction()
     return if (current != BAR_BAR) {

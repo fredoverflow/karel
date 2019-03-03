@@ -1,6 +1,7 @@
 package parsing
 
 import freditor.persistent.StringedValueMap
+import parsing.TokenKind.*
 
 class Lexer(input: String) : LexerBase(input) {
 
@@ -15,7 +16,7 @@ class Lexer(input: String) : LexerBase(input) {
             '/' -> when (next()) {
                 '/' -> {
                     while (next() != '\n') {
-                        if (current == EOF) return pooled(END_OF_INPUT)
+                        if (current == EOF) return verbatim(END_OF_INPUT)
                     }
                     next() // skip '\n'
                     nextToken()
@@ -23,7 +24,7 @@ class Lexer(input: String) : LexerBase(input) {
                 '*' -> {
                     next() // skip '*'
                     do {
-                        if (current == EOF) return pooled(END_OF_INPUT)
+                        if (current == EOF) return verbatim(END_OF_INPUT)
                     } while ((current != '*') or (next() != '/'))
                     next() // skip '/'
                     nextToken()
@@ -33,29 +34,29 @@ class Lexer(input: String) : LexerBase(input) {
 
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> number()
 
-            '(' -> nextPooled(OPENING_PAREN)
-            ')' -> nextPooled(CLOSING_PAREN)
-            ';' -> nextPooled(SEMICOLON)
-            '{' -> nextPooled(OPENING_BRACE)
-            '}' -> nextPooled(CLOSING_BRACE)
+            '(' -> nextVerbatim(OPENING_PAREN)
+            ')' -> nextVerbatim(CLOSING_PAREN)
+            ';' -> nextVerbatim(SEMICOLON)
+            '{' -> nextVerbatim(OPENING_BRACE)
+            '}' -> nextVerbatim(CLOSING_BRACE)
 
-            '!' -> nextPooled(BANG)
+            '!' -> nextVerbatim(BANG)
 
             '&' -> {
                 if (next() != '&') error("logical and is &&")
-                nextPooled(AMPERSAND_AMPERSAND)
+                nextVerbatim(AMPERSAND_AMPERSAND)
             }
 
             '|' -> {
                 if (next() != '|') error("logical or is ||")
-                nextPooled(BAR_BAR)
+                nextVerbatim(BAR_BAR)
             }
 
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
             '_' -> identifierOrKeyword()
 
-            EOF -> pooled(END_OF_INPUT)
+            EOF -> verbatim(END_OF_INPUT)
 
             else -> error("illegal character $current")
         }
@@ -75,7 +76,7 @@ class Lexer(input: String) : LexerBase(input) {
         else -> {
             val lexeme = lexeme()
             when (val value: Any? = identifiersOrKeywords[lexeme]) {
-                is Keyword -> token(value.kind, value.lexeme)
+                is TokenKind -> verbatim(value)
                 is String -> token(IDENTIFIER, value)
                 else -> {
                     identifiersOrKeywords = identifiersOrKeywords.put(lexeme)

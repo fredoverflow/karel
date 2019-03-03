@@ -1,5 +1,7 @@
 package parsing
 
+import parsing.TokenKind.*
+
 fun Parser.program(): Program {
     return Program(list1Until(END_OF_INPUT, ::command))
 }

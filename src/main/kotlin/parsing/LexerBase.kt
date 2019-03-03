@@ -34,13 +34,13 @@ abstract class LexerBase(private val input: String) {
         return Token(kind, start, lexeme)
     }
 
-    protected fun pooled(kind: TokenKind): Token {
-        return token(kind, kind.show())
+    protected fun verbatim(kind: TokenKind): Token {
+        return token(kind, kind.lexeme)
     }
 
-    protected fun nextPooled(kind: TokenKind): Token {
+    protected fun nextVerbatim(kind: TokenKind): Token {
         next()
-        return pooled(kind)
+        return verbatim(kind)
     }
 
     protected fun error(message: String): Nothing {

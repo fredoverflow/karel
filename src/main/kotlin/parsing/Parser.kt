@@ -1,18 +1,20 @@
 package parsing
 
+import parsing.TokenKind.*
+
 class Parser(private val lexer: Lexer) {
     private var previousEnd: Int = 0
 
     var token: Token = lexer.nextToken()
         private set
 
-    var current: Byte = token.kind
+    var current: TokenKind = token.kind
         private set
 
     var lookahead: Token = lexer.nextToken()
         private set
 
-    fun next(): Byte {
+    fun next(): TokenKind {
         previousEnd = token.end
         token = lookahead
         current = token.kind
@@ -26,8 +28,8 @@ class Parser(private val lexer: Lexer) {
         return result
     }
 
-    fun expect(expected: Byte): Token {
-        if (current != expected) throw Diagnostic(previousEnd, "expected ${expected.show()}")
+    fun expect(expected: TokenKind): Token {
+        if (current != expected) throw Diagnostic(previousEnd, "expected $expected")
         return accept()
     }
 
@@ -62,11 +64,11 @@ class Parser(private val lexer: Lexer) {
         }
     }
 
-    inline fun <T> list1Until(terminator: Byte, parse: () -> T): List<T> {
+    inline fun <T> list1Until(terminator: TokenKind, parse: () -> T): List<T> {
         return list1While({ current != terminator }, parse)
     }
 
-    inline fun <T> list0Until(terminator: Byte, parse: () -> T): List<T> {
+    inline fun <T> list0Until(terminator: TokenKind, parse: () -> T): List<T> {
         return list0While({ current != terminator }, parse)
     }
 
@@ -77,7 +79,7 @@ class Parser(private val lexer: Lexer) {
         return result
     }
 
-    inline fun <T> optional(indicator: Byte, parse: () -> T): T? {
+    inline fun <T> optional(indicator: TokenKind, parse: () -> T): T? {
         return if (current != indicator) {
             null
         } else {

@@ -2,6 +2,7 @@ package parsing
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import parsing.TokenKind.*
 
 class LexerTest {
     private var lexer = Lexer("")
