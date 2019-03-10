@@ -1,4 +1,7 @@
-package parsing
+package vm
+
+import common.Diagnostic
+import syntax.tree.*
 
 class KarelSemantics(val program: Program, entryPoint: String, val targetLevel: Int) {
 
@@ -73,7 +76,7 @@ class KarelSemantics(val program: Program, entryPoint: String, val targetLevel: 
     }
 
     private fun targetIsUnknown(call: Call): Boolean {
-        return !commands.contains(call.target.lexeme) && !vm.builtinCommands.contains(call.target.lexeme)
+        return !commands.contains(call.target.lexeme) && !builtinCommands.contains(call.target.lexeme)
     }
 
     private fun illegalWhileLoops(): List<Diagnostic> {

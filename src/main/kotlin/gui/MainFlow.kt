@@ -1,11 +1,15 @@
 package gui
 
+import common.Diagnostic
 import logic.KarelError
 import logic.Problem
 import logic.World
-import parsing.*
+import syntax.lexer.Lexer
+import syntax.parser.Parser
+import syntax.parser.program
 import vm.CodeGenerator
 import vm.Instruction
+import vm.KarelSemantics
 import vm.VirtualMachine
 
 import java.util.concurrent.atomic.AtomicReference

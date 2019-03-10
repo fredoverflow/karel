@@ -1,6 +1,10 @@
-package parsing
+package syntax.parser
 
-import parsing.TokenKind.*
+import common.Diagnostic
+import syntax.lexer.Lexer
+import syntax.lexer.Token
+import syntax.lexer.TokenKind
+import syntax.lexer.TokenKind.*
 
 class Parser(private val lexer: Lexer) {
     private var previousEnd: Int = 0

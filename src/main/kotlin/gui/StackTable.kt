@@ -1,7 +1,5 @@
 package gui
 
-import util.Stack
-
 import java.awt.Dimension
 import java.awt.Font
 

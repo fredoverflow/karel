@@ -1,4 +1,4 @@
-package util
+package gui
 
 private val command = Regex("""\p{javaJavaIdentifierStart}\p{javaJavaIdentifierPart}*\(\)""")
 private val reverse = Regex("""\)?\(?\p{javaJavaIdentifierPart}*\p{javaJavaIdentifierStart}""")

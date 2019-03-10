@@ -1,4 +1,6 @@
-package parsing
+package syntax.lexer
+
+import common.Diagnostic
 
 class Token(val kind: TokenKind, val position: Int, val lexeme: String) {
 

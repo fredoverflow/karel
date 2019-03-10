@@ -1,6 +1,7 @@
-package parsing
+package syntax.parser
 
-import parsing.TokenKind.*
+import syntax.lexer.TokenKind.*
+import syntax.tree.*
 
 fun Parser.disjunction(): Condition {
     val left = conjunction()

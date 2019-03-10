@@ -1,7 +1,7 @@
-package parsing
+package syntax.lexer
 
 import freditor.persistent.StringedValueMap
-import parsing.TokenKind.*
+import syntax.lexer.TokenKind.*
 
 class Lexer(input: String) : LexerBase(input) {
 

@@ -1,9 +1,8 @@
 package vm
 
+import gui.Stack
+import gui.push
 import logic.World
-import util.Stack
-import util.push
-
 import java.util.concurrent.atomic.AtomicReference
 
 // If "step over" or "step return" do not finish within 10 seconds,

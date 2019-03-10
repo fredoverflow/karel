@@ -1,4 +1,6 @@
-package parsing
+package syntax.lexer
+
+import common.Diagnostic
 
 const val EOF = '\u0000'
 

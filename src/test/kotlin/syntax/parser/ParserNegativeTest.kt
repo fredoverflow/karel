@@ -1,8 +1,10 @@
-package parsing
+package syntax.parser
 
+import common.Diagnostic
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
+import syntax.lexer.Lexer
 
 class ParserNegativeTest {
     @Rule

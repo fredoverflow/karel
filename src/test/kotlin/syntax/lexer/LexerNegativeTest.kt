@@ -1,5 +1,6 @@
-package parsing
+package syntax.lexer
 
+import common.Diagnostic
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException

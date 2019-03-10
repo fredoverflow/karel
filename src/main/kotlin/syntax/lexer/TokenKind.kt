@@ -1,4 +1,4 @@
-package parsing
+package syntax.lexer
 
 import freditor.persistent.StringedValueMap
 

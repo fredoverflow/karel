@@ -1,4 +1,6 @@
-package parsing
+package vm
+
+import syntax.tree.*
 
 class StatementWalker(private val enter: (Node) -> Unit) {
 

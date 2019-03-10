@@ -1,6 +1,5 @@
 package gui
 
-import util.Stack
 import vm.Instruction
 
 import java.awt.Font

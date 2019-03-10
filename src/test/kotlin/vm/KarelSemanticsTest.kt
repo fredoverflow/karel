@@ -1,8 +1,12 @@
-package parsing
+package vm
 
+import common.Diagnostic
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Test
+import syntax.lexer.Lexer
+import syntax.parser.Parser
+import syntax.parser.program
 
 const val whileLoop = """
 void main() {

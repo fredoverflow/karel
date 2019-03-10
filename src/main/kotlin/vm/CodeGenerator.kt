@@ -1,7 +1,7 @@
 package vm
 
-import parsing.*
-import util.IdentityGenerator
+import syntax.lexer.Token
+import syntax.tree.*
 
 typealias CommandNameId = Int
 typealias Address = Int

@@ -1,4 +1,4 @@
-package util
+package vm
 
 class IdentityGenerator(start: Int = 0) {
 

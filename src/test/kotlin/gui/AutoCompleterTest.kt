@@ -1,4 +1,4 @@
-package util
+package gui
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

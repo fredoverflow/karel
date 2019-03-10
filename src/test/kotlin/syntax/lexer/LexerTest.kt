@@ -1,8 +1,8 @@
-package parsing
+package syntax.lexer
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import parsing.TokenKind.*
+import syntax.lexer.TokenKind.*
 
 class LexerTest {
     private var lexer = Lexer("")

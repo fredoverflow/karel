@@ -1,8 +1,11 @@
 package vm
 
+import common.Diagnostic
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import parsing.*
+import syntax.lexer.Lexer
+import syntax.parser.Parser
+import syntax.parser.program
 
 class CodeGeneratorTest {
     private fun compile(sourceCode: String): List<Instruction> {
