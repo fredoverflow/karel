@@ -21,7 +21,7 @@ class CodeGenerator(private val semantics: KarelSemantics) {
     }
 
     private fun generateInstruction(bytecode: Int, token: Token) {
-        program.add(Instruction(bytecode, token.position))
+        program.add(Instruction(bytecode, token.start))
     }
 
     private val id = IdentityGenerator()

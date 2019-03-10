@@ -63,8 +63,8 @@ class KarelSemantics(val program: Program, entryPoint: String, val targetLevel: 
         val duplicates = grouped.values.filter { it.size >= 2 }
         return duplicates.map { command ->
             val name = command[0].identifier.lexeme
-            val first = command[0].identifier.position
-            val second = command[1].identifier.position
+            val first = command[0].identifier.start
+            val second = command[1].identifier.start
             Diagnostic(second, "duplicate command $name was already defined at $first")
         }
     }
@@ -72,7 +72,7 @@ class KarelSemantics(val program: Program, entryPoint: String, val targetLevel: 
     private fun undefinedCommands(): List<Diagnostic> {
         return callsInside(program)
                 .filter(this::targetIsUnknown)
-                .map { Diagnostic(it.target.position, "undefined command ${it.target.lexeme}") }
+                .map { Diagnostic(it.target.start, "undefined command ${it.target.lexeme}") }
     }
 
     private fun targetIsUnknown(call: Call): Boolean {
@@ -81,7 +81,7 @@ class KarelSemantics(val program: Program, entryPoint: String, val targetLevel: 
 
     private fun illegalWhileLoops(): List<Diagnostic> {
         return if (targetLevel < 2) {
-            whileLoops().map { Diagnostic(it.whi1e.position, "while loops are not allowed yet") }
+            whileLoops().map { Diagnostic(it.whi1e.start, "while loops are not allowed yet") }
         } else {
             emptyList()
         }
@@ -102,7 +102,7 @@ class KarelSemantics(val program: Program, entryPoint: String, val targetLevel: 
 
     private fun illegalRecursion(): List<Diagnostic> {
         return if (targetLevel < 3) {
-            recursiveCommands().map { Diagnostic(it.identifier.position, "recursion is not allowed yet") }
+            recursiveCommands().map { Diagnostic(it.identifier.start, "recursion is not allowed yet") }
         } else {
             emptyList()
         }

@@ -2,13 +2,13 @@ package syntax.lexer
 
 import common.Diagnostic
 
-class Token(val kind: TokenKind, val position: Int, val lexeme: String) {
+class Token(val kind: TokenKind, val start: Int, val lexeme: String) {
 
     val end: Int
-        get() = position + lexeme.length
+        get() = start + lexeme.length
 
     fun error(message: String): Nothing {
-        throw Diagnostic(position, message)
+        throw Diagnostic(start, message)
     }
 
     override fun toString(): String = kind.toString()
