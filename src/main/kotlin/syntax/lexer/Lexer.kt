@@ -15,18 +15,11 @@ class Lexer(input: String) : LexerBase(input) {
 
             '/' -> when (next()) {
                 '/' -> {
-                    while (next() != '\n') {
-                        if (current == EOF) return verbatim(END_OF_INPUT)
-                    }
-                    next() // skip '\n'
+                    skipSingleLineComment()
                     nextToken()
                 }
                 '*' -> {
-                    next() // skip '*'
-                    do {
-                        if (current == EOF) return verbatim(END_OF_INPUT)
-                    } while ((current != '*') or (next() != '/'))
-                    next() // skip '/'
+                    skipMultiLineComment()
                     nextToken()
                 }
                 else -> error("comments start with // or /*")
@@ -60,6 +53,21 @@ class Lexer(input: String) : LexerBase(input) {
 
             else -> error("illegal character $current")
         }
+    }
+
+    private fun skipSingleLineComment() {
+        while (next() != '\n') {
+            if (current == EOF) return
+        }
+        next() // skip '\n'
+    }
+
+    private fun skipMultiLineComment() {
+        next() // skip '*'
+        do {
+            if (current == EOF) return
+        } while ((current != '*') or (next() != '/'))
+        next() // skip '/'
     }
 
     private tailrec fun number(): Token = when (next()) {

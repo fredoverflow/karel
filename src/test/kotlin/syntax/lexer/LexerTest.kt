@@ -52,6 +52,12 @@ class LexerTest {
     }
 
     @Test
+    fun openSingleLineComment() {
+        lexer = Lexer("//")
+        assertToken(END_OF_INPUT)
+    }
+
+    @Test
     fun multiLineComments() {
         lexer = Lexer("""
         /*
@@ -62,7 +68,7 @@ class LexerTest {
         c /**/
         d/***/
         e /* / ** / *** /*/
-        f  /*
+        f
         """)
 
         assertIdentifier("a")
@@ -71,6 +77,12 @@ class LexerTest {
         assertIdentifier("d")
         assertIdentifier("e")
         assertIdentifier("f")
+        assertToken(END_OF_INPUT)
+    }
+
+    @Test
+    fun openMultiLineComment() {
+        lexer = Lexer("/*")
         assertToken(END_OF_INPUT)
     }
 
