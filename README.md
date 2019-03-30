@@ -83,7 +83,7 @@ Navigate to the `bin` folder and run the `idea.bat` or `idea.sh` script.
 Then follow these instructions:
 
 ```
-Complete Installation
+Import IntelliJ IDEA Settings From...
 (o) Do not import settings
 OK
 
@@ -99,9 +99,10 @@ Skip Remaining and Set Defaults
 
 ## How do I import karel into IntelliJ IDEA?
 
+* If there are no projects open, pick the **Import Project** option from the *Welcome to IntelliJ IDEA* screen.
+* Otherwise, pick **File > New > Project from Existing Sources...**
+
 ```
-Welcome to IntelliJ IDEA
-Import Project
 Windows: C:\Users\fred\git\karel
 Linux: /home/fred/git/karel
 OK
@@ -119,6 +120,7 @@ JDK
 Windows: C:\Program Files\Java\jdk1.8.0_...
 Linux: /usr/lib/jvm/java-8-openjdk-amd64
 OK
+
 Next
 Finish
 
