@@ -135,3 +135,17 @@ Close
 karel/src/main/kotlin/Main.kt (right-click)
 Run 'MainKt'
 ```
+
+## What IntelliJ IDEA settings do you like to change after install?
+
+**File > Settings...**
+
+* Keymap
+  * Eclipse
+* Editor > Font
+  * Font: Source Code Pro
+  * Size: 16
+* Editor > General > Code Folding
+  * [ ] One-line methods
+* Editor > General > Appearance
+  * [ ] Show intention bulb
