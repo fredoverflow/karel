@@ -52,11 +52,11 @@ public class Flexer extends freditor.Flexer {
     }
 
     private static final ChampMap<FlexerState, Integer> lexemeColors = ChampMap.of(ERROR, 0x808080)
-            .tup(0x808080, START::read, "/", "&", "|")
+            .put(START.read("/", "&", "|"), 0x808080)
             .put(SLASH_SLASH, SLASH_ASTERISK, SLASH_ASTERISK___ASTERISK, SLASH_ASTERISK___ASTERISK_SLASH, 0x008000)
             .put(NUMBER_HEAD, NUMBER_TAIL, 0x6400c8)
-            .tup(0x0000ff, START::read, "else", "false", "if", "repeat", "true", "while")
-            .tup(0x008080, START::read, "void")
-            .tup(0xff0000, START::read, "(", ")", "{", "}")
-            .tup(0x804040, START::read, "!", "&&", "||");
+            .put(START.read("else", "false", "if", "repeat", "true", "while"), 0x0000ff)
+            .put(START.read("void"), 0x008080)
+            .put(START.read("(", ")", "{", "}"), 0xff0000)
+            .put(START.read("!", "&&", "||"), 0x804040);
 }

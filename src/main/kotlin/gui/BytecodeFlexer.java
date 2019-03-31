@@ -39,9 +39,9 @@ public class BytecodeFlexer extends freditor.Flexer {
 
     private static final ChampMap<FlexerState, Integer> lexemeColors = ChampMap.of(ERROR, 0x808080)
             .put(NUMBER_HEAD, NUMBER_TAIL, 0x6400c8)
-            .tup(0x808080, START::read, "@", "CODE", "MNEMONIC")
-            .tup(0x000080, START::read, "BEEP", "HEAD", "LCLR", "FCLR", "RCLR", "NOT", "AND", "OR", "XOR", "PUSH")
-            .tup(0x400000, START::read, "RET", "LOOP", "CALL", "JUMP", "J0MP", "J1MP");
+            .put(START.read("@", "CODE", "MNEMONIC"), 0x808080)
+            .put(START.read("BEEP", "HEAD", "LCLR", "FCLR", "RCLR", "NOT", "AND", "OR", "XOR", "PUSH"), 0x000080)
+            .put(START.read("RET", "LOOP", "CALL", "JUMP", "J0MP", "J1MP"), 0x400000);
 
     private static final ChampMap<FlexerState, Integer> afterNewline = lexemeColors
             .put(NUMBER_HEAD, NUMBER_TAIL, 0x808080);
