@@ -22,4 +22,3 @@ function countForLanguage {
 }
 
 countForLanguage "Kotlin" "kt"
-countForLanguage "Java"   "java"

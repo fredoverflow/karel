@@ -10,7 +10,7 @@ import java.io.File
 import java.io.IOException
 import java.security.MessageDigest
 
-class Editor : FreditorUI(Flexer.instance, JavaIndenter.instance, 60, 1) {
+class Editor : FreditorUI(Flexer, JavaIndenter.instance, 60, 1) {
     companion object {
         // TODO Can this be refactored to a more readable raw string without causing platform issues?
         // see https://stackoverflow.com/questions/46861701

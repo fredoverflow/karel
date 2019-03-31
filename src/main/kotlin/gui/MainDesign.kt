@@ -21,7 +21,7 @@ open class MainDesign(val atomicWorld: AtomicReference<World>) : JFrame(Editor.f
 
     val worldPanel = WorldPanel(atomicWorld)
 
-    val story = FreditorUI(Flexer.instance, JavaIndenter.instance, 33, 5)
+    val story = FreditorUI(Flexer, JavaIndenter.instance, 33, 5)
 
     val left = VerticalBoxPanel(controlPanel, worldPanel, Box.createRigidArea(Dimension(0, 16)), story).apply {
         setEmptyBorder(16)
