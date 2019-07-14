@@ -7,11 +7,24 @@
     <version>0.1.0-SNAPSHOT</version>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>1.3.21</kotlin.version>
         <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
         <main.class>MainKt</main.class>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.runtime>${java.home}/lib/rt.jar</java.runtime>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>java-modules</id>
+            <activation>
+                <jdk>[9,)</jdk>
+            </activation>
+            <properties>
+                <java.runtime>${java.home}/jmods(!**.jar;!module-info.class)</java.runtime>
+            </properties>
+        </profile>
+    </profiles>
 
     <dependencies>
         <dependency>
@@ -77,6 +90,14 @@
                 <groupId>com.github.wvengen</groupId>
                 <artifactId>proguard-maven-plugin</artifactId>
                 <version>2.0.14</version>
+                <!-- https://github.com/wvengen/proguard-maven-plugin/issues/64 -->
+                <dependencies>
+                    <dependency>
+                        <groupId>net.sf.proguard</groupId>
+                        <artifactId>proguard-base</artifactId>
+                        <version>6.1.1</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -89,10 +110,9 @@
                     <includeDependencyInjar>true</includeDependencyInjar>
                     <outFilter>META-INF/MANIFEST.MF,!META-INF/**,!**.kotlin_*</outFilter>
                     <outjar>${project.artifactId}.jar</outjar>
-                    <libs>
-                        <lib>${java.home}/lib/rt.jar</lib>
-                    </libs>
                     <options>
+                        <!-- for some reason, the usual approach via configuration/libs/lib does not work -->
+                        <option>-libraryjars ${java.runtime}</option>
                         <!-- preserve entry point, otherwise output jar would be empty -->
                         <option>-keep public class ${main.class} { public static void main(java.lang.String[]); }</option>
                         <!-- remove compiler-generated null checks for unneeded Java->Kotlin interoperability -->
