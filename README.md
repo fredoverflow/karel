@@ -148,4 +148,5 @@ Run 'MainKt'
 * Editor > General > Code Folding
   * [ ] One-line methods
 * Editor > General > Appearance
+  * [ ] Caret blinking
   * [ ] Show intention bulb
