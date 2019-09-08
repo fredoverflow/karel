@@ -143,8 +143,8 @@ Run 'MainKt'
 * Keymap
   * Eclipse
 * Editor > Font
-  * Font: Source Code Pro
-  * Size: 16
+  * Font: Fira Code (`sudo apt install fonts-firacode`)
+  * Size: 20
 * Editor > General > Code Folding
   * [ ] One-line methods
 * Editor > General > Appearance
