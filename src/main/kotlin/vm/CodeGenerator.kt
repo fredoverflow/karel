@@ -8,7 +8,7 @@ typealias Address = Int
 
 class CodeGenerator(private val semantics: KarelSemantics) {
 
-    private val program: MutableList<Instruction> = vm.createInstructionBuffer()
+    private val program: MutableList<Instruction> = createInstructionBuffer()
 
     private val pc: Int
         get() = program.size

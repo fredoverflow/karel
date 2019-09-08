@@ -7,7 +7,7 @@ class KarelSemantics(val program: Program, entryPoint: String, val targetLevel: 
 
     val commands: Map<String, Command> = program.commands.associateBy { it.identifier.lexeme }
 
-    val calleesOf: Map<Command, List<Command>> = program.commands.associate { it to commandsCalledBy(it) }
+    val calleesOf: Map<Command, List<Command>> = program.commands.associateWith { commandsCalledBy(it) }
 
     private fun commandsCalledBy(command: Command): List<Command> {
         return callsInside(command).mapNotNull { (target) -> commands[target.lexeme] }

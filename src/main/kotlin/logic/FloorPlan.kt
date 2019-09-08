@@ -143,20 +143,20 @@ class FloorBuilder(walls: LongArray) : FloorPlan(walls) {
 
     fun buildHorizontalWall(x: Int, y: Int): FloorBuilder {
         if (y < Problem.HEIGHT) {
-            walls[y] = walls[y].or(bitmask(x, FloorPlan.WALL_NORTH))
+            walls[y] = walls[y].or(bitmask(x, WALL_NORTH))
         }
         if (y > 0) {
-            walls[y - 1] = walls[y - 1].or(bitmask(x, FloorPlan.WALL_SOUTH))
+            walls[y - 1] = walls[y - 1].or(bitmask(x, WALL_SOUTH))
         }
         return this
     }
 
     fun buildVerticalWall(x: Int, y: Int): FloorBuilder {
         if (x < Problem.WIDTH) {
-            walls[y] = walls[y].or(bitmask(x, FloorPlan.WALL_WEST))
+            walls[y] = walls[y].or(bitmask(x, WALL_WEST))
         }
         if (x > 0) {
-            walls[y] = walls[y].or(bitmask(x - 1, FloorPlan.WALL_EAST))
+            walls[y] = walls[y].or(bitmask(x - 1, WALL_EAST))
         }
         return this
     }

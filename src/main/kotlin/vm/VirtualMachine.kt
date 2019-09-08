@@ -12,7 +12,7 @@ const val TIMEOUT = 10000000000L
 // The first instruction starts at address 256.
 // This makes it easier to distinguish addresses
 // from truth values and loop counters on the stack.
-const val START = 256
+const val ENTRY_POINT = 256
 
 data class IllegalBytecode(val bytecode: Int) : Exception("%04x".format(bytecode))
 
@@ -22,9 +22,9 @@ class VirtualMachine(val program: List<Instruction>,
                      private val onReturn: () -> Unit,
                      private val onInfiniteLoop: () -> Unit) {
 
-    var pc: Int = vm.START
+    var pc: Int = ENTRY_POINT
         private set(value) {
-            if (field !in vm.START..program.size) throw IllegalArgumentException("$value")
+            if (field !in ENTRY_POINT..program.size) throw IllegalArgumentException("$value")
             field = value
         }
 
@@ -75,7 +75,7 @@ class VirtualMachine(val program: List<Instruction>,
     private fun stepUntil(targetDepth: Int) {
         val start = System.nanoTime()
         stepInto(false)
-        while ((callDepth > targetDepth) && (System.nanoTime() - start < vm.TIMEOUT)) {
+        while ((callDepth > targetDepth) && (System.nanoTime() - start < TIMEOUT)) {
             executeOneInstruction()
         }
         if (callDepth > targetDepth) {

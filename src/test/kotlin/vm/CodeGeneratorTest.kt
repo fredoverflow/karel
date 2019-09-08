@@ -22,7 +22,7 @@ class CodeGeneratorTest {
 
     private fun assertBytecode(sourceCode: String, vararg bytecodes: Int) {
         val expected = bytecodes.map { bytecode -> "%x".format(bytecode) }
-        val actual = compile(sourceCode).drop(vm.START).map { (bytecode) -> "%x".format(bytecode) }
+        val actual = compile(sourceCode).drop(ENTRY_POINT).map { (bytecode) -> "%x".format(bytecode) }
         assertEquals(expected, actual)
     }
 

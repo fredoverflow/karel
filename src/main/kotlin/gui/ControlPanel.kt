@@ -14,9 +14,9 @@ class ControlPanel(problems: List<Problem>) : VerticalBoxPanel() {
         maximumSize = minimumSize
     }
 
-    val start_stop_reset = JButton("start")
+    val startStopReset = JButton("start")
 
-    val firstRow = HorizontalBoxPanel(goal, problemPicker, start_stop_reset)
+    val firstRow = HorizontalBoxPanel(goal, problemPicker, startStopReset)
 
     val stepInto = JButton("step into (F12)")
     val stepOver = JButton("step over")
@@ -48,18 +48,18 @@ class ControlPanel(problems: List<Problem>) : VerticalBoxPanel() {
     fun executionStarted() {
         problemPicker.isEnabled = false
         goal.isEnabled = false
-        start_stop_reset.text = "stop"
+        startStopReset.text = "stop"
         setEnabledStepButtons(true)
     }
 
     fun executionFinished() {
         problemPicker.isEnabled = true
         goal.isEnabled = true
-        start_stop_reset.text = "reset"
+        startStopReset.text = "reset"
         setEnabledStepButtons(false)
     }
 
     fun isRunning(): Boolean {
-        return start_stop_reset.text === "stop"
+        return startStopReset.text === "stop"
     }
 }

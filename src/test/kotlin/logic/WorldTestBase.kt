@@ -14,7 +14,7 @@ open class WorldTestBase {
         val instructions = vm.createInstructionBuffer()
         instructions.addAll(problem.goal.map { vm.goalInstruction(it.toInt()) })
         initialWorld = problem.createWorld()
-        val atomicWorld = AtomicReference<World>(initialWorld)
+        val atomicWorld = AtomicReference(initialWorld)
         val virtualMachine = VirtualMachine(instructions, atomicWorld, this::push, this::pop, this::infiniteLoopDetected)
         try {
             virtualMachine.stepReturn()

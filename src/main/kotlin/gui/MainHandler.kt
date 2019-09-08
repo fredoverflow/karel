@@ -2,8 +2,6 @@ package gui
 
 import java.awt.event.KeyEvent
 
-import javax.swing.JFrame
-
 class MainHandler : MainFlow() {
     init {
         controlPanel.goal.addActionListener {
@@ -18,7 +16,7 @@ class MainHandler : MainFlow() {
         }
 
         controlPanel.problemPicker.addActionListener {
-            controlPanel.start_stop_reset.text = "start"
+            controlPanel.startStopReset.text = "start"
 
             initialWorld = currentProblem.createWorld()
             atomicWorld.set(initialWorld)
@@ -31,8 +29,8 @@ class MainHandler : MainFlow() {
             editor.requestFocusInWindow()
         }
 
-        controlPanel.start_stop_reset.addActionListener {
-            when (controlPanel.start_stop_reset.text) {
+        controlPanel.startStopReset.addActionListener {
+            when (controlPanel.startStopReset.text) {
                 "start" ->
                     parseAndExecute()
 
@@ -40,7 +38,7 @@ class MainHandler : MainFlow() {
                     stop()
 
                 "reset" -> {
-                    controlPanel.start_stop_reset.text = "start"
+                    controlPanel.startStopReset.text = "start"
                     atomicWorld.set(initialWorld)
                     worldPanel.repaint()
                 }
@@ -87,13 +85,13 @@ class MainHandler : MainFlow() {
                     if (controlPanel.isRunning()) {
                         stepInto()
                     } else {
-                        controlPanel.start_stop_reset.doClick()
+                        controlPanel.startStopReset.doClick()
                     }
                 }
             }
         }
 
-        defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+        defaultCloseOperation = EXIT_ON_CLOSE
 
         this.onWindowClosing {
             editor.tryToSaveCode()

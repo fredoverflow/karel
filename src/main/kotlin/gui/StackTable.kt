@@ -9,7 +9,7 @@ import javax.swing.table.AbstractTableModel
 class StackTable(font: Font) : JTable() {
     init {
         this.font = font
-        setAutoResizeMode(JTable.AUTO_RESIZE_OFF)
+        setAutoResizeMode(AUTO_RESIZE_OFF)
         model = StackTableModel()
 
         val column = columnModel.getColumn(0)

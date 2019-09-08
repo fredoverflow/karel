@@ -1,5 +1,7 @@
 package gui
 
+import kotlin.math.min
+
 private val command = Regex("""\p{javaJavaIdentifierStart}\p{javaJavaIdentifierPart}*\(\)""")
 private val reverse = Regex("""\)?\(?\p{javaJavaIdentifierPart}*\p{javaJavaIdentifierStart}""")
 
@@ -9,7 +11,7 @@ fun completeCommand(sourceCode: String, lineUntilCursor: String): List<String> {
         emptyList()
     } else {
         val lcp = longestCommonPrefixOf(suffixes)
-        if (!lcp.isEmpty()) {
+        if (lcp.isNotEmpty()) {
             listOf(lcp)
         } else {
             suffixes
@@ -34,7 +36,7 @@ private fun longestCommonPrefixOf(commands: List<String>): String {
 
 // TODO Is there an elegant AND EFFICIENT functional solution?
 private fun longestCommonPrefix(a: String, b: String): String {
-    val n = Math.min(a.length, b.length)
+    val n = min(a.length, b.length)
     var i = 0
     while ((i < n) && (a[i] == b[i])) {
         ++i
