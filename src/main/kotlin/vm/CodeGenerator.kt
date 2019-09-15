@@ -50,25 +50,18 @@ class CodeGenerator(private val semantics: KarelSemantics) {
         generateInstruction(RETURN, body.closingBrace)
     }
 
-    private fun removeNegations(): Int {
-        var parity = 0
-        while (lastInstruction.bytecode == NOT) {
+    private fun prepareForwardJump(token: Token): Int {
+        if (lastInstruction.bytecode != NOT) {
+            generateInstruction(J0MP, token)
+        } else {
             removeLastInstruction()
-            // If an odd number of NOTs is removed,
-            // parity is the bitmask that turns J0MP into J1MP and vice versa.
-            parity = parity xor (J0MP xor J1MP)
+            generateInstruction(J1MP, token)
         }
-        return parity
-    }
-
-    private fun prepareForwardJump(category: Int, token: Token): Int {
-        val parity = removeNegations()
-        generateInstruction(category xor parity, token)
         return pc - 1
     }
 
-    private fun patchForwardJump(from: Int) {
-        program[from] = program[from].withTarget(pc)
+    private fun patchForwardJumpFrom(origin: Int) {
+        program[origin] = program[origin].withTarget(pc)
     }
 
     private fun Statement.generate() {
@@ -79,36 +72,37 @@ class CodeGenerator(private val semantics: KarelSemantics) {
             is IfThenElse -> {
                 if (e1se == null) {
                     condition.generate()
-                    val over = prepareForwardJump(J0MP, iF)
+                    val over = prepareForwardJump(iF)
                     th3n.generate()
-                    patchForwardJump(over)
+                    patchForwardJumpFrom(over)
                 } else {
                     condition.generate()
-                    val overThen = prepareForwardJump(J0MP, iF)
+                    val overThen = prepareForwardJump(iF)
                     th3n.generate()
-                    val overElse = prepareForwardJump(JUMP, th3n.closingBrace)
-                    patchForwardJump(overThen)
+                    val overElse = pc
+                    generateInstruction(JUMP, th3n.closingBrace)
+                    patchForwardJumpFrom(overThen)
                     e1se.generate()
-                    patchForwardJump(overElse)
+                    patchForwardJumpFrom(overElse)
                 }
             }
             is While -> {
                 val back = pc
                 condition.generate()
-                val over = prepareForwardJump(J0MP, whi1e)
+                val over = prepareForwardJump(whi1e)
                 body.generate()
-                generateInstruction(JUMP or back, body.closingBrace)
-                patchForwardJump(over)
+                generateInstruction(JUMP + back, body.closingBrace)
+                patchForwardJumpFrom(over)
             }
             is Repeat -> {
-                generateInstruction(PUSH or times, repeat)
+                generateInstruction(PUSH + times, repeat)
                 val back = pc
                 body.generate()
-                generateInstruction(LOOP or back, body.closingBrace)
+                generateInstruction(LOOP + back, body.closingBrace)
             }
             is Call -> {
                 val builtin = builtinCommands[target.lexeme]
-                val bytecode = builtin ?: CALL or id(target.lexeme)
+                val bytecode = builtin ?: CALL + id(target.lexeme)
                 generateInstruction(bytecode, target)
             }
         }
@@ -116,8 +110,8 @@ class CodeGenerator(private val semantics: KarelSemantics) {
 
     private fun Condition.generate() {
         when (this) {
-            is False -> generateInstruction(PUSH or 0, fa1se)
-            is True -> generateInstruction(PUSH or 1, tru3)
+            is False -> generateInstruction(PUSH + 0, fa1se)
+            is True -> generateInstruction(PUSH + 1, tru3)
 
             is OnBeeper -> generateInstruction(ON_BEEPER, onBeeper)
             is BeeperAhead -> generateInstruction(BEEPER_AHEAD, beeperAhead)
@@ -127,7 +121,11 @@ class CodeGenerator(private val semantics: KarelSemantics) {
 
             is Not -> {
                 p.generate()
-                generateInstruction(NOT, not)
+                if (lastInstruction.bytecode != NOT) {
+                    generateInstruction(NOT, not)
+                } else {
+                    removeLastInstruction()
+                }
             }
 
             is Conjunction -> {
