@@ -8,40 +8,23 @@ import syntax.lexer.Lexer
 import syntax.parser.Parser
 import syntax.parser.program
 
-const val whileLoop = """
-void main() {
-    while (frontIsClear()) {
-        moveForward();
-    }
-}
-"""
-
-const val recursion = """
-void main() {
-    if (frontIsClear()) {
-        moveForward();
-        main();
-    }
-}
-"""
-
 class KarelSemanticsTest {
 
-    private fun analyze(sourceCode: String, targetLevel: Int): KarelSemantics {
+    private fun analyze(sourceCode: String): KarelSemantics {
         val lexer = Lexer(sourceCode)
         val parser = Parser(lexer)
         val program = parser.program()
-        return KarelSemantics(program, "main", targetLevel)
+        return KarelSemantics(program)
     }
 
-    private fun assertLegal(sourceCode: String, targetLevel: Int) {
-        val semantics = analyze(sourceCode, targetLevel)
+    private fun assertLegal(sourceCode: String) {
+        val semantics = analyze(sourceCode)
         val errors = semantics.errors()
         assertEquals(emptyList<Diagnostic>(), errors)
     }
 
-    private fun assertIllegal(messageSubstring: String, sourceCode: String, targetLevel: Int) {
-        val semantics = analyze(sourceCode, targetLevel)
+    private fun assertIllegal(messageSubstring: String, sourceCode: String) {
+        val semantics = analyze(sourceCode)
         val errors = semantics.errors()
         if (errors.isEmpty()) {
             fail("""no errors found, but expected at least one containing "$messageSubstring"""")
@@ -71,7 +54,7 @@ class KarelSemanticsTest {
 
         void c() {
         }
-        """, 1)
+        """)
 
         val commands = semantics.commands
         assertEquals(setOf("main", "a", "b", "c"), commands.keys)
@@ -98,7 +81,7 @@ class KarelSemanticsTest {
         void main() {
             dropBeeper();
         }
-        """, 3)
+        """)
     }
 
     @Test
@@ -110,29 +93,100 @@ class KarelSemanticsTest {
 
         void b() {
         }
-        """, 3)
+        """)
     }
 
     @Test
     fun whileLoopsAreForbiddenInWeek1() {
-        assertIllegal("while loop", whileLoop, 1)
+        assertIllegal("while loop", """
+        void karelsFirstProgram() {
+            moveToWall();
+        }
+
+        void moveToWall() {
+            while (frontIsClear()) {
+                moveForward();
+            }
+        }
+        """)
     }
 
     @Test
-    fun whileLoopsAreAllowedAfterWeek1() {
-        assertLegal(whileLoop, 2)
-        assertLegal(whileLoop, 3)
+    fun whileLoopsAreAllowedInWeek2() {
+        assertLegal("""
+        void hangTheLampions() {
+            moveToWall();
+        }
+
+        void moveToWall() {
+            while (frontIsClear()) {
+                moveForward();
+            }
+        }
+        """)
     }
 
     @Test
-    fun recursionIsForbiddenBeforeWeek3() {
-        assertIllegal("recursion", recursion, 1)
-        assertIllegal("recursion", recursion, 2)
+    fun whileLoopsAreAllowedInWeek3() {
+        assertLegal("""
+        void partyAgain() {
+            moveToWall();
+        }
+
+        void moveToWall() {
+            while (frontIsClear()) {
+                moveForward();
+            }
+        }
+        """)
+    }
+
+    @Test
+    fun recursionIsForbiddenInWeek1() {
+        assertIllegal("recursion", """
+        void karelsFirstProgram() {
+            moveToWall();
+        }
+
+        void moveToWall() {
+            if (frontIsClear()) {
+                moveForward();
+                moveToWall();
+            }
+        }
+        """)
+    }
+
+    @Test
+    fun recursionIsForbiddenInWeek2() {
+        assertIllegal("recursion", """
+        void hangTheLampions() {
+            moveToWall();
+        }
+
+        void moveToWall() {
+            if (frontIsClear()) {
+                moveForward();
+                moveToWall();
+            }
+        }
+        """)
     }
 
     @Test
     fun recursionIsAllowedInWeek3() {
-        assertLegal(recursion, 3)
+        assertLegal("""
+        void partyAgain() {
+            moveToWall();
+        }
+
+        void moveToWall() {
+            if (frontIsClear()) {
+                moveForward();
+                moveToWall();
+            }
+        }
+        """)
     }
 
     @Test
@@ -153,6 +207,6 @@ class KarelSemanticsTest {
         void c() {
             a();
         }
-        """, 2)
+        """)
     }
 }

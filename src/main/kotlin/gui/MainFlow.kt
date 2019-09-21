@@ -112,7 +112,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.crea
             val parser = Parser(lexer)
             val program = parser.program()
 
-            val semantics = KarelSemantics(program, currentProblem.name, currentProblem.level)
+            val semantics = KarelSemantics(program, currentProblem.name)
             val errors = semantics.errors()
             if (errors.isEmpty()) {
                 how(semantics)
