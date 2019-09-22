@@ -12,14 +12,8 @@ import java.security.MessageDigest
 
 class Editor : FreditorUI(Flexer, JavaIndenter.instance, 60, 1) {
     companion object {
-        // TODO Can this be refactored to a more readable raw string without causing platform issues?
-        // see https://stackoverflow.com/questions/46861701
-        val firstProgram = "/*\nF1 = moveForward();\nF2 = turnLeft();\nF3 = turnAround();\nF4 = turnRight();\nF5 = pickBeeper();\nF6 = dropBeeper();\n*/\n\nvoid karelsFirstProgram()\n{\n    // your code here\n    \n}\n"
-
-        val directory: String = "${System.getProperty("user.home")}/karel"
-        val filenamePrefix: String = "$directory/karel"
-        val filenameSuffix: String = ".txt"
-        val filename: String = "$filenamePrefix$filenameSuffix"
+        val directory = "${System.getProperty("user.home")}${File.separator}karel${File.separator}"
+        val filename = "${directory}!karel.txt"
     }
 
     init {
@@ -31,7 +25,21 @@ class Editor : FreditorUI(Flexer, JavaIndenter.instance, 60, 1) {
         try {
             loadFromFile(filename)
         } catch (ignored: IOException) {
-            loadFromString(firstProgram)
+            loadFromString("""/*
+F1 = moveForward();
+F2 = turnLeft();
+F3 = turnAround();
+F4 = turnRight();
+F5 = pickBeeper();
+F6 = dropBeeper();
+*/
+
+void karelsFirstProgram()
+{
+    // your code here
+    
+}
+""")
         }
     }
 
@@ -42,8 +50,9 @@ class Editor : FreditorUI(Flexer, JavaIndenter.instance, 60, 1) {
     }
 
     private fun createDirectory() {
-        if (File(directory).mkdir()) {
-            println("created directory $directory")
+        val dir = File(directory)
+        if (dir.mkdir()) {
+            println("created directory $dir")
         }
     }
 
@@ -60,14 +69,13 @@ class Editor : FreditorUI(Flexer, JavaIndenter.instance, 60, 1) {
         val sha1 = MessageDigest.getInstance("SHA")
         val text = text.toByteArray(Charsets.ISO_8859_1)
         val hash = sha1.digest(text)
-        val builder = StringBuilder(filenamePrefix)
-        builder.append('_')
+        val builder = StringBuilder(directory)
         for (byte in hash) {
             val x = byte.toInt()
             builder.append("0123456789abcdef"[x.ushr(4).and(15)])
             builder.append("0123456789abcdef"[x.and(15)])
         }
-        return builder.append(filenameSuffix).toString()
+        return builder.append(".txt").toString()
     }
 
     private fun listenToKeyboard() {
