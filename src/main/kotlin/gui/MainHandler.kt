@@ -94,7 +94,7 @@ class MainHandler : MainFlow() {
         defaultCloseOperation = EXIT_ON_CLOSE
 
         this.onWindowClosing {
-            editor.tryToSaveCode()
+            editor.autosaver.save()
         }
     }
 }

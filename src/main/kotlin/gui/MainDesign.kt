@@ -15,7 +15,7 @@ import javax.swing.Box
 import javax.swing.JFrame
 import javax.swing.JOptionPane
 
-open class MainDesign(val atomicWorld: AtomicReference<World>) : JFrame(Editor.filename) {
+open class MainDesign(val atomicWorld: AtomicReference<World>) : JFrame() {
 
     val controlPanel = ControlPanel(Problem.problems)
 
@@ -35,6 +35,7 @@ open class MainDesign(val atomicWorld: AtomicReference<World>) : JFrame(Editor.f
     val virtualMachinePanel = VirtualMachinePanel(Font(Font.MONOSPACED, Font.PLAIN, 16))
 
     init {
+        title = editor.autosaver.pathname
         add(left, BorderLayout.WEST)
         add(editorWithLineNumbers, BorderLayout.CENTER)
         add(virtualMachinePanel, BorderLayout.EAST)

@@ -1,31 +1,18 @@
 package gui
 
+import freditor.Autosaver
 import freditor.FreditorUI
 import freditor.JavaIndenter
 
 import java.awt.*
 import java.awt.event.KeyEvent
 import java.awt.geom.Line2D
-import java.io.File
-import java.io.IOException
-import java.security.MessageDigest
 
 class Editor : FreditorUI(Flexer, JavaIndenter.instance, 60, 1) {
-    companion object {
-        val directory = "${System.getProperty("user.home")}${File.separator}karel${File.separator}"
-        val filename = "${directory}!karel.txt"
-    }
+    val autosaver: Autosaver = newAutosaver("karel")
 
     init {
-        tryToLoadCode()
-        listenToKeyboard()
-    }
-
-    fun tryToLoadCode() {
-        try {
-            loadFromFile(filename)
-        } catch (ignored: IOException) {
-            loadFromString("""/*
+        autosaver.loadOrDefault("""/*
 F1 = moveForward();
 F2 = turnLeft();
 F3 = turnAround();
@@ -40,42 +27,7 @@ void karelsFirstProgram()
     
 }
 """)
-        }
-    }
-
-    fun tryToSaveCode() {
-        createDirectory()
-        tryToSaveCodeAs(filename)
-        tryToSaveCodeAs(backupFilename())
-    }
-
-    private fun createDirectory() {
-        val dir = File(directory)
-        if (dir.mkdir()) {
-            println("created directory $dir")
-        }
-    }
-
-    private fun tryToSaveCodeAs(pathname: String) {
-        try {
-            println("saving code as $pathname")
-            saveToFile(pathname)
-        } catch (ex: IOException) {
-            ex.printStackTrace()
-        }
-    }
-
-    private fun backupFilename(): String {
-        val sha1 = MessageDigest.getInstance("SHA")
-        val text = text.toByteArray(Charsets.ISO_8859_1)
-        val hash = sha1.digest(text)
-        val builder = StringBuilder(directory)
-        for (byte in hash) {
-            val x = byte.toInt()
-            builder.append("0123456789abcdef"[x.ushr(4).and(15)])
-            builder.append("0123456789abcdef"[x.and(15)])
-        }
-        return builder.append(".txt").toString()
+        listenToKeyboard()
     }
 
     private fun listenToKeyboard() {
