@@ -2,13 +2,11 @@ package gui
 
 import vm.Instruction
 
-import java.awt.Font
-
 import javax.swing.Box
 
-class VirtualMachinePanel(font: Font) : HorizontalBoxPanel() {
+class VirtualMachinePanel : HorizontalBoxPanel() {
 
-    private val stackTable = StackTable(font)
+    private val stackTable = StackTable()
     private val bytecodeTable = BytecodeTable()
 
     init {

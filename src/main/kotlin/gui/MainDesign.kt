@@ -8,7 +8,6 @@ import logic.World
 
 import java.awt.BorderLayout
 import java.awt.Dimension
-import java.awt.Font
 import java.util.concurrent.atomic.AtomicReference
 
 import javax.swing.Box
@@ -32,7 +31,7 @@ open class MainDesign(val atomicWorld: AtomicReference<World>) : JFrame() {
         editor.setComponentToRepaint(this)
     }
 
-    val virtualMachinePanel = VirtualMachinePanel(Font(Font.MONOSPACED, Font.PLAIN, 16))
+    val virtualMachinePanel = VirtualMachinePanel()
 
     init {
         title = editor.autosaver.pathname

@@ -64,9 +64,9 @@ void karelsFirstProgram()
 
     private var lines: Stack<Line2D.Double> = Stack.Nil
 
-    private val fontHeight = FreditorUI.fontHeight
-    private val fontWidth = FreditorUI.fontWidth
-    private val thickness = fontWidth - 2.0f
+    private val frontHeight = FreditorUI.frontHeight
+    private val frontWidth = FreditorUI.frontWidth
+    private val thickness = frontWidth - 2.0f
 
     private val stroke = BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
     private val color = Color(0x40ff0000, true)
@@ -81,9 +81,9 @@ void karelsFirstProgram()
     }
 
     private fun pushLine(callerLine: Int, calleeLine: Int) {
-        val x = 0.5 * thickness + lines.size() * fontWidth
-        val y1 = (callerLine - 0.5) * fontHeight
-        val y2 = (calleeLine - 0.5) * fontHeight
+        val x = 0.5 * thickness + lines.size() * frontWidth
+        val y1 = (callerLine - 0.5) * frontHeight
+        val y2 = (calleeLine - 0.5) * frontHeight
 
         val line = Line2D.Double(x, y1, x, y2)
         lines = lines.push(line)
@@ -110,7 +110,7 @@ void karelsFirstProgram()
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         graphics.stroke = stroke
         graphics.color = color
-        graphics.translate(0, -firstVisibleLine() * fontHeight)
+        graphics.translate(0, -firstVisibleLine() * frontHeight)
         if (!lines.isEmpty()) {
             lines.forEach(graphics::draw)
             graphics.draw(lines.top())
