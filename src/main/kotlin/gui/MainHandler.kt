@@ -20,7 +20,7 @@ class MainHandler : MainFlow() {
 
             initialWorld = currentProblem.createWorld()
             atomicWorld.set(initialWorld)
-			worldPanel.levelImagePath(currentProblem.levelImagePath)
+            worldPanel.levelImagePath(currentProblem.levelImagePath)
             worldPanel.binaryLines = currentProblem.binaryLines
             worldPanel.repaint()
 

@@ -2,12 +2,12 @@ package logic
 
 class Problem(val index: String, val name: String, val story: String, val goal: String, val binaryLines: Int, val createWorld: () -> World) {
     
-	constructor(index:String, name: String, story:String, goal:String, binaryLines:Int, levelPath: String, createWorld:() -> World ):
-			this(index,name,story,goal,binaryLines, createWorld) {
-		this.levelImagePath = levelPath;
-	}
+    constructor(index:String, name: String, story:String, goal:String, binaryLines:Int, levelPath: String, createWorld:() -> World ):
+            this(index,name,story,goal,binaryLines, createWorld) {
+        this.levelImagePath = levelPath;
+    }
 	
-	var levelImagePath: String = ""
+    var levelImagePath: String = ""
 	
 	val level: Int
         get() = index[0] - '0'

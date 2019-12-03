@@ -24,18 +24,18 @@ private fun readTile(size: Int, name: String): BufferedImage {
     return ImageIO.read(WorldPanel::class.java.getResourceAsStream("/tiles/$size/$name.png"))
 }
 
-private fun readTile(size: Int, level: String, name: String) : BufferedImage {
-	if(level.length > 0) {
-	    val resource = WorldPanel::class.java.getResourceAsStream("/tiles/$size/$level/$name.png")
-		if(resource != null) {
-			return ImageIO.read(resource)
-		}
-	}
-	return readTile(size, name);
+private fun readTile(size: Int, level: String, name: String): BufferedImage {
+    if (level.length > 0) {
+        val resource = WorldPanel::class.java.getResourceAsStream("/tiles/$size/$level/$name.png")
+        if (resource != null) {
+            return ImageIO.read(resource)
+        }
+    }
+    return readTile(size, name);
 }
 
 private fun BufferedImage.rotatedCounterclockwise(): BufferedImage {
-	val tx = AffineTransform()
+    val tx = AffineTransform()
     tx.rotate(Math.toRadians(-90.0), width / 2.0, height / 2.0)
     return AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR).filter(this, null)
 }
@@ -57,16 +57,16 @@ class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
     private var karels = emptyArray<BufferedImage>()
     private var walls = emptyArray<BufferedImage>()
 	
-	private var levelPath = ""
+    private var levelPath = ""
 	
-	fun levelImagePath(path : String ) {
+    fun levelImagePath(path : String ) {
 		
-		if(path != levelPath) {
-		    levelPath = path
+        if(path != levelPath) {
+            levelPath = path
             initializeBeeper()
-		    initializeKarels()
-		}
-	}
+            initializeKarels()
+        }
+    }
 
     private fun initialize() {
         initializeBeeper()
@@ -79,9 +79,9 @@ class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
         maximumSize = panelSize
     }
 	
-	private fun initializeBeeper() {
-		 beeper = readTile(tileSize, levelPath, "beeper")
-	}
+    private fun initializeBeeper() {
+        beeper = readTile(tileSize, levelPath, "beeper")
+    }
 
     private fun initializeKarels() {
         val east = readTile(tileSize, levelPath,  "karel")
