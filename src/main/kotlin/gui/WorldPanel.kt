@@ -14,6 +14,8 @@ import java.util.concurrent.atomic.AtomicReference
 import javax.imageio.ImageIO
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
+import java.awt.geom.AffineTransform
+import java.awt.image.AffineTransformOp
 
 private const val TILE_SIZE_MEDIUM = 40
 private const val TILE_SIZE_LARGE = 64
@@ -22,22 +24,28 @@ private fun readTile(size: Int, name: String): BufferedImage {
     return ImageIO.read(WorldPanel::class.java.getResourceAsStream("/tiles/$size/$name.png"))
 }
 
-private fun BufferedImage.rotatedCounterclockwise(): BufferedImage {
-    require(width == height) { "image is not a square" }
-
-    val tileSize = width
-    val src = IntArray(tileSize * tileSize)
-    val dst = IntArray(tileSize * tileSize)
-    getRGB(0, 0, tileSize, tileSize, src, 0, tileSize)
-    for (y in 0 until tileSize) {
-        for (x in 0 until tileSize) {
-            dst[y * tileSize + x] = src[x * tileSize + (tileSize - 1 - y)]
-        }
-    }
-    val rotated = BufferedImage(tileSize, tileSize, BufferedImage.TYPE_INT_ARGB)
-    rotated.setRGB(0, 0, tileSize, tileSize, dst, 0, tileSize)
-    return rotated
+private fun readTile(size: Int, level: String, name: String) : BufferedImage {
+	if(level.length > 0) {
+	    val resource = WorldPanel::class.java.getResourceAsStream("/tiles/$size/$level/$name.png")
+		if(resource != null) {
+			return ImageIO.read(resource)
+		}
+	}
+	return readTile(size, name);
 }
+
+private fun BufferedImage.rotatedCounterclockwise(): BufferedImage {
+	val tx = AffineTransform()
+    tx.rotate(Math.toRadians(-90.0), width / 2.0, height / 2.0)
+    return AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR).filter(this, null)
+}
+
+private fun BufferedImage.mirrorImage(): BufferedImage {
+    val tx = AffineTransform.getScaleInstance(-1.0, 1.0)
+    tx.translate(- width.toDouble(), 0.0);
+    return AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR).filter(this, null)
+}
+
 
 class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
 
@@ -48,9 +56,20 @@ class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
     private var beeper = BufferedImage(tileSize, tileSize, BufferedImage.TYPE_INT_ARGB)
     private var karels = emptyArray<BufferedImage>()
     private var walls = emptyArray<BufferedImage>()
+	
+	private var levelPath = ""
+	
+	fun levelImagePath(path : String ) {
+		
+		if(path != levelPath) {
+		    levelPath = path
+            initializeBeeper()
+		    initializeKarels()
+		}
+	}
 
     private fun initialize() {
-        beeper = readTile(tileSize, "beeper")
+        initializeBeeper()
         initializeKarels()
         initializeWalls()
 
@@ -59,11 +78,15 @@ class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
         preferredSize = panelSize
         maximumSize = panelSize
     }
+	
+	private fun initializeBeeper() {
+		 beeper = readTile(tileSize, levelPath, "beeper")
+	}
 
     private fun initializeKarels() {
-        val east = readTile(tileSize, "karel")
+        val east = readTile(tileSize, levelPath,  "karel")
         val north = east.rotatedCounterclockwise()
-        val west = north.rotatedCounterclockwise()
+        val west = east.mirrorImage()
         val south = west.rotatedCounterclockwise()
 
         karels = arrayOf(east, north, west, south)
