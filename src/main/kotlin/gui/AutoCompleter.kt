@@ -5,8 +5,8 @@ import kotlin.math.min
 private val command = Regex("""\p{javaJavaIdentifierStart}\p{javaJavaIdentifierPart}*\(\)""")
 private val reverse = Regex("""\)?\(?\p{javaJavaIdentifierPart}*\p{javaJavaIdentifierStart}""")
 
-fun completeCommand(sourceCode: String, lineUntilCursor: String): List<String> {
-    val suffixes = fittingSuffixes(sourceCode, lineUntilCursor)
+fun completeCommand(sourceCode: String, lineBeforeSelection: String): List<String> {
+    val suffixes = fittingSuffixes(sourceCode, lineBeforeSelection)
     return if (suffixes.isEmpty()) {
         emptyList()
     } else {
@@ -19,8 +19,8 @@ fun completeCommand(sourceCode: String, lineUntilCursor: String): List<String> {
     }
 }
 
-private fun fittingSuffixes(sourceCode: String, lineUntilCursor: String): List<String> {
-    val prefix = reverse.find(lineUntilCursor.reversed())?.value.orEmpty().reversed()
+private fun fittingSuffixes(sourceCode: String, lineBeforeSelection: String): List<String> {
+    val prefix = reverse.find(lineBeforeSelection.reversed())?.value.orEmpty().reversed()
     val prefixLength = prefix.length
 
     val allCommands = command.findAll(sourceCode).map(MatchResult::value).toMutableList()

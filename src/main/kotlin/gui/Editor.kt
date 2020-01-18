@@ -48,7 +48,7 @@ void karelsFirstProgram()
                 KeyEvent.VK_F11 -> insertString("rightIsClear()")
 
                 KeyEvent.VK_SPACE -> if (event.isControlDown) {
-                    val suffixes = completeCommand(text, lineUntilCursor)
+                    val suffixes = completeCommand(text, lineBeforeSelection)
                     when (suffixes.size) {
                         0 -> {
                         }
