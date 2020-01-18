@@ -30,19 +30,30 @@ void karelsFirstProgram()
         listenToKeyboard()
     }
 
+    fun insertCommand(command: String) {
+        if (lineBeforeSelection.all(Char::isWhitespace)) {
+            insertString(command)
+        } else {
+            simulateEnter()
+            insertString(command)
+            // remove the commit between simulateEnter and insertString,
+            // effectively committing both changes as a single commit
+            uncommit()
+        }
+    }
+
     private fun listenToKeyboard() {
         onKeyPressed { event ->
             when (event.keyCode) {
-                KeyEvent.VK_F1 -> insertString("moveForward();")
-                KeyEvent.VK_F2 -> insertString("turnLeft();")
-                KeyEvent.VK_F3 -> insertString("turnAround();")
-                KeyEvent.VK_F4 -> insertString("turnRight();")
+                KeyEvent.VK_F1 -> insertCommand("moveForward();")
+                KeyEvent.VK_F2 -> insertCommand("turnLeft();")
+                KeyEvent.VK_F3 -> insertCommand("turnAround();")
+                KeyEvent.VK_F4 -> insertCommand("turnRight();")
+                KeyEvent.VK_F5 -> insertCommand("pickBeeper();")
+                KeyEvent.VK_F6 -> insertCommand("dropBeeper();")
 
-                KeyEvent.VK_F5 -> insertString("pickBeeper();")
-                KeyEvent.VK_F6 -> insertString("dropBeeper();")
                 KeyEvent.VK_F7 -> insertString("onBeeper()")
                 KeyEvent.VK_F8 -> insertString("beeperAhead()")
-
                 KeyEvent.VK_F9 -> insertString("leftIsClear()")
                 KeyEvent.VK_F10 -> insertString("frontIsClear()")
                 KeyEvent.VK_F11 -> insertString("rightIsClear()")
