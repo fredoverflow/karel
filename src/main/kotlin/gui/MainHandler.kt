@@ -25,7 +25,7 @@ class MainHandler : MainFlow() {
 
             story.loadFromString(currentProblem.story)
 
-            editor.setCursorTo("void ${currentProblem.name}()")
+            editor.setCursorTo("""\bvoid\s+(${currentProblem.name})\b""", 1)
             editor.requestFocusInWindow()
         }
 
