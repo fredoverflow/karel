@@ -59,14 +59,11 @@ void karelsFirstProgram()
                 KeyEvent.VK_F11 -> insertString("rightIsClear()")
 
                 KeyEvent.VK_SPACE -> if (event.isControlDown) {
-                    val suffixes = completeCommand(text, lineBeforeSelection)
-                    when (suffixes.size) {
-                        0 -> {
-                        }
-
-                        1 -> insertString(suffixes[0])
-
-                        else -> println(suffixes.joinToString(", "))
+                    val suffixes = autocompleteCall(text, lineBeforeSelection)
+                    if (suffixes.size == 1) {
+                        insertString(suffixes[0])
+                    } else {
+                        println(suffixes.sorted().joinToString(", "))
                     }
                 }
             }
