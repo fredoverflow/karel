@@ -66,6 +66,8 @@ F12   start / step into / reset
 
 Tab or Enter   auto-indent
 Ctrl Space     auto-complete
+Alt Shift R    rename command
+
 Ctrl D         delete line
 
 Ctrl C         copy

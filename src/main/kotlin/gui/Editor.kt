@@ -3,10 +3,15 @@ package gui
 import freditor.Autosaver
 import freditor.FreditorUI
 import freditor.JavaIndenter
+import syntax.lexer.keywords
+import vm.builtinCommands
 
 import java.awt.*
 import java.awt.event.KeyEvent
 import java.awt.geom.Line2D
+import javax.swing.JOptionPane
+
+private val NAME = Regex("""[A-Z_a-z][0-9A-Z_a-z]*""")
 
 class Editor : FreditorUI(Flexer, JavaIndenter.instance, 60, 1) {
     val autosaver: Autosaver = newAutosaver("karel")
@@ -59,12 +64,33 @@ void karelsFirstProgram()
                 KeyEvent.VK_F11 -> insertString("rightIsClear()")
 
                 KeyEvent.VK_SPACE -> if (event.isControlDown) {
-                    val suffixes = autocompleteCall(text, lineBeforeSelection)
-                    if (suffixes.size == 1) {
-                        insertString(suffixes[0])
-                    } else {
-                        println(suffixes.sorted().joinToString(", "))
-                    }
+                    autocompleteCall()
+                }
+
+                KeyEvent.VK_R -> if (event.isAltDown && event.isShiftDown) {
+                    renameCommand()
+                }
+            }
+        }
+    }
+
+    private fun autocompleteCall() {
+        val suffixes = autocompleteCall(text, lineBeforeSelection)
+        if (suffixes.size == 1) {
+            insertString(suffixes[0])
+        } else {
+            println(suffixes.sorted().joinToString(", "))
+        }
+    }
+
+    private fun renameCommand() {
+        val oldName = symbolNearCursor(Flexer.IDENTIFIER_TAIL)
+        if (oldName.isNotEmpty() && oldName !in keywords && oldName !in builtinCommands) {
+            val input = JOptionPane.showInputDialog(this, oldName, "rename command", JOptionPane.QUESTION_MESSAGE, null, null, oldName)
+            if (input != null) {
+                val newName = input.toString()
+                if (NAME.matches(newName) && newName !in keywords && newName !in builtinCommands) {
+                    replace("""$oldName(\s*\(\s*\))""", "$newName$1")
                 }
             }
         }

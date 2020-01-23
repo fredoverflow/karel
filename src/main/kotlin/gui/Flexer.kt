@@ -20,7 +20,7 @@ object Flexer : freditor.Flexer() {
     private val NUMBER_TAIL = FlexerState("09", THIS)
     private val NUMBER_HEAD = NUMBER_TAIL.head()
 
-    private val IDENTIFIER_TAIL = FlexerState("09AZ__az", THIS)
+    val IDENTIFIER_TAIL = FlexerState("09AZ__az", THIS)
     private val IDENTIFIER_HEAD = IDENTIFIER_TAIL.head()
 
     private val START = FlexerStateBuilder()

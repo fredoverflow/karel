@@ -1,5 +1,7 @@
 package vm
 
+import freditor.persistent.ChampMap
+
 data class Instruction(val bytecode: Int, val position: Int) {
 
     val category: Int
@@ -95,13 +97,13 @@ const val JUMP = 0xb000
 const val J0MP = 0xc000
 const val J1MP = 0xd000
 
-val builtinCommands = mapOf(
-        "moveForward" to MOVE_FORWARD,
-        "turnLeft" to TURN_LEFT,
-        "turnAround" to TURN_AROUND,
-        "turnRight" to TURN_RIGHT,
-        "pickBeeper" to PICK_BEEPER,
-        "dropBeeper" to DROP_BEEPER)
+val builtinCommands: ChampMap<String, Int> = ChampMap.of(
+        "moveForward", MOVE_FORWARD,
+        "turnLeft", TURN_LEFT,
+        "turnAround", TURN_AROUND,
+        "turnRight", TURN_RIGHT,
+        "pickBeeper", PICK_BEEPER,
+        "dropBeeper", DROP_BEEPER)
 
 private val basicGoalInstructions = Array(XOR + 1) { Instruction(it, 0) }
 
