@@ -52,10 +52,10 @@ class CodeGenerator(private val semantics: KarelSemantics) {
 
     private fun prepareForwardJump(token: Token): Int {
         if (lastInstruction.bytecode != NOT) {
-            generateInstruction(J0MP, token)
+            generateInstruction(ELSE, token)
         } else {
             removeLastInstruction()
-            generateInstruction(J1MP, token)
+            generateInstruction(THEN, token)
         }
         return pc - 1
     }
@@ -110,8 +110,8 @@ class CodeGenerator(private val semantics: KarelSemantics) {
 
     private fun Condition.generate() {
         when (this) {
-            is False -> generateInstruction(PUSH + 0, fa1se)
-            is True -> generateInstruction(PUSH + 1, tru3)
+            is False -> generateInstruction(FALSE, fa1se)
+            is True -> generateInstruction(TRUE, tru3)
 
             is OnBeeper -> generateInstruction(ON_BEEPER, onBeeper)
             is BeeperAhead -> generateInstruction(BEEPER_AHEAD, beeperAhead)

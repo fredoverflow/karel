@@ -53,13 +53,17 @@ data class Instruction(val bytecode: Int, val position: Int) {
             XOR -> "XOR"
 
             else -> when (category) {
-                PUSH -> "PUSH %03x".format(target)
+                PUSH -> when (target) {
+                    0 -> "FALSE"
+                    1 -> "TRUE"
+                    else -> "PUSH %03x".format(target)
+                }
                 LOOP -> "LOOP %03x".format(target)
                 CALL -> "CALL %03x".format(target)
 
                 JUMP -> "JUMP %03x".format(target)
-                J0MP -> "J0MP %03x".format(target)
-                J1MP -> "J1MP %03x".format(target)
+                ELSE -> "ELSE %03x".format(target)
+                THEN -> "THEN %03x".format(target)
 
                 else -> throw IllegalBytecode(bytecode)
             }
@@ -90,12 +94,14 @@ const val XOR = 0x000f
 const val NORM = 0x0000
 
 const val PUSH = 0x8000
+const val FALSE = PUSH + 0
+const val TRUE = PUSH + 1
 const val LOOP = 0x9000
 const val CALL = 0xa000
 
 const val JUMP = 0xb000
-const val J0MP = 0xc000
-const val J1MP = 0xd000
+const val ELSE = 0xc000
+const val THEN = 0xd000
 
 val builtinCommands: ChampMap<String, Int> = ChampMap.of(
         "moveForward", MOVE_FORWARD,

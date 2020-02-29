@@ -130,7 +130,7 @@ class CodeGeneratorTest {
                 }
             }
             """,
-                ON_BEEPER, J0MP + 0x103,
+                ON_BEEPER, ELSE + 0x103,
                 PICK_BEEPER,
                 RETURN)
     }
@@ -144,7 +144,7 @@ class CodeGeneratorTest {
                 }
             }
             """,
-                ON_BEEPER, J1MP + 0x103,
+                ON_BEEPER, THEN + 0x103,
                 DROP_BEEPER,
                 RETURN)
     }
@@ -160,7 +160,7 @@ class CodeGeneratorTest {
                 }
             }
             """,
-                ON_BEEPER, J0MP + 0x104,
+                ON_BEEPER, ELSE + 0x104,
                 PICK_BEEPER,
                 JUMP + 0x105,
                 DROP_BEEPER,
@@ -178,7 +178,7 @@ class CodeGeneratorTest {
                 }
             }
             """,
-                ON_BEEPER, J1MP + 0x104,
+                ON_BEEPER, THEN + 0x104,
                 DROP_BEEPER,
                 JUMP + 0x105,
                 PICK_BEEPER,
@@ -198,7 +198,7 @@ class CodeGeneratorTest {
                 FRONT_IS_CLEAR, NOT,
                 RIGHT_IS_CLEAR, NOT,
                 AND, AND,
-                J0MP + 0x10a,
+                ELSE + 0x10a,
                 TURN_AROUND,
                 RETURN)
     }
@@ -213,7 +213,7 @@ class CodeGeneratorTest {
             }
             """,
                 LEFT_IS_CLEAR, FRONT_IS_CLEAR, RIGHT_IS_CLEAR,
-                OR, OR, J1MP + 0x107,
+                OR, OR, THEN + 0x107,
                 TURN_AROUND,
                 RETURN)
     }
@@ -232,12 +232,12 @@ class CodeGeneratorTest {
                 }
             }
             """,
-                LEFT_IS_CLEAR, J0MP + 0x104,
+                LEFT_IS_CLEAR, ELSE + 0x104,
                 TURN_LEFT,
                 JUMP + 0x10c,
-                FRONT_IS_CLEAR, J0MP + 0x107,
+                FRONT_IS_CLEAR, ELSE + 0x107,
                 JUMP + 0x10c,
-                RIGHT_IS_CLEAR, J0MP + 0x10b,
+                RIGHT_IS_CLEAR, ELSE + 0x10b,
                 TURN_RIGHT,
                 JUMP + 0x10c,
                 TURN_AROUND,
@@ -254,7 +254,7 @@ class CodeGeneratorTest {
                 }
             }
             """,
-                BEEPER_AHEAD, J0MP + 0x105,
+                BEEPER_AHEAD, ELSE + 0x105,
                 MOVE_FORWARD,
                 PICK_BEEPER,
                 JUMP + 0x100,
@@ -274,7 +274,7 @@ class CodeGeneratorTest {
                 }
             }
             """,
-                FRONT_IS_CLEAR, J1MP + 0x104,
+                FRONT_IS_CLEAR, THEN + 0x104,
                 TURN_AROUND,
                 JUMP + 0x107,
                 MOVE_FORWARD,
@@ -292,7 +292,7 @@ class CodeGeneratorTest {
                 }
             }
             """,
-                ON_BEEPER, J1MP + 0x103,
+                ON_BEEPER, THEN + 0x103,
                 DROP_BEEPER,
                 RETURN)
     }
@@ -306,7 +306,7 @@ class CodeGeneratorTest {
                 }
             }
             """,
-                FRONT_IS_CLEAR, J0MP + 0x103,
+                FRONT_IS_CLEAR, ELSE + 0x103,
                 MOVE_FORWARD,
                 RETURN)
     }
@@ -320,8 +320,8 @@ class CodeGeneratorTest {
                 }
             }
             """,
-                PUSH + 1,
-                J0MP + 0x104,
+                TRUE,
+                ELSE + 0x104,
                 TURN_LEFT,
                 JUMP + 0x100,
                 RETURN)
@@ -338,8 +338,8 @@ class CodeGeneratorTest {
                 }
             }
             """,
-                PUSH + 0,
-                J0MP + 0x105,
+                FALSE,
+                ELSE + 0x105,
                 TURN_AROUND,
                 MOVE_FORWARD,
                 TURN_AROUND,

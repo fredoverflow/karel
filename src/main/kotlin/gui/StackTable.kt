@@ -2,13 +2,14 @@ package gui
 
 import common.Stack
 import freditor.Front
+import vm.StackValue
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Graphics
 import javax.swing.JComponent
 
 class StackTable : JComponent() {
-    private var stack: Stack<Int> = Stack.Nil
+    private var stack: Stack<StackValue> = Stack.Nil
 
     init {
         resize(0)
@@ -22,7 +23,7 @@ class StackTable : JComponent() {
         revalidate()
     }
 
-    fun setStack(stack: Stack<Int>) {
+    fun setStack(stack: Stack<StackValue>) {
         if (stack !== this.stack) {
             val newSize = stack.size()
             val oldSize = this.stack.size()
@@ -41,7 +42,7 @@ class StackTable : JComponent() {
         var y = 0
         val frontHeight = Front.front.height
         stack.forEach { stackValue ->
-            Front.front.drawString(g, 0, y, " %3x".format(stackValue), 0)
+            Front.front.drawString(g, 0, y, stackValue.toString(), stackValue.color)
             y += frontHeight
         }
     }

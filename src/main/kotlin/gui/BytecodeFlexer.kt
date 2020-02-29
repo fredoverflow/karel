@@ -21,7 +21,7 @@ object BytecodeFlexer : freditor.Flexer() {
                     "MOVE", "TRNL", "TRNA", "TRNR", "PICK", "DROP",
                     "BEEP", "HEAD", "LCLR", "FCLR", "RCLR",
                     "NOT", "AND", "OR", "XOR",
-                    "PUSH", "LOOP", "CALL", "JUMP", "J0MP", "J1MP")
+                    "PUSH", "FALSE", "TRUE", "LOOP", "CALL", "JUMP", "ELSE", "THEN")
             .setDefault(ERROR)
 
     override fun start(): FlexerState = START
@@ -34,8 +34,8 @@ object BytecodeFlexer : freditor.Flexer() {
     private val lexemeColors = ChampMap.of(ERROR, 0x808080)
             .put(NUMBER_HEAD, NUMBER_TAIL, 0x6400c8)
             .put(START.read("@", "CODE", "MNEMONIC"), 0x808080)
-            .put(START.read("BEEP", "HEAD", "LCLR", "FCLR", "RCLR", "NOT", "AND", "OR", "XOR", "PUSH"), 0x000080)
-            .put(START.read("RET", "LOOP", "CALL", "JUMP", "J0MP", "J1MP"), 0x400000)
+            .put(START.read("BEEP", "HEAD", "LCLR", "FCLR", "RCLR", "NOT", "AND", "OR", "XOR", "PUSH", "FALSE", "TRUE"), 0x000080)
+            .put(START.read("RET", "LOOP", "CALL", "JUMP", "ELSE", "THEN"), 0x400000)
 
     private val afterNewline = lexemeColors
             .put(NUMBER_HEAD, NUMBER_TAIL, 0x808080)

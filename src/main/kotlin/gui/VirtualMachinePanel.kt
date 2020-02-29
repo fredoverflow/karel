@@ -2,6 +2,7 @@ package gui
 
 import common.Stack
 import vm.Instruction
+import vm.StackValue
 
 import javax.swing.Box
 
@@ -24,7 +25,7 @@ class VirtualMachinePanel : HorizontalBoxPanel() {
         bytecodeTable.setProgram(program)
     }
 
-    fun update(pc: Int, stack: Stack<Int>) {
+    fun update(pc: Int, stack: Stack<StackValue>) {
         stackTable.setStack(stack)
         bytecodeTable.highlightLine(pc)
     }

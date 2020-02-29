@@ -40,8 +40,8 @@ class InstructionTest {
         assertNoPause(LOOP, GOAL)
         assertNoPause(CALL, GOAL)
         assertNoPause(JUMP, GOAL)
-        assertNoPause(J0MP, GOAL)
-        assertNoPause(J1MP, GOAL)
+        assertNoPause(ELSE, GOAL)
+        assertNoPause(THEN, GOAL)
     }
 
     @Test
@@ -51,7 +51,7 @@ class InstructionTest {
         assertPause(LOOP, HUMAN)
         assertPause(CALL, HUMAN)
         assertNoPause(JUMP, HUMAN)
-        assertPause(J0MP, HUMAN)
-        assertPause(J1MP, HUMAN)
+        assertPause(ELSE, HUMAN)
+        assertPause(THEN, HUMAN)
     }
 }
