@@ -6,7 +6,7 @@ import vm.VirtualMachine
 
 import java.util.concurrent.atomic.AtomicReference
 
-open class WorldTestBase {
+open class WorldTestBase : VirtualMachine.Callbacks {
     protected var initialWorld: World = Problem.emptyWorld
     protected var world: World = Problem.emptyWorld
 
@@ -15,7 +15,7 @@ open class WorldTestBase {
         instructions.addAll(problem.goal.map { vm.goalInstruction(it.toInt()) })
         initialWorld = problem.createWorld()
         val atomicWorld = AtomicReference(initialWorld)
-        val virtualMachine = VirtualMachine(instructions, atomicWorld, this::push, this::pop, this::infiniteLoopDetected)
+        val virtualMachine = VirtualMachine(instructions, atomicWorld, this)
         try {
             virtualMachine.stepReturn()
         } catch (error: AssertionError) {
@@ -26,13 +26,7 @@ open class WorldTestBase {
         world = atomicWorld.get()
     }
 
-    private fun push(callerPosition: Int, calleePosition: Int) {
-    }
-
-    private fun pop() {
-    }
-
-    private fun infiniteLoopDetected() {
+    override fun onInfiniteLoop() {
         fail("infinite loop detected")
     }
 

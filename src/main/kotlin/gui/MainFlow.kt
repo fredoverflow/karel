@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 import javax.swing.Timer
 
-open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.createWorld())) {
+open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.createWorld())), VirtualMachine.Callbacks {
 
     val currentProblem: Problem
         get() = controlPanel.problemPicker.selectedItem as Problem
@@ -53,7 +53,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.crea
 
     fun start(instructions: List<Instruction>) {
         virtualMachinePanel.setProgram(instructions)
-        virtualMachine = VirtualMachine(instructions, atomicWorld, editor::push, editor::pop, this::infiniteLoopDetected)
+        virtualMachine = VirtualMachine(instructions, atomicWorld, this)
         controlPanel.executionStarted()
         update()
         if (delay() >= 0) {
@@ -69,7 +69,15 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.crea
         editor.requestFocusInWindow()
     }
 
-    fun infiniteLoopDetected() {
+    override fun onCall(callerPosition: Int, calleePosition: Int) {
+        editor.push(callerPosition, calleePosition)
+    }
+
+    override fun onReturn() {
+        editor.pop()
+    }
+
+    override fun onInfiniteLoop() {
         showErrorDialog("Please check your program for infinite loops!", "Timeout expired")
     }
 

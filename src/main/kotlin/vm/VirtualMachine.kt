@@ -16,11 +16,15 @@ const val ENTRY_POINT = 256
 
 data class IllegalBytecode(val bytecode: Int) : Exception("%04x".format(bytecode))
 
-class VirtualMachine(val program: List<Instruction>,
+class VirtualMachine(private val program: List<Instruction>,
                      private val atomicWorld: AtomicReference<World>,
-                     private val onCall: (Int, Int) -> Unit,
-                     private val onReturn: () -> Unit,
-                     private val onInfiniteLoop: () -> Unit) {
+                     private val callbacks: Callbacks) {
+
+    interface Callbacks {
+        fun onCall(callerPosition: Int, calleePosition: Int) {}
+        fun onReturn() {}
+        fun onInfiniteLoop() {}
+    }
 
     var pc: Int = ENTRY_POINT
         private set(value) {
@@ -79,7 +83,7 @@ class VirtualMachine(val program: List<Instruction>,
             executeOneInstruction()
         }
         if (callDepth > targetDepth) {
-            onInfiniteLoop()
+            callbacks.onInfiniteLoop()
         }
     }
 
@@ -118,14 +122,14 @@ class VirtualMachine(val program: List<Instruction>,
 
     private fun Instruction.executeCall() {
         val returnInstruction = program.asSequence().drop(target).find { it.bytecode == RETURN }
-        onCall(position, returnInstruction!!.position)
+        callbacks.onCall(position, returnInstruction!!.position)
         push(pc)
         ++callDepth
         pc = target
     }
 
     private fun executeReturn() {
-        onReturn()
+        callbacks.onReturn()
         pc = pop()
         --callDepth
     }
