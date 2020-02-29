@@ -1,7 +1,7 @@
 package vm
 
-import gui.Stack
-import gui.push
+import common.Stack
+import common.push
 import logic.World
 import java.util.concurrent.atomic.AtomicReference
 

@@ -1,5 +1,6 @@
 package gui
 
+import common.Stack
 import java.awt.Dimension
 
 import javax.swing.JTable

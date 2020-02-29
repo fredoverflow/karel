@@ -1,5 +1,7 @@
 package gui
 
+import common.Stack
+import common.push
 import freditor.Autosaver
 import freditor.FreditorUI
 import freditor.JavaIndenter

@@ -1,5 +1,6 @@
 package gui
 
+import common.Stack
 import vm.Instruction
 
 import javax.swing.Box

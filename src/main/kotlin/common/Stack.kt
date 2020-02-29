@@ -1,4 +1,4 @@
-package gui
+package common
 
 sealed class Stack<out T> {
     abstract fun isEmpty(): Boolean
