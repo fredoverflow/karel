@@ -1,44 +1,48 @@
 package gui
 
 import common.Stack
+import freditor.Front
+import java.awt.Color
 import java.awt.Dimension
+import java.awt.Graphics
+import javax.swing.JComponent
 
-import javax.swing.JTable
-import javax.swing.table.AbstractTableModel
+class StackTable : JComponent() {
+    private var stack: Stack<Int> = Stack.Nil
 
-class StackTable : JTable() {
     init {
-        setAutoResizeMode(AUTO_RESIZE_OFF)
-        model = StackTableModel()
+        resize(0)
+    }
 
-        val column = columnModel.getColumn(0)
-        val renderer = getDefaultRenderer(dataModel.getColumnClass(0))
-        val component = renderer.getTableCellRendererComponent(this, "stack", false, false, 0, 0)
-        column.preferredWidth = component.preferredSize.width
-        column.resizable = false
-
-        preferredViewportSize = Dimension(columnModel.getColumn(0).preferredWidth, 1)
-        fillsViewportHeight = true
+    private fun resize(rows: Int) {
+        val dimension = Dimension(Front.front.width * 5, Front.front.height * rows)
+        minimumSize = dimension
+        maximumSize = dimension
+        preferredSize = dimension
+        revalidate()
     }
 
     fun setStack(stack: Stack<Int>) {
-        (dataModel as StackTableModel).stack = stack
-    }
-}
-
-class StackTableModel : AbstractTableModel() {
-
-    var stack: Stack<Int> = Stack.Nil
-        set(value) {
-            if (field !== value) {
-                field = value
-                fireTableDataChanged()
+        if (stack !== this.stack) {
+            val newSize = stack.size()
+            val oldSize = this.stack.size()
+            this.stack = stack
+            if (newSize != oldSize) {
+                resize(newSize)
             }
+            repaint()
         }
+    }
 
-    override fun getRowCount(): Int = stack.size()
+    override fun paint(g: Graphics) {
+        g.color = Color.WHITE
+        g.fillRect(0, 0, width, height)
 
-    override fun getColumnCount(): Int = 1
-
-    override fun getValueAt(row: Int, column: Int): String = " %3x".format(stack[row])
+        var y = 0
+        val frontHeight = Front.front.height
+        stack.forEach { stackValue ->
+            Front.front.drawString(g, 0, y, " %3x".format(stackValue), 0)
+            y += frontHeight
+        }
+    }
 }
