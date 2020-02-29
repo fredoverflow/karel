@@ -14,8 +14,6 @@ const val TIMEOUT = 10000000000L
 // from truth values and loop counters on the stack.
 const val ENTRY_POINT = 256
 
-data class IllegalBytecode(val bytecode: Int) : Exception("%04x".format(bytecode))
-
 class VirtualMachine(private val program: List<Instruction>,
                      private val atomicWorld: AtomicReference<World>,
                      private val callbacks: Callbacks) {
