@@ -39,10 +39,10 @@ void karelsFirstProgram()
 
     fun insertCommand(command: String) {
         if (lineBeforeSelection.all(Char::isWhitespace)) {
-            insertString(command)
+            insert(command)
         } else {
             simulateEnter()
-            insertString(command)
+            insert(command)
             // remove the commit between simulateEnter and insertString,
             // effectively committing both changes as a single commit
             uncommit()
@@ -59,11 +59,11 @@ void karelsFirstProgram()
                 KeyEvent.VK_F5 -> insertCommand("pickBeeper();")
                 KeyEvent.VK_F6 -> insertCommand("dropBeeper();")
 
-                KeyEvent.VK_F7 -> insertString("onBeeper()")
-                KeyEvent.VK_F8 -> insertString("beeperAhead()")
-                KeyEvent.VK_F9 -> insertString("leftIsClear()")
-                KeyEvent.VK_F10 -> insertString("frontIsClear()")
-                KeyEvent.VK_F11 -> insertString("rightIsClear()")
+                KeyEvent.VK_F7 -> insert("onBeeper()")
+                KeyEvent.VK_F8 -> insert("beeperAhead()")
+                KeyEvent.VK_F9 -> insert("leftIsClear()")
+                KeyEvent.VK_F10 -> insert("frontIsClear()")
+                KeyEvent.VK_F11 -> insert("rightIsClear()")
 
                 KeyEvent.VK_SPACE -> if (event.isControlDown) {
                     autocompleteCall()
@@ -79,7 +79,7 @@ void karelsFirstProgram()
     private fun autocompleteCall() {
         val suffixes = autocompleteCall(text, lineBeforeSelection)
         if (suffixes.size == 1) {
-            insertString(suffixes[0])
+            insert(suffixes[0])
         } else {
             println(suffixes.sorted().joinToString(", "))
         }
