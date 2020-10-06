@@ -3,35 +3,24 @@
 ## Background
 
 Karel The Robot is a simple teaching environment for imperative programming basics.
-The original idea was developed in the 1970s by Richard Pattis at Stanford University.
+The original idea was developed in the 1970s by Richard Pattis at Stanford University:
 
-This project started in 2012 due to dissatisfaction with the available Karel environments,
-and also to gain practical experience with [Scala](https://www.scala-lang.org).
+> In the 1970s, a Stanford graduate student named Rich Pattis decided that it would be easier to teach the fundamentals of programming if students could somehow learn the basic ideas in a simple environment free from the complexities that characterize most programming languages.
+>
+> In sophisticated languages like Java, there are so many details that learning these details often becomes the focus of the course. When that happens, the much more critical issues of problem solving tend to get lost in the shuffle. By starting with Karel, you can concentrate on solving problems from the very beginning. And because Karel encourages imagination and creativity, you can have quite a lot of fun along the way.
+
+This project started in 2012 due to dissatisfaction with the available Karel environments.
 Since then, thousands of German university students have been introduced to the basics of imperative programming via this project.
 
-In 2017, the Scala code was migrated to [Kotlin](https://kotlinlang.org), hoping to simplify future maintenance.
+## Getting started
 
-## How do I compile karel into an executable jar?
+Download [karel.jar](https://github.com/fredoverflow/karel/raw/release/karel.jar) (~250 kb)
 
-```
-git clone https://github.com/fredoverflow/freditor
-cd freditor
-mvn install
-cd ..
-git clone https://github.com/fredoverflow/karel
-cd karel
-mvn package
-```
+Karel The Robot requires [Java 8 or newer](https://adoptopenjdk.net) to run.
 
-The executable `karel.jar` will be located inside the `target` folder.
+On Windows, you can simply run karel.jar by double-clicking on it.
 
-## How do I start the system?
-
-Karel The Robot requires Java 8 or newer to run. Make sure you have Java installed!
-
-On Windows, you can simply run a jar by double-clicking on it.
-
-On other operating systems, open a terminal where the jar lives and write:
+On other operating systems, open a terminal in the download folder and write:
 
     java -jar karel.jar
 
@@ -40,13 +29,268 @@ Replacing `xrender` with `opengl` may help:
 
     java -jar -Dsun.java2d.opengl=True karel.jar
 
-## How do I save my code?
+## Autosave
 
-The code is automatically saved to a new file each time you click the start button.
+Your code is automatically saved to a new file each time you click the start button.
 The save folder is named `karel`, and it is located in your home directory.
 The full path is displayed in the title bar.
 
-## Keyboard Shortcuts
+## Language reference
+
+### Primitive commands
+
+| Shortcut | Command           | Meaning |
+| -------- | ----------------- | ------- |
+| F1       | `moveForward();`  | Karel moves one square forward in the direction he currently faces.<br>Fails if a wall blocks the way. |
+| F2       | `turnLeft();`     | Karel turns 90° to the left. |
+| F3       | `turnAround();`   | Karel turns 180° around. |
+| F4       | `turnRight();`    | Karel turns 90° to the right. |
+| F5       | `pickBeeper();`   | Karel picks a beeper from the square he currently stands on.<br>Fails if there is no beeper. |
+| F6       | `dropBeeper();`   | Karel drops a beeper onto the square he currently stands on.<br>Fails if there already is a beeper. |
+
+### Custom commands
+
+Sometimes the same sequence of commands appears multiple times:
+```
+void roundTrip()
+{
+    moveForward();
+    moveForward();
+    moveForward();
+    moveForward();
+    moveForward();
+    moveForward();
+    moveForward();
+    moveForward();
+    moveForward();
+
+    turnAround();
+
+    moveForward();
+    moveForward();
+    moveForward();
+    moveForward();
+    moveForward();
+    moveForward();
+    moveForward();
+    moveForward();
+    moveForward();
+}
+```
+You can extract such a sequence of commands into a new, custom command:
+```
+void moveAcrossWorld()
+{
+    moveForward();
+    moveForward();
+    moveForward();
+    moveForward();
+    moveForward();
+    moveForward();
+    moveForward();
+    moveForward();
+    moveForward();
+}
+```
+and use it just like a primitive command:
+```
+void roundTrip()
+{
+    moveAcrossWorld();
+    turnAround();
+    moveAcrossWorld();
+}
+```
+Deciding when a sequence of commands is worth extracting and choosing a good name for the custom command are essential development skills you will acquire over time.
+
+### Repeat
+
+Instead of writing the same sequence of commands multiple times:
+```
+void dance()
+{
+    moveForward();
+    turnLeft();
+    moveForward();
+    turnLeft();
+    moveForward();
+    turnLeft();
+    moveForward();
+    turnLeft();
+}
+```
+you can use `repeat` and only write it once:
+```
+void dance()
+{
+    repeat (4)
+    {
+        moveForward();
+        turnLeft();
+    }
+}
+```
+
+### If/else
+
+Sometimes you only want to do something if some condition holds:
+```
+if (onBeeper())
+{
+    pickBeeper();
+}
+```
+Optionally, you can also specify what to do in case the condition does *not* hold:
+```
+if (onBeeper())
+{
+    pickBeeper();
+}
+else
+{
+    dropBeeper();
+}
+```
+Note that conditions are only checked when control flow actually reaches them (when the corresponding line is highlighted in the code editor).
+Conditions are *not* periodically checked in the background!
+In large programs with lots of potentially contradicting conditionals, such periodic background checks would quickly lead to incomprehensible program behavior.
+
+### Primitive conditions
+
+| Shortcut | Condition        | Meaning |
+| -------- | ---------------- | ------- |
+| F7       | `onBeeper()`     | Karel checks whether a beeper is on the square he currently stands on. |
+| F8       | `beeperAhead()`  | Karel checks whether a beeper is on the square immediately in front of him. |
+| F9       | `leftIsClear()`  | Karel checks whether no wall is between him and the square to his left. |
+| F10      | `frontIsClear()` | Karel checks whether no wall is between him and the square in front of him. |
+| F11      | `rightIsClear()` | Karel checks whether no wall is between him and the square to his right. |
+
+### If/else if
+
+An `else` with nothing but another `if` inside:
+```
+if (leftIsClear())
+{
+    turnLeft();
+}
+else
+{
+    if (rightIsClear())
+    {
+        turnRight();
+    }
+}
+```
+can be simplified by leaving out the block between the `else` and `if`:
+```
+if (leftIsClear())
+{
+    turnLeft();
+}
+else if (rightIsClear())
+{
+    turnRight();
+}
+```
+Note that without the `else`, Karel might turn left and then immedately turn right again, given `frontIsClear()` originally held.
+The `else` prevents the second `if` from executing in case the first condition was already `true`.
+
+### Not `!`
+
+An `if/else` with an empty first block:
+```
+if (onBeeper())
+{
+}
+else
+{
+    dropBeeper();
+}
+```
+can be simplified by negating the condition with a leading `!`:
+```
+if (!onBeeper())
+{
+    dropBeeper();
+}
+```
+
+### And `&&`
+
+An `if` with nothing but another `if` inside:
+```
+if (frontIsClear())
+{
+    if (beeperAhead())
+    {
+        moveForward();
+        pickBeeper();
+    }
+}
+```
+can be simplified by combining both conditions with `&&`:
+```
+if (frontIsClear() && beeperAhead())
+{
+    moveForward();
+    pickBeeper();
+}
+```
+
+### Or `||`
+
+An `if/else if` with identical blocks:
+```
+if (!frontIsClear())
+{
+    turnRight();
+}
+else if (beeperAhead())
+{
+    turnRight();
+}
+```
+can be simplified by combining both conditions with `||`:
+```
+if (!frontIsClear() || beeperAhead())
+{
+    turnRight();
+}
+```
+
+### Summary compound conditions
+
+| Condition | Meaning |
+| --------- | ------- |
+| <code>!<i>a</i></code>                      | holds if <i>a</i> does **not** hold (and vice versa) |
+| <code><i>a</i> &#038;&#038; <i>b</i></code> | holds if both <i>a</i> **and** <i>b</i> hold |
+| <code><i>a</i> &#124;&#124; <i>b</i></code> | holds if <i>a</i> **or** <i>b</i> (or both) hold |
+| <code><i>a</i> &#124;&#124; !<i>b</i> &#038;&#038; <i>c</i></code> | <code><i>a</i> &#124;&#124; ((!<i>b</i>) &#038;&#038; <i>c</i>)</code> |
+
+### While
+
+`if` checks the condition and then executes the block at most once:
+```
+void moveForwardSafely()
+{
+    if (frontIsClear())
+    {
+        moveForward(); // This line is executed 0 or 1 times
+    }
+}
+```
+`while` re-checks the condition after the block is executed:
+```
+void moveToWall()
+{
+    while (frontIsClear())
+    {
+        moveForward(); // This line is executed 0 to 9 times
+    }
+}
+```
+
+## Keyboard shortcuts
 
 ```
 F1    moveForward();
@@ -77,78 +321,3 @@ Ctrl V         paste
 Ctrl Z         undo
 Ctrl Y         redo
 ```
-
-## How do I install IntelliJ IDEA?
-
-Download the Community Edition `zip` or `tar.gz` from https://www.jetbrains.com/idea/download and extract it wherever you like.
-Navigate to the `bin` folder and run the `idea.bat` or `idea.sh` script.
-Then follow these instructions:
-
-```
-Import IntelliJ IDEA Settings From...
-(o) Do not import settings
-OK
-
-JetBrains Privacy Policy
-[x] I confirm that I have read and accept the terms of this User Agreement
-Continue
-
-Data Sharing
-Don't send
-
-Skip Remaining and Set Defaults
-```
-
-## How do I import karel into IntelliJ IDEA?
-
-* If there are no projects open, pick the **Import Project** option from the *Welcome to IntelliJ IDEA* screen.
-* Otherwise, pick **File > New > Project from Existing Sources...**
-
-```
-Windows: C:\Users\fred\git\karel
-Linux: /home/fred/git/karel
-OK
-
-Import Project
-(o) Import project from external model
-Maven
-Next
-Next
-Next
-
-Please select project SDK. This SDK will be used by default by all project modules.
-+
-JDK
-Windows: C:\Program Files\Java\jdk1.8.0_...
-Linux: /usr/lib/jvm/java-8-openjdk-amd64
-OK
-
-Next
-Finish
-
-Tip of the Day
-[ ] Show tips on startup
-Close
-```
-
-## How do I start karel from within IntelliJ IDEA?
-
-```
-karel/src/main/kotlin/Main.kt (right-click)
-Run 'MainKt'
-```
-
-## What IntelliJ IDEA settings do you like to change after install?
-
-**File > Settings...**
-
-* Keymap
-  * Eclipse
-* Editor > Font
-  * Font: Fira Code (`sudo apt install fonts-firacode`)
-  * Size: 20
-* Editor > General > Code Folding
-  * [ ] One-line methods
-* Editor > General > Appearance
-  * [ ] Caret blinking
-  * [ ] Show intention bulb
