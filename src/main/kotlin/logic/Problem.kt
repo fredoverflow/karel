@@ -204,7 +204,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
         }
 
         val increment = Problem("2.2.1", "increment",
-                "Do you know binary numbers?\nKarel wants to add 1 to a number.\nThis is almost trivial in binary.",
+                "Do you know binary numbers?\nen.wikipedia.org/wiki/Binary_number\nde.wikipedia.org/wiki/Dualsystem\nKarel wants to add 1 to a number.\nThis is almost trivial in binary.",
                 "\u0007\uc105\u0005\u0001\ub100\u0006\u0000", 1, ::randomByte)
 
         val decrement = Problem("2.2.2", "decrement",
