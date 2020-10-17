@@ -1,22 +1,20 @@
 package syntax.parser
 
 import common.Diagnostic
-import org.junit.Rule
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.core.StringContains.containsString
+import org.junit.Assert.assertThrows
 import org.junit.Test
-import org.junit.rules.ExpectedException
 import syntax.lexer.Lexer
 
 class ParserNegativeTest {
-    @Rule
-    @JvmField
-    val thrown: ExpectedException = ExpectedException.none()
-
     private fun assertDiagnostic(messageSubstring: String, sourceCode: String) {
         val lexer = Lexer(sourceCode)
         val parser = Parser(lexer)
-        thrown.expect(Diagnostic::class.java)
-        thrown.expectMessage(messageSubstring)
-        parser.program()
+        val diagnostic = assertThrows(Diagnostic::class.java) {
+            parser.program()
+        }
+        assertThat(diagnostic.message, containsString(messageSubstring))
     }
 
     @Test

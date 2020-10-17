@@ -13,10 +13,12 @@ class BeeperTest {
         assertTrue(afterDrop.beeperAt(1, 2))
     }
 
-    @Test(expected = CellIsFull::class)
+    @Test
     fun dropAnotherBeeper() {
         val one = Problem.emptyWorld.dropBeeper(1, 2)
-        one.dropBeeper(1, 2)
+        assertThrows(CellIsFull::class.java) {
+            one.dropBeeper(1, 2)
+        }
     }
 
     @Test
@@ -37,8 +39,10 @@ class BeeperTest {
         assertFalse(afterPick.beeperAt(0, 0))
     }
 
-    @Test(expected = CellIsEmpty::class)
+    @Test
     fun pickImaginaryBeeper() {
-        Problem.emptyWorld.pickBeeper(0, 0)
+        assertThrows(CellIsEmpty::class.java) {
+            Problem.emptyWorld.pickBeeper(0, 0)
+        }
     }
 }

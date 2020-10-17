@@ -1,8 +1,10 @@
 package vm
 
 import common.Diagnostic
+import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertEquals
-import org.junit.Assert.fail
+import org.junit.Assert.assertFalse
 import org.junit.Test
 import syntax.lexer.Lexer
 import syntax.parser.Parser
@@ -26,14 +28,9 @@ class KarelSemanticsTest {
     private fun assertIllegal(messageSubstring: String, sourceCode: String) {
         val semantics = analyze(sourceCode)
         val errors = semantics.errors()
-        if (errors.isEmpty()) {
-            fail("""no errors found, but expected at least one containing "$messageSubstring"""")
-        }
+        assertFalse(errors.isEmpty())
         for (error in errors) {
-            val message = error.message
-            if (!message.contains(messageSubstring)) {
-                fail(""""$message" does not contain "$messageSubstring"""")
-            }
+            assertThat(error.message, containsString(messageSubstring))
         }
     }
 
