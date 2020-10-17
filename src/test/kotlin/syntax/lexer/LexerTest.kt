@@ -130,7 +130,7 @@ class LexerTest {
 
     @Test
     fun identifiers() {
-        lexer = Lexer("a z a0 z9 a_z foo _bar the_quick_brown_fox_jumped_over_the_lazy_dog THE_QUICK_BROWN_FOX_JUMPED_OVER_THE_LAZY_DOG")
+        lexer = Lexer("a z a0 z9 a_z foo _bar the_quick_brown_fox_jumps_over_the_lazy_dog THE_QUICK_BROWN_FOX_JUMPS_OVER_THE_LAZY_DOG")
 
         assertIdentifier("a")
         assertIdentifier("z")
@@ -139,8 +139,8 @@ class LexerTest {
         assertIdentifier("a_z")
         assertIdentifier("foo")
         assertIdentifier("_bar")
-        assertIdentifier("the_quick_brown_fox_jumped_over_the_lazy_dog")
-        assertIdentifier("THE_QUICK_BROWN_FOX_JUMPED_OVER_THE_LAZY_DOG")
+        assertIdentifier("the_quick_brown_fox_jumps_over_the_lazy_dog")
+        assertIdentifier("THE_QUICK_BROWN_FOX_JUMPS_OVER_THE_LAZY_DOG")
     }
 
     @Test
