@@ -69,7 +69,7 @@ void karelsFirstProgram()
                     autocompleteCall()
                 }
 
-                KeyEvent.VK_R -> if (event.isAltDown && event.isShiftDown) {
+                KeyEvent.VK_R -> if (isControlRespectivelyCommandDown(event) && event.isAltDown) {
                     renameCommand()
                 }
             }

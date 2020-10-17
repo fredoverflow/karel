@@ -326,32 +326,26 @@ void moveToWall()
 
 ## Keyboard shortcuts
 
-```
-F1    moveForward();
-F2    turnLeft();
-F3    turnAround();
-F4    turnRight();
-F5    pickBeeper();
-F6    dropBeeper();
-
-F7    onBeeper()
-F8    beeperAhead()
-F9    leftIsClear()
-F10   frontIsClear()
-F11   rightIsClear()
-
-F12   start / step into / reset
-
-Tab or Enter   auto-indent
-Ctrl Space     auto-complete
-Alt Shift R    rename command
-
-Ctrl D         delete line
-
-Ctrl C         copy
-Ctrl X         cut
-Ctrl V         paste
-
-Ctrl Z         undo
-Ctrl Y         redo
-```
+| Shortcut | Effect           |
+| -------- | ---------------- |
+| F1       | `moveForward();` |
+| F2       | `turnLeft();`    |
+| F3       | `turnAround();`  |
+| F4       | `turnRight();`   |
+| F5       | `pickBeeper();`  |
+| F6       | `dropBeeper();`  |
+| F7       | `onBeeper()`     |
+| F8       | `beeperAhead()`  |
+| F9       | `leftIsClear()`  |
+| F10      | `frontIsClear()` |
+| F11      | `rightIsClear()` |
+| F12      | start / step into / reset |
+| Tab<br>Enter                       | auto-indent    |
+| ⊞ Ctrl Space<br>🍎 Command Space    | auto-complete  |
+| ⊞ Ctrl Alt R<br>🍎 Command Option R | rename command |
+| ⊞ Ctrl D<br>🍎 Command D            | delete line    |
+| ⊞ Ctrl C<br>🍎 Command C            | copy           |
+| ⊞ Ctrl X<br>🍎 Command X            | cut            |
+| ⊞ Ctrl V<br>🍎 Command V            | paste          |
+| ⊞ Ctrl Z<br>🍎 Command Z            | undo           |
+| ⊞ Ctrl Y<br>🍎 Command Y            | redo           |
