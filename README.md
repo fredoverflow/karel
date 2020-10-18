@@ -326,26 +326,26 @@ void moveToWall()
 
 ## Keyboard shortcuts
 
-| Shortcut | Effect           |
-| -------- | ---------------- |
-| F1       | `moveForward();` |
-| F2       | `turnLeft();`    |
-| F3       | `turnAround();`  |
-| F4       | `turnRight();`   |
-| F5       | `pickBeeper();`  |
-| F6       | `dropBeeper();`  |
-| F7       | `onBeeper()`     |
-| F8       | `beeperAhead()`  |
-| F9       | `leftIsClear()`  |
-| F10      | `frontIsClear()` |
-| F11      | `rightIsClear()` |
-| F12      | start / step into / reset |
-| Tab<br>Enter                       | auto-indent    |
-| ⊞ Ctrl Space<br>🍎 Command Space    | auto-complete  |
-| ⊞ Ctrl Alt R<br>🍎 Command Option R | rename command |
-| ⊞ Ctrl D<br>🍎 Command D            | delete line    |
-| ⊞ Ctrl C<br>🍎 Command C            | copy           |
-| ⊞ Ctrl X<br>🍎 Command X            | cut            |
-| ⊞ Ctrl V<br>🍎 Command V            | paste          |
-| ⊞ Ctrl Z<br>🍎 Command Z            | undo           |
-| ⊞ Ctrl Y<br>🍎 Command Y            | redo           |
+| Windows      | Effect                      | Macintosh        |
+| -----------: | :-------------------------: | ---------------- |
+| F1           | `moveForward();`            | F1               |
+| F2           | `turnLeft();`               | F2               |
+| F3           | `turnAround();`             | F3               |
+| F4           | `turnRight();`              | F4               |
+| F5           | `pickBeeper();`             | F5               |
+| F6           | `dropBeeper();`             | F6               |
+| F7           | `onBeeper()`                | F7               |
+| F8           | `beeperAhead()`             | F8               |
+| F9           | `leftIsClear()`             | F9               |
+| F10          | `frontIsClear()`            | F10              |
+| F11          | `rightIsClear()`            | F11              |
+| F12          | start<br>step into<br>reset | F12              |
+| Tab<br>Enter | auto-indent                 | Tab<br>Enter     |
+| Ctrl Space   | auto-complete               | Command Space    |
+| Ctrl Alt R   | rename command              | Command Option R |
+| Ctrl D       | delete line                 | Command D        |
+| Ctrl C       | copy                        | Command C        |
+| Ctrl X       | cut                         | Command X        |
+| Ctrl V       | paste                       | Command V        |
+| Ctrl Z       | undo                        | Command Z        |
+| Ctrl Y       | redo                        | Command Y        |
