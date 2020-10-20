@@ -48,13 +48,32 @@ If we keep delving deeper into lower levels of abstraction until we reach indivi
 
 ## Getting started
 
-Download [karel.jar](https://github.com/fredoverflow/karel/raw/release/karel.jar) (~250 kb)
+### Install Java
 
 Karel The Robot requires [Java 8 or newer](https://adoptopenjdk.net) to run.
+The pre-selected version and JVM are usually fine, no need to change them.
 
-On Windows, you can simply run karel.jar by double-clicking on it.
+### Download Karel
 
-On other operating systems, open a terminal in the download folder and write:
+Download [karel.jar](https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar) (~250 kb)
+
+Some Windows browsers seem to have trouble downloading jar files.
+In that case, press the Windows key (the key on the bottom left with the Windows logo on it), write `cmd` and confirm with Enter.
+Then enter the following lines:
+
+    cd Downloads
+    curl -o karel.jar https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar
+    java -jar karel.jar
+    
+The last line verifies the download by starting the jar file.
+If that fails, enter `java -version`.
+If that also fails, Java is not installed correctly.
+
+### Start Karel
+
+Most Windows users can start karel.jar by double-clicking on it.
+
+On other operating systems (or if double-clicking fails), open a terminal in the download folder and write:
 
     java -jar karel.jar
 
