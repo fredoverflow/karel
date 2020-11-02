@@ -55,7 +55,7 @@ The pre-selected version and JVM are usually fine, no need to change them.
 
 ### Download Karel
 
-Download [karel.jar](https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar) (~250 kb)
+Download <a href="https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar" type="application/java-archive">karel.jar</a> (~250 kb)
 
 Some Windows browsers seem to have trouble downloading jar files.
 In that case, press the Windows key (the key on the bottom left with the Windows logo on it), write `cmd` and confirm with Enter.
