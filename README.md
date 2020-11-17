@@ -50,30 +50,48 @@ If we keep delving deeper into lower levels of abstraction until we reach indivi
 
 ### Install Java
 
-Karel The Robot requires [Java 8 or newer](https://adoptopenjdk.net) to run.
+Karel The Robot requires Java version 8 or later: https://adoptopenjdk.net
+
 The pre-selected version and JVM are usually fine, no need to change them.
 
 ### Download Karel
 
 Download <a href="https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar" type="application/java-archive">karel.jar</a> (~250 kb)
 
-Some Windows browsers seem to have trouble downloading jar files.
-In that case, press the Windows key (the key on the bottom left with the Windows logo on it), write `cmd` and confirm with Enter.
+### Start Karel (Microsoft Windows)
+
+Open Windows explorer, navigate to the `Downloads` folder and double-click on `karel.jar`.
+
+If double-clicking does not start Karel, the most probable causes are:
+
+1. Java is not installed correctly:
+   - You skipped the Java requirement above
+   - You downloaded Java, but did not install it
+   - You picked an inferior alternative to https://adoptopenjdk.net
+2. `karel.jar` was silently renamed to `karel.jar.ZIP`
+
+Apparently, some Windows browsers silently rename `.jar` files to `.jar.ZIP` during download.
+Since Windows explorer hides file extensions by default, you probably won't even notice the wrong extension;
+the file name will show up as `karel.jar`, and the file type as `ZIP archive`.
+Double-clicking on that file will *not* start Karel, but open the ZIP archive instead.
+You will see `a`, `b`, `c`, `d`, `e`, `f`, `g`, `META-INF`, `tiles`, `a.class`, `font.png` and `MainKt.class`.
+
+Unfortunately, changing file extensions in Windows explorer is not trivial.
+I recommend downloading `karel.jar` from the Windows command line instead.
+Press the Windows key (the key on the bottom left with the Windows logo on it), write `cmd` and confirm with Enter.
 Then enter the following lines:
 
     cd Downloads
     curl -o karel.jar https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar
     java -jar karel.jar
     
-The last line verifies the download by starting the jar file.
+The last line verifies the download by starting Karel.
 If that fails, enter `java -version`.
 If that also fails, Java is not installed correctly.
 
-### Start Karel
+### Start Karel (other operating systems)
 
-Most Windows users can start karel.jar by double-clicking on it.
-
-On other operating systems (or if double-clicking fails), open a terminal in the download folder and write:
+Open a terminal in the download folder and write:
 
     java -jar karel.jar
 
