@@ -4,7 +4,7 @@
 # $1 directory
 # $2 extension
 function countInDirectory {
-	lines=$(find "src/$1" -name "*.$2" -exec grep -v "^[{ }]*$" {} + | wc -l)
+	lines=$(find "src/$1" -name "*.$2" -exec grep -vP "^[{ }]*\r?$" {} + | wc -l)
 	if [ $lines -gt 0 ]
 	then
 		printf "$1: $lines\n"
