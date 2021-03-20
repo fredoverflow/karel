@@ -1,6 +1,6 @@
 package gui
 
-import freditor.Front
+import freditor.Fronts
 import logic.Problem
 import logic.World
 
@@ -136,9 +136,9 @@ class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
 
     private fun Graphics.drawNumber(x: Int, y: Int, value: Int, color: Int) {
         val str = "%3d".format(value)
-        val width = str.length * Front.front.width
+        val width = str.length * Fronts.front.width
         val leftPad = (tileSize - width).shr(1)
-        Front.front.drawString(this, x * tileSize + leftPad, y * tileSize, str, color)
+        Fronts.front.drawString(this, x * tileSize + leftPad, y * tileSize, str, color)
     }
 
     private fun listenToMouse() {

@@ -1,7 +1,7 @@
 package gui
 
 import common.Stack
-import freditor.Front
+import freditor.Fronts
 import vm.StackValue
 import java.awt.Color
 import java.awt.Dimension
@@ -16,7 +16,7 @@ class StackTable : JComponent() {
     }
 
     private fun resize(rows: Int) {
-        val dimension = Dimension(Front.front.width * 5, Front.front.height * rows)
+        val dimension = Dimension(Fronts.front.width * 5, Fronts.front.height * rows)
         minimumSize = dimension
         maximumSize = dimension
         preferredSize = dimension
@@ -40,9 +40,9 @@ class StackTable : JComponent() {
         g.fillRect(0, 0, width, height)
 
         var y = 0
-        val frontHeight = Front.front.height
+        val frontHeight = Fronts.front.height
         stack.forEach { stackValue ->
-            Front.front.drawString(g, 0, y, stackValue.toString(), stackValue.color)
+            Fronts.front.drawString(g, 0, y, stackValue.toString(), stackValue.color)
             y += frontHeight
         }
     }
