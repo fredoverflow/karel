@@ -33,7 +33,7 @@ class Parser(private val lexer: Lexer) {
     }
 
     fun expect(expected: TokenKind): Token {
-        if (current != expected) throw Diagnostic(previousEnd, "expected $expected")
+        if (current != expected) throw Diagnostic(previousEnd, "missing $expected")
         return accept()
     }
 

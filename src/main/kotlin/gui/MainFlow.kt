@@ -46,7 +46,8 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.crea
                 val instructions = CodeGenerator(semantics).generate()
                 start(instructions)
             } else {
-                showErrorDialog("undefined command ${currentProblem.name}", "Missing entry point")
+                editor.setCursorTo(editor.length())
+                showDiagnostic("void ${currentProblem.name} not found")
             }
         }
     }
@@ -78,7 +79,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.crea
     }
 
     override fun onInfiniteLoop() {
-        showErrorDialog("Please check your program for infinite loops!", "Timeout expired")
+        showDiagnostic("infinite loop detected")
     }
 
     fun update() {
@@ -109,7 +110,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.crea
         } catch (error: KarelError) {
             stop()
             update()
-            showErrorDialog(error.message!!, "Runtime Error")
+            showDiagnostic(error.message!!)
         }
     }
 
@@ -126,17 +127,21 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.crea
             if (errors.isEmpty()) {
                 how(semantics)
             } else {
-                showDiagnostic(errors[0], "Semantic Error")
+                showDiagnostic(errors[0])
             }
         } catch (diagnostic: Diagnostic) {
-            showDiagnostic(diagnostic, "Syntax Error")
+            showDiagnostic(diagnostic)
         }
     }
 
-    fun showDiagnostic(diagnostic: Diagnostic, title: String) {
+    fun showDiagnostic(diagnostic: Diagnostic) {
         editor.setCursorTo(diagnostic.position)
-        editor.requestFocus()
-        showErrorDialog(diagnostic.message, title)
+        showDiagnostic(diagnostic.message)
+    }
+
+    fun showDiagnostic(message: String) {
+        editor.requestFocusInWindow()
+        editor.showDiagnostic(message)
     }
 
     init {

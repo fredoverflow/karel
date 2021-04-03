@@ -36,7 +36,7 @@ class ParserNegativeTest {
 
     @Test
     fun commandMissingName() {
-        assertDiagnostic("expected IDENTIFIER", """
+        assertDiagnostic("missing IDENTIFIER", """
         void () {
         }
         """)
@@ -44,7 +44,7 @@ class ParserNegativeTest {
 
     @Test
     fun commandMissingParameters() {
-        assertDiagnostic("expected (", """
+        assertDiagnostic("missing (", """
         void main {
         }
         """)
@@ -52,7 +52,7 @@ class ParserNegativeTest {
 
     @Test
     fun commandMissingBody() {
-        assertDiagnostic("expected {", """
+        assertDiagnostic("missing {", """
         void main()
         """)
     }
@@ -88,7 +88,7 @@ class ParserNegativeTest {
 
     @Test
     fun commandMissingArguments() {
-        assertDiagnostic("expected (", """
+        assertDiagnostic("missing (", """
         void main() {
             other;
         }
@@ -97,7 +97,7 @@ class ParserNegativeTest {
 
     @Test
     fun commandMissingSemicolon() {
-        assertDiagnostic("expected ;", """
+        assertDiagnostic("missing ;", """
         void main() {
             other()
         }
@@ -106,7 +106,7 @@ class ParserNegativeTest {
 
     @Test
     fun repeatMissingParens() {
-        assertDiagnostic("expected (", """
+        assertDiagnostic("missing (", """
         void main() {
             repeat 9 {
                 moveForward();
@@ -117,7 +117,7 @@ class ParserNegativeTest {
 
     @Test
     fun repeatMissingNumber() {
-        assertDiagnostic("expected NUMBER", """
+        assertDiagnostic("missing NUMBER", """
         void main() {
             repeat () {
                 moveForward();
@@ -128,7 +128,7 @@ class ParserNegativeTest {
 
     @Test
     fun repeatMissingBlock() {
-        assertDiagnostic("expected {", """
+        assertDiagnostic("missing {", """
         void main() {
             repeat (9)
                 moveForward();
@@ -182,7 +182,7 @@ class ParserNegativeTest {
 
     @Test
     fun ifMissingParens() {
-        assertDiagnostic("expected (", """
+        assertDiagnostic("missing (", """
         void main() {
             if frontIsClear() {
                 moveForward();
@@ -193,7 +193,7 @@ class ParserNegativeTest {
 
     @Test
     fun ifMissingBlock() {
-        assertDiagnostic("expected {", """
+        assertDiagnostic("missing {", """
         void main() {
             if (frontIsClear())
                 moveForward();
@@ -215,7 +215,7 @@ class ParserNegativeTest {
 
     @Test
     fun whileMissingParens() {
-        assertDiagnostic("expected (", """
+        assertDiagnostic("missing (", """
         void main() {
             while frontIsClear() {
                 moveForward();
@@ -226,7 +226,7 @@ class ParserNegativeTest {
 
     @Test
     fun whileMissingBlock() {
-        assertDiagnostic("expected {", """
+        assertDiagnostic("missing {", """
         void main() {
             while (frontIsClear())
                 moveForward();
@@ -246,7 +246,7 @@ class ParserNegativeTest {
 
     @Test
     fun conditionMissingParens() {
-        assertDiagnostic("expected (", """
+        assertDiagnostic("missing (", """
         void main() {
             while (frontIsClear) {
                 moveForward();

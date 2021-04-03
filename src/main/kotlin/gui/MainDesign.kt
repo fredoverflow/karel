@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicReference
 
 import javax.swing.Box
 import javax.swing.JFrame
-import javax.swing.JOptionPane
 
 open class MainDesign(val atomicWorld: AtomicReference<World>) : JFrame() {
 
@@ -40,9 +39,5 @@ open class MainDesign(val atomicWorld: AtomicReference<World>) : JFrame() {
         add(virtualMachinePanel, BorderLayout.EAST)
         pack()
         isVisible = true
-    }
-
-    fun showErrorDialog(message: String, title: String) {
-        JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE)
     }
 }
