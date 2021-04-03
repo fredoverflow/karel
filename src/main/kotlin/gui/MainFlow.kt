@@ -114,6 +114,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.crea
     }
 
     fun processProgram(how: (KarelSemantics) -> Unit) {
+        editor.indent()
         editor.autosaver.save()
         try {
             val lexer = Lexer(editor.text)
