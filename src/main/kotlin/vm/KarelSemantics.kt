@@ -7,8 +7,10 @@ import syntax.tree.*
 class KarelSemantics(val program: Program, entryPoint: String = program.commands.first().identifier.lexeme) {
     companion object {
         val whileEnablers: List<String> = Problem.problems.filter { it.level >= 2 }.map { it.name }
+        val firstWhileEnabler: Problem = Problem.problems.first { it.level >= 2 }
 
         val recursionEnablers: List<String> = Problem.problems.filter { it.level >= 3 }.map { it.name }
+        val firstRecursionEnabler: Problem = Problem.problems.first { it.level >= 3 }
     }
 
     val commands: Map<String, Command> = program.commands.associateBy { it.identifier.lexeme }
@@ -87,7 +89,7 @@ class KarelSemantics(val program: Program, entryPoint: String = program.commands
 
     private fun illegalWhileLoops(): List<Diagnostic> {
         return if (whileEnablers.none(commands::containsKey)) {
-            whileLoops().map { Diagnostic(it.whi1e.start, "while loops are not allowed yet") }
+            whileLoops().map { Diagnostic(it.whi1e.start, "while loops are not allowed until $firstWhileEnabler") }
         } else {
             emptyList()
         }
@@ -108,7 +110,7 @@ class KarelSemantics(val program: Program, entryPoint: String = program.commands
 
     private fun illegalRecursion(): List<Diagnostic> {
         return if (recursionEnablers.none(commands::containsKey)) {
-            recursiveCommands().map { Diagnostic(it.identifier.start, "recursion is not allowed yet") }
+            recursiveCommands().map { Diagnostic(it.identifier.start, "recursion is not allowed until $firstRecursionEnabler") }
         } else {
             emptyList()
         }
