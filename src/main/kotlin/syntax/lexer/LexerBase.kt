@@ -4,13 +4,13 @@ import common.Diagnostic
 
 const val EOF = '\u0000'
 
-abstract class LexerBase(private val input: String) {
+abstract class LexerBase(protected val input: String) {
 
     var start: Int = -1
         private set
 
     var index: Int = -1
-        private set
+        protected set
 
     fun startAtIndex() {
         start = index

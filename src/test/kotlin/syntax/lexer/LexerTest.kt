@@ -81,12 +81,6 @@ class LexerTest {
     }
 
     @Test
-    fun openMultiLineComment() {
-        lexer = Lexer("/*")
-        assertToken(END_OF_INPUT)
-    }
-
-    @Test
     fun digits() {
         lexer = Lexer("0 1 2 3 4 5 6 7 8 9")
         assertNumber("0")

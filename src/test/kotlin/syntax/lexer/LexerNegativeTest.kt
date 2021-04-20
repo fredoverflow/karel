@@ -34,4 +34,9 @@ class LexerNegativeTest {
     fun singleBar() {
         assertDiagnostic(messageSubstring = "||", input = "|")
     }
+
+    @Test
+    fun unclosedMultiLineComment() {
+        assertDiagnostic(messageSubstring = "multi-line comment", input = "/*")
+    }
 }

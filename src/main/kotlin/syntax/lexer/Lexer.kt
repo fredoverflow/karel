@@ -64,8 +64,15 @@ class Lexer(input: String) : LexerBase(input) {
 
     private fun skipMultiLineComment() {
         next() // skip '*'
+        val afterAsterisk = index
         do {
-            if (current == EOF) return
+            if (current == EOF) {
+                val voidIndex = input.indexOf("void", afterAsterisk)
+                if (voidIndex != -1) {
+                    index = voidIndex
+                }
+                error("/* starts a green multi-line comment, but no */ was found to end it.\nPlease insert */ where you intend to end the comment.")
+            }
         } while ((current != '*') or (next() != '/'))
         next() // skip '/'
     }
