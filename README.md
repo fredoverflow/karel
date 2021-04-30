@@ -48,17 +48,17 @@ If we keep delving deeper into lower levels of abstraction until we reach indivi
 
 ## Getting started
 
-### Install Java
+### 1. Install Java
 
 Karel The Robot requires Java version 8 or later: https://adoptopenjdk.net
 
 The pre-selected version and JVM are usually fine, no need to change them.
 
-### Download Karel
+### 2. Download Karel
 
 Download <a href="https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar" type="application/java-archive">karel.jar</a> (~250 kb)
 
-### Start Karel (Microsoft Windows)
+### 3. Start Karel (Microsoft Windows)
 
 Open Windows explorer, navigate to the `Downloads` folder and double-click on `karel.jar`.
 
@@ -89,7 +89,7 @@ The last line verifies the download by starting Karel.
 If that fails, enter `java -version`.
 If that also fails, Java is not installed correctly.
 
-### Start Karel (other operating systems)
+### 3. Start Karel (other operating systems)
 
 Open a terminal in the download folder and write:
 
