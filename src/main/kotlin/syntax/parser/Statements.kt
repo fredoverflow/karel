@@ -31,7 +31,14 @@ fun Parser.statement(): Statement = when (current) {
         }
     })
 
-    VOID -> token.error("Commands cannot be nested.\nDid you forget a } somewhere?")
+    VOID -> {
+        val void = accept()
+        expect(IDENTIFIER).emptyParens()
+        when (current) {
+            OPENING_BRACE -> void.error("Command definitions cannot be nested.\nDid you forget a } somewhere?")
+            else -> void.error("Command calls have no void before the command name")
+        }
+    }
     END_OF_INPUT -> token.error("End of file encountered in an unclosed block.\nDid you forget a } somewhere?")
     else -> illegalStartOf("statement")
 }

@@ -105,6 +105,15 @@ class ParserNegativeTest {
     }
 
     @Test
+    fun commandSuperfluousVoid() {
+        assertDiagnostic("void", """
+        void main() {
+            void other();
+        }
+        """)
+    }
+
+    @Test
     fun repeatMissingParens() {
         assertDiagnostic("missing (", """
         void main() {
