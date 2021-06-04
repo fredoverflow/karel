@@ -5,6 +5,7 @@ import common.push
 import freditor.Autosaver
 import freditor.FreditorUI
 import freditor.JavaIndenter
+import freditor.OperatingSystem
 import syntax.lexer.keywords
 import vm.builtinCommands
 
@@ -19,6 +20,13 @@ class Editor : FreditorUI(Flexer, JavaIndenter.instance, 60, 1) {
     val autosaver: Autosaver = newAutosaver("karel")
 
     init {
+        val braces = if (OperatingSystem.isMacintosh) """
+Alt/Option 8 = {
+Alt/Option 9 = }
+Alt/Option is the 3rd key from the lower left, between Ctrl and Cmd""" else """
+Alt Gr 7 = {
+Alt Gr 0 = }
+Alt Gr is a single key, located to the RIGHT of the space bar"""
         autosaver.loadOrDefault("""/*
 F1 = moveForward();
 F2 = turnLeft();
@@ -26,6 +34,7 @@ F3 = turnAround();
 F4 = turnRight();
 F5 = pickBeeper();
 F6 = dropBeeper();
+$braces
 */
 
 void karelsFirstProgram()
