@@ -6,7 +6,6 @@ import logic.Problem.Companion.SOUTH
 import logic.Problem.Companion.WEST
 
 import java.util.concurrent.Callable
-import java.util.concurrent.ExecutorCompletionService
 import java.util.concurrent.Executors
 
 // Sometimes, due to "bad luck" with the random number generator,
@@ -14,17 +13,11 @@ import java.util.concurrent.Executors
 // A practical fix is to run the algorithm multiple times in parallel
 // and let the quickest execution "win".
 private const val PARALLEL_TASKS = 16
+private val pool = Executors.newFixedThreadPool(PARALLEL_TASKS)
 
 fun generateRandomLabyrinth(): World {
-    val pool = Executors.newFixedThreadPool(PARALLEL_TASKS)
-    val service = ExecutorCompletionService<World>(pool)
-
-    repeat(PARALLEL_TASKS) {
-        service.submit(LabyrinthGenerator())
-    }
-
-    val firstWorld = service.take().get()
-    pool.shutdownNow()
+    val labyrinthGenerators = List(PARALLEL_TASKS) { LabyrinthGenerator() }
+    val firstWorld = pool.invokeAny(labyrinthGenerators)
     return firstWorld.withKarelAt(0, 0, EAST)
 }
 
