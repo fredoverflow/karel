@@ -48,57 +48,89 @@ If we keep delving deeper into lower levels of abstraction until we reach indivi
 
 ## Getting started
 
-### 1. Install Java
+Please take the time to **read the following instructions carefully.**
+Most problems stem from skipping or misunderstanding important steps.
 
-Karel The Robot requires Java version 8 or later: https://adoptopenjdk.net
+### ☕ Windows & macOS
 
-The pre-selected version and JVM are usually fine, no need to change them.
+1. Visit https://adoptium.net
 
-### 2. Download Karel
+2. Click "Latest release" to download Java installer
 
-Download <a href="https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar" type="application/java-archive">karel.jar</a> (~250 kb)
+3. Wait for download to finish
 
-### 3. Start Karel (Microsoft Windows)
+4. Open the `Downloads` folder (via Windows Explorer or Finder/Spotlight, respectively) and double-click `OpenJDK...` to start Java installer
 
-Open Windows explorer, navigate to the `Downloads` folder and double-click on `karel.jar`.
+5. Click Next, Next, Install, Finish
 
-If double-clicking does not start Karel, the most probable causes are:
+6. Click [karel.jar](https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar) to download Karel
 
-1. Java is not installed correctly:
-   - You skipped the Java requirement above
-   - You downloaded Java, but did not install it
-   - You picked an inferior alternative to https://adoptopenjdk.net
-2. `karel.jar` was silently renamed to `karel.jar.ZIP`
+7. Open the `Downloads` folder and double-click `karel.jar` to start Karel
 
-Apparently, some Windows browsers silently rename `.jar` files to `.jar.ZIP` during download.
-Since Windows explorer hides file extensions by default, you probably won't even notice the wrong extension;
-the file name will show up as `karel.jar`, and the file type as `ZIP archive`.
-Double-clicking on that file will *not* start Karel, but open the ZIP archive instead.
-You will see `a`, `b`, `c`, `d`, `e`, `f`, `g`, `META-INF`, `tiles`, `a.class`, `font.png` and `MainKt.class`.
+**If Karel fails to start**, continue with ⚠️ Troubleshooting *Windows*, or ⚠️ Troubleshooting *macOS*.
 
-Unfortunately, changing file extensions in Windows explorer is not trivial.
-I recommend downloading `karel.jar` from the Windows command line instead.
-Press the Windows key (the key on the bottom left with the Windows logo on it), write `cmd` and confirm with Enter.
-Then enter the following lines:
+### ⚠️ Troubleshooting *Windows*
 
-    cd Downloads
-    curl -o karel.jar https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar
-    java -jar karel.jar
-    
-The last line verifies the download by starting Karel.
-If that fails, enter `java -version`.
-If that also fails, Java is not installed correctly.
+Steps 1 through 5 (install Java) worked, but steps 6 (download Karel) or 7 (start Karel) failed? Then read on.
 
-### 3. Start Karel (other operating systems)
+Move your mouse over the script below.
+A button appears in the top right corner of the script.
+Click that button to copy the script.
+```cmd
+cd Downloads
+if exist karel.jar.zip erase karel.jar.zip
+curl -o karel.jar https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar
+echo java -version > karel.cmd
+echo java -jar karel.jar >> karel.cmd
+karel.cmd
 
-Open a terminal in the download folder and write:
+```
+Press the Windows key (the key on the bottom left with the Windows logo ⊞ on it), write `cmd` and confirm with Enter.
+A terminal appears. Right-click anywhere inside that terminal to paste and execute the script.
+(Should copy/paste not work for some reason, just type every line manually.)
 
-    java -jar karel.jar
+From now on, simply double-click `karel.cmd` in the `Downloads` folder to start Karel.<br>
+Feel free to move `karel.jar` and `karel.cmd` to the Desktop or any other folder you prefer.
 
-Java animations tend to stutter on Linux.
-Replacing `xrender` with `opengl` may help:
+### ⚠️ Troubleshooting *macOS*
 
-    java -jar -Dsun.java2d.opengl=True karel.jar
+Steps 1 through 5 (install Java) worked, but steps 6 (download Karel) or 7 (start Karel) failed? Then read on.
+
+Move your mouse over the script below.
+A button appears in the top right corner of the script.
+Click that button to copy the script.
+```sh
+cd Downloads
+curl -o karel.jar https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar
+echo java -version > karel.sh
+echo java -jar karel.jar >> karel.sh
+chmod +x karel.sh
+./karel.sh
+
+```
+Press `Command⌘ Space` (or click the magnifying glass 🔍 in the top right corner of the screen) to open Spotlight.
+Write `terminal` and confirm with Enter. A terminal appears.
+Press `Command⌘ V` to paste and execute the script.
+(Should copy/paste not work for some reason, just type every line manually.)
+
+From now on, simply double-click `karel.sh` in the `Downloads` folder to start Karel.<br>
+Feel free to move `karel.jar` and `karel.sh` to the Desktop or any other folder you prefer.
+
+### 🐧 Ubuntu, Linux Mint, Debian...
+
+```sh
+sudo apt install default-jdk
+cd Downloads
+curl -o karel.jar https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar
+echo java -version > karel.sh
+echo java -jar -Dsun.java2d.opengl=True karel.jar >> karel.sh
+chmod +x karel.sh
+./karel.sh
+
+```
+
+From now on, simply double-click `karel.sh` in the `Downloads` folder to start Karel.<br>
+Feel free to move `karel.jar` and `karel.sh` to the Desktop or any other folder you prefer.
 
 ## Autosave
 
