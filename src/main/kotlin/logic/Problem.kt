@@ -118,7 +118,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
                 "\ua102\u0003\ua108\u8002\u0001\u0001\u0002\u9104\u8004\u0001\u0005\u0004\u0001\u0002\u9109\u0000", 0) {
             val world = emptyWorld
 
-            world.withBeepers(0x805L, 0x2a1542a05008000).withKarelAt(5, 8, NORTH)
+            world.withBeepers(0x805L, 0x2a1542a05008000L).withKarelAt(5, 8, NORTH)
         }
 
         val repairTheStreet = Problem("1.3.2", "repairTheStreet",
@@ -186,7 +186,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
             for (x in 0..9) {
                 builder.buildHorizontalWall(x, 1 + rng.nextInt(3))
             }
-            val world = builder.world().withBeepers(1023L.shl(90 - 64), 0)
+            val world = builder.world().withBeepers(1023L.shl(90 - 64), 0L)
             world.withKarelAt(0, 9, EAST)
         }
 
@@ -361,7 +361,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
             for (x in 0..9) {
                 builder.buildHorizontalWall(x, 1 + rng.nextInt(3))
             }
-            val world = builder.world().withBeepers(1023.shl(80 - 64), 0)
+            val world = builder.world().withBeepers(1023L.shl(80 - 64), 0L)
             world.withKarelAt(0, 8, EAST)
         }
 

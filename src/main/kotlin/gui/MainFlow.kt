@@ -36,7 +36,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.crea
 
     fun executeGoal(goal: String) {
         val instructions = vm.createInstructionBuffer()
-        instructions.addAll(goal.map { vm.goalInstruction(it.toInt()) })
+        instructions.addAll(goal.map { vm.goalInstruction(it.code) })
         start(instructions)
     }
 

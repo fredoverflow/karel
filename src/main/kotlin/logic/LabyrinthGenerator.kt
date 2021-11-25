@@ -106,11 +106,12 @@ class LabyrinthGenerator : Callable<World> {
                 var line = 0L
                 for (x in 1..10) {
                     val position = y * NEIGHBOUR_Y + x * NEIGHBOUR_X
-                    val east = labyrinth[position + WALL_X].toLong().and(1)
-                    val north = labyrinth[position - WALL_Y].toLong().and(2)
-                    val west = labyrinth[position - WALL_X].toLong().and(4)
-                    val south = labyrinth[position + WALL_Y].toLong().and(8)
-                    line = line.shl(4).or(south).or(west).or(north).or(east)
+                    val east = labyrinth[position + WALL_X].code.and(1)
+                    val north = labyrinth[position - WALL_Y].code.and(2)
+                    val west = labyrinth[position - WALL_X].code.and(4)
+                    val south = labyrinth[position + WALL_Y].code.and(8)
+                    val cell = south.or(west).or(north).or(east).toLong()
+                    line = line.shl(4).or(cell)
                 }
                 walls[y - 1] = line
             }
