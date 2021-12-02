@@ -1,7 +1,15 @@
 package logic
 
 class Problem(val index: String, val name: String, val story: String, val goal: String, val binaryLines: Int, val createWorld: () -> World) {
-    val level: Int
+    
+    constructor(index:String, name: String, story:String, goal:String, binaryLines:Int, levelPath: String, createWorld:() -> World ):
+            this(index,name,story,goal,binaryLines, createWorld) {
+        this.levelImagePath = levelPath;
+    }
+	
+    var levelImagePath: String = ""
+	
+	val level: Int
         get() = index[0] - '0'
 
     override fun toString(): String = "$index $name"
@@ -59,7 +67,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
 
         val defuseOneBomb = Problem("1.1.2", "defuseOneBomb",
                 "Karel the demolition expert\ndefuses a bomb at the other end\nof the room and returns filled\nwith pride and self-confidence:\nHe did it without duplicate code!",
-                "\ua106\u0005\u0003\ua106\u0003\u0000\u8009\u0001\u9107\u0000", 0) {
+                "\ua106\u0005\u0003\ua106\u0003\u0000\u8009\u0001\u9107\u0000", 0, "bomb") {
             val world = emptyWorld.dropBeeper(9, 9)
 
             world.withKarelAt(0, 9, EAST)
@@ -67,7 +75,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
 
         val defuseTwoBombs = Problem("1.1.3", "defuseTwoBombs",
                 "One bomb is no problem for Karel.\nLet's spice up the challenge!\nShouldn't this be rather simple,\ngiven that Karel already knows\nhow to defuse one single bomb?",
-                "\ua102\u0002\ua108\u0005\u0003\ua108\u0003\u0000\u8009\u0001\u9109\u0000", 0) {
+                "\ua102\u0002\ua108\u0005\u0003\ua108\u0003\u0000\u8009\u0001\u9109\u0000", 0, "bomb") {
             val world = emptyWorld.dropBeeper(0, 0).dropBeeper(9, 9)
 
             world.withKarelAt(0, 9, EAST)
@@ -75,7 +83,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
 
         val practiceHomeRun = Problem("1.1.4", "practiceHomeRun",
                 "Karel's heart burns for baseball,\nbut he has become bored of just\nwatching. Tonight, he will sneak\ninto the stadium and perform his\nfirst home run. Adrenaline rush!",
-                "\u8004\u8009\u0001\u9102\u0005\u0002\u9101\u0000", 0) {
+                "\u8004\u8009\u0001\u9102\u0005\u0002\u9101\u0000", 0, "baseball") {
             val world = emptyWorld.dropBeeper(0, 0).dropBeeper(9, 0).dropBeeper(0, 9).dropBeeper(9, 9)
 
             world.withKarelAt(0, 9, EAST)
@@ -90,8 +98,8 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
         }
 
         val fillTheHoles = Problem("1.2.2", "fillTheHoles",
-                "Karel considers a career in den-\ndistry. The local dental school\nhas Open House day. Coincidence?\nKarel gets to fill 4 carious\nteeth with dental amalgam. Ouch!",
-                "\u8004\u0001\u0004\u0001\u0006\u0003\u0001\u0004\u0001\u9101\u0000", 0) {
+                "Karel considers a career in den-\ntistry. The local dental school\nhas Open House day. Coincidence?\nKarel gets to fill 4 carious\nteeth with dental amalgam. Ouch!",
+                "\u8004\u0001\u0004\u0001\u0006\u0003\u0001\u0004\u0001\u9101\u0000", 0, "amalgam") {
             val world = FloorPlan.holes.world()
 
             world.withKarelAt(1, 8, EAST)
@@ -99,7 +107,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
 
         val saveTheFlower = Problem("1.2.3", "saveTheFlower",
                 "During a vacation in the alps,\nKarel discovers a rare flower\nwhich has trouble blooming\nat such low altitude...\nIt's a long way to the top!",
-                "\u0001\u0005\u8004\u0002\u0001\u0001\u0004\u0001\u9103\u0006\u8004\u0001\u0004\u0001\u0001\u0002\u910b\u0000", 0) {
+                "\u0001\u0005\u8004\u0002\u0001\u0001\u0004\u0001\u9103\u0006\u8004\u0001\u0004\u0001\u0001\u0002\u910b\u0000", 0, "flower") {
             val world = FloorPlan.mountain.world().dropBeeper(1, 9)
 
             world.withKarelAt(0, 9, EAST)
@@ -107,7 +115,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
 
         val mowTheLawn = Problem("1.2.4", "mowTheLawn",
                 "Karel promised his aunt to help\nin the garden. She has already\npulled up the weeds, so Karel\ncan focus on mowing the lawn.",
-                "\u8002\ua106\u0004\u0001\u0004\u9101\ua10a\u0002\u0001\u0002\u8006\u0001\u0005\u910b\u0001\u0000", 0) {
+                "\u8002\ua106\u0004\u0001\u0004\u9101\ua10a\u0002\u0001\u0002\u8006\u0001\u0005\u910b\u0001\u0000", 0, "grass") {
             val world = emptyWorld
 
             world.withBeepers(0x3f0fL, 0xc3f0fc3f0fcL.shl(20)).withKarelAt(1, 7, EAST)
@@ -115,7 +123,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
 
         val harvestTheField = Problem("1.3.1", "harvestTheField",
                 "Karel's uncle is an agricult --\nerm... farmer. Having helped his\naunt, Karel can't reject the des-\nperate plea for help on the farm.\nThe wheat is already overripe!",
-                "\ua102\u0003\ua108\u8002\u0001\u0001\u0002\u9104\u8004\u0001\u0005\u0004\u0001\u0002\u9109\u0000", 0) {
+                "\ua102\u0003\ua108\u8002\u0001\u0001\u0002\u9104\u8004\u0001\u0005\u0004\u0001\u0002\u9109\u0000", 0, "wheat") {
             val world = emptyWorld
 
             world.withBeepers(0x805L, 0x2a1542a05008000L).withKarelAt(5, 8, NORTH)
@@ -123,7 +131,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
 
         val repairTheStreet = Problem("1.3.2", "repairTheStreet",
                 "Load this problem again. Notice\nsomething? Not all streets are\ncreated equal! Have you learned\nabout the if/else statement yet?\nF7..F11 are Karel's conditions.",
-                "\u8009\ua104\u0001\u9101\u000b\uc10c\u0004\u0001\u0006\u0003\u0001\u0004\u0000", 0) {
+                "\u8009\ua104\u0001\u9101\u000b\uc10c\u0004\u0001\u0006\u0003\u0001\u0004\u0000", 0, "street") {
             val builder = FloorPlan.empty.builder()
 
             for (x in 0..9) {
@@ -139,7 +147,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
 
         val cleanTheRoom = Problem("1.3.3", "cleanTheRoom",
                 "Karel's parents are paying him\na surprise visit. His apartment\nis *really* out of shape :(\nThe chaos is almost overwhelming.\nCan you help him clean up?",
-                "\u8004\ua106\u0004\u0001\u0004\u9101\ua10a\u0002\u0001\u0002\u8009\ua10e\u0001\u910b\u0007\uc111\u0005\u0000", 0) {
+                "\u8004\ua106\u0004\u0001\u0004\u9101\ua10a\u0002\u0001\u0002\u8009\ua10e\u0001\u910b\u0007\uc111\u0005\u0000", 0, "garbage") {
             var world = emptyWorld
 
             for (y in 0..9) {
@@ -160,7 +168,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
 
         val stealOlympicFire = Problem("1.4.1", "stealOlympicFire",
                 "Karel is mad with olympic fever\nand somehow his CPU decided\nit would be a good idea to\nsteal the olympic fire O_o\nLet's hope nobody will notice...",
-                "\u0001\u8006\u0002\u0001\u0004\u0001\u9102\u0005\u0001\u0004\u8006\u0001\u910b\u0002\u0001\u0000", 0) {
+                "\u0001\u8006\u0002\u0001\u0004\u0001\u9102\u0005\u0001\u0004\u8006\u0001\u910b\u0002\u0001\u0000", 0, "fire") {
             val world = FloorPlan.stairs.world().dropBeeper(7, 3)
 
             world.withKarelAt(0, 9, EAST)
@@ -180,7 +188,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
 
         val hangTheLampions = Problem("2.1.1", "hangTheLampions",
                 "Today is Karel's birthday! To\ncelebrate this special occasion,\nKarel bought 10 lampions. Now all\nthat's left to do is hang them\nfrom his (irregular) ceiling.",
-                "\u8009\ua104\u0001\u9101\u0002\u0005\ua10d\u0006\u0003\ua10d\u0002\u0000\u0001\u000a\ud10c\u0000", 0) {
+                "\u8009\ua104\u0001\u9101\u0002\u0005\ua10d\u0006\u0003\ua10d\u0002\u0000\u0001\u000a\ud10c\u0000", 0, "lampion") {
             val builder = FloorPlan.empty.builder()
 
             for (x in 0..9) {
@@ -192,7 +200,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
 
         val followTheSeeds = Problem("2.1.2", "followTheSeeds",
                 "Karel had insomnia and decided\nto take a walk in the forest.\nBeing the smart robot that he is,\nhe always leaves a trail of seeds\nso he can find his way back...",
-                "\u0008\uc109\u0008\uc107\u0001\u0005\ub102\u0002\ub100\u0000", 0) {
+                "\u0008\uc109\u0008\uc107\u0001\u0005\ub102\u0002\ub100\u0000", 0, "seed") {
             val world = emptyWorld.withBeepers(0xffc017f50L, 0x55d5555157d405ffL)
             world.withKarelAt(5, 4, WEST)
         }
@@ -228,7 +236,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
 
         val saveTheFlowers = Problem("2.3.1", "saveTheFlowers",
                 "Karel climbs Mt. Everest. On his\nway up, he collects four flowers\nthat do not get enough sunlight\non the west side of the mountain.\nEast is where the sun comes up!",
-                "\u8004\ua110\u0005\u9101\ua110\u8004\u0006\u0001\u0004\u000a\uc10d\u0001\ub109\u0002\u9106\u0000\u0002\u000b\ud115\u0001\ub111\u0004\u0001\u0000", 0) {
+                "\u8004\ua110\u0005\u9101\ua110\u8004\u0006\u0001\u0004\u000a\uc10d\u0001\ub109\u0002\u9106\u0000\u0002\u000b\ud115\u0001\ub111\u0004\u0001\u0000", 0, "flower") {
             val builder = FloorPlan.empty.builder()
 
             var y1 = rng.nextInt(5)
@@ -273,7 +281,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
 
         val findTeddyBear = Problem("2.3.2", "findTeddyBear",
                 "In the middle of the night, Karel\nawakens from a terrible dream.\nHis teddy bear will give him\ncomfort. It should lay somewhere\nnear the edge of the bed...",
-                "\u0007\ud108\u000a\uc106\u0001\ub100\u0002\ub100\u0000", 0) {
+                "\u0007\ud108\u000a\uc106\u0001\ub100\u0002\ub100\u0000", 0, "teddy") {
             var world = emptyWorld
 
             val xy = rng.nextInt(10)
@@ -355,7 +363,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
 
         val partyAgain = Problem("3.1.1", "partyAgain",
                 "Karel is preparing the next big\nparty. Unfortunately, the floor\nis so soaked from the last party\nthat he must be careful not to\nbreak through into the cellar!",
-                "\u8009\ua104\u0001\u9101\u0002\u0005\ua109\u0002\u0000\u000a\ud10e\u0006\u0003\u0000\u0001\ua109\u0001\u0000", 0) {
+                "\u8009\ua104\u0001\u9101\u0002\u0005\ua109\u0002\u0000\u000a\ud10e\u0006\u0003\u0000\u0001\ua109\u0001\u0000", 0, "lampion") {
             val builder = FloorPlan.trap.builder()
 
             for (x in 0..9) {
@@ -367,7 +375,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
 
         val fetchTheStars = Problem("3.1.2", "fetchTheStars",
                 "Karel arranges a romantic date\nwith Karoline on a frozen lake\nwhere he \"fetches the stars from\nthe sky\" (German for \"goes to the\nends of the world and back\").",
-                "\u8009\ua104\u0001\u9101\u0002\ua109\u0006\u0002\u0000\u000a\ud10e\u0005\u0003\u0000\u0001\ua109\u0001\u0000", 0) {
+                "\u8009\ua104\u0001\u9101\u0002\ua109\u0006\u0002\u0000\u000a\ud10e\u0005\u0003\u0000\u0001\ua109\u0001\u0000", 0, "star") {
             val builder = FloorPlan.trap.builder()
             var world = builder.world()
 
