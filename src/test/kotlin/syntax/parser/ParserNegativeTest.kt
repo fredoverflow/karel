@@ -19,7 +19,7 @@ class ParserNegativeTest {
 
     @Test
     fun tooManyClosingBraces() {
-        assertDiagnostic("Too many closing braces", """
+        assertDiagnostic("too many closing braces", """
         void main() {
           }
         }
@@ -27,10 +27,56 @@ class ParserNegativeTest {
     }
 
     @Test
-    fun commandMissingVoid() {
-        assertDiagnostic("illegal start of command", """
+    fun firstCommandMissingVoid() {
+        assertDiagnostic("expected void", """
         main() {
         }
+        """)
+    }
+
+    @Test
+    fun secondCommandMissingVoid() {
+        assertDiagnostic("expected void", """
+        void first() {
+        }
+        second() {
+        }
+        """)
+    }
+
+    @Test
+    fun repeatBelongsInsideCommand() {
+        assertDiagnostic("repeat belongs inside command", """
+        void main() {
+        }
+        repeat
+        """)
+    }
+
+    @Test
+    fun whileBelongsInsideCommand() {
+        assertDiagnostic("while belongs inside command", """
+        void main() {
+        }
+        while
+        """)
+    }
+
+    @Test
+    fun ifBelongsInsideCommand() {
+        assertDiagnostic("if belongs inside command", """
+        void main() {
+        }
+        if
+        """)
+    }
+
+    @Test
+    fun commandCallsBelongInsideCommand() {
+        assertDiagnostic("Command calls belong inside command", """
+        void main() {
+        }
+        moveForward();
         """)
     }
 

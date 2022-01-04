@@ -4,14 +4,27 @@ import syntax.lexer.TokenKind.*
 import syntax.tree.*
 
 fun Parser.program(): Program {
+    if (current != VOID) token.error("expected void")
+
     return Program(list1Until(END_OF_INPUT, ::command))
 }
 
-fun Parser.command(): Command {
-    if (current == CLOSING_BRACE) token.error("Too many closing braces.\nDid you forget a { somewhere?")
-    if (current != VOID) illegalStartOf("command definition")
+fun Parser.command(): Command = when (current) {
+    VOID -> Command(accept(), expect(IDENTIFIER).emptyParens(), block())
 
-    return Command(accept(), expect(IDENTIFIER).emptyParens(), block())
+    CLOSING_BRACE -> token.error("too many closing braces")
+
+    REPEAT, WHILE, IF -> token.error("$current belongs inside command.\nDid you close too many braces?")
+
+    IDENTIFIER -> {
+        val identifier = accept().emptyParens()
+        when (current) {
+            SEMICOLON -> identifier.error("Command calls belong inside command.\nDid you close too many braces?")
+            else -> identifier.error("expected void")
+        }
+    }
+
+    else -> token.error("expected void")
 }
 
 fun Parser.block(): Block {
