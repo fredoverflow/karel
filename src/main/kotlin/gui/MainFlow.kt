@@ -47,7 +47,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.crea
                 start(instructions)
             } else {
                 editor.setCursorTo(editor.length())
-                showDiagnostic("void ${currentProblem.name} not found")
+                showDiagnostic("void ${currentProblem.name}() not found")
             }
         }
     }
