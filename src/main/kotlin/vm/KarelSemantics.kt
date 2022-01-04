@@ -1,8 +1,11 @@
 package vm
 
 import common.Diagnostic
+import freditor.Levenshtein
 import logic.Problem
 import syntax.tree.*
+
+val BUILTIN_COMMANDS = listOf("moveForward", "turnLeft", "turnAround", "turnRight", "pickBeeper", "dropBeeper")
 
 class KarelSemantics(val program: Program, entryPoint: String = program.commands.first().identifier.lexeme) {
     companion object {
@@ -79,8 +82,18 @@ class KarelSemantics(val program: Program, entryPoint: String = program.commands
 
     private fun undefinedCommands(): List<Diagnostic> {
         return callsInside(program)
-                .filter(this::targetIsUnknown)
-                .map { Diagnostic(it.target.start, "undefined command ${it.target.lexeme}") }
+            .filter(this::targetIsUnknown)
+            .map { call ->
+                val bestMatches = Levenshtein.bestMatches(call.target.lexeme, commands.keys + BUILTIN_COMMANDS)
+                if (bestMatches.size == 1) {
+                    val bestMatch = bestMatches.first()
+                    val prefix = bestMatch.commonPrefixWith(call.target.lexeme)
+                    Diagnostic(call.target.start + prefix.length, "Did you mean $bestMatch?")
+                } else {
+                    val commaSeparated = bestMatches.joinToString(", ")
+                    Diagnostic(call.target.start, "Did you mean $commaSeparated?")
+                }
+            }
     }
 
     private fun targetIsUnknown(call: Call): Boolean {

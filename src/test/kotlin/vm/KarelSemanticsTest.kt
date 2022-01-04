@@ -83,7 +83,7 @@ class KarelSemanticsTest {
 
     @Test
     fun undefinedCommand() {
-        assertIllegal("undefined command", """
+        assertIllegal("Did you mean b?", """
         void main() {
             a();
         }
