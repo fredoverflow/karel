@@ -136,7 +136,7 @@ data class World(private val hi: Long, private val lo: Long, val floorPlan: Floo
     }
 
     fun countBeepersInColumn(x: Int): Int {
-        return (0..9).sumBy { y -> beepersAt(x, y) }
+        return (0..9).sumOf { y -> beepersAt(x, y) }
     }
 
     // KAREL
