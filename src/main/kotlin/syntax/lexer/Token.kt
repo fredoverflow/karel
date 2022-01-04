@@ -11,6 +11,10 @@ class Token(val kind: TokenKind, val start: Int, val lexeme: String) {
         throw Diagnostic(start, message)
     }
 
+    fun error(message: String, startDelta: Int): Nothing {
+        throw Diagnostic(start + startDelta, message)
+    }
+
     override fun toString(): String = kind.toString()
 
     fun toInt(range: IntRange): Int {

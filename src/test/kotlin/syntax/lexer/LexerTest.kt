@@ -139,25 +139,12 @@ class LexerTest {
 
     @Test
     fun keywords() {
-        lexer = Lexer("if else false repeat true void while")
+        lexer = Lexer("if else repeat void while")
 
         assertToken(IF)
         assertToken(ELSE)
-        assertToken(FALSE)
         assertToken(REPEAT)
-        assertToken(TRUE)
         assertToken(VOID)
         assertToken(WHILE)
-    }
-
-    @Test
-    fun predicates() {
-        lexer = Lexer("onBeeper beeperAhead leftIsClear frontIsClear rightIsClear")
-
-        assertToken(ON_BEEPER)
-        assertToken(BEEPER_AHEAD)
-        assertToken(LEFT_IS_CLEAR)
-        assertToken(FRONT_IS_CLEAR)
-        assertToken(RIGHT_IS_CLEAR)
     }
 }

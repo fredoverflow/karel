@@ -245,7 +245,7 @@ class ParserNegativeTest {
 
     @Test
     fun statementAsCondition() {
-        assertDiagnostic("illegal start of condition", """
+        assertDiagnostic("Did you mean", """
         void main() {
             if (turnAround()) {
             }

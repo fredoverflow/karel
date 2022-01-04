@@ -9,14 +9,6 @@ enum class TokenKind(val lexeme: String) {
     ELSE("else"),
     WHILE("while"),
 
-    FALSE("false"),
-    TRUE("true"),
-    ON_BEEPER("onBeeper"),
-    BEEPER_AHEAD("beeperAhead"),
-    LEFT_IS_CLEAR("leftIsClear"),
-    FRONT_IS_CLEAR("frontIsClear"),
-    RIGHT_IS_CLEAR("rightIsClear"),
-
     OPENING_PAREN("("),
     CLOSING_PAREN(")"),
     OPENING_BRACE("{"),
