@@ -84,7 +84,7 @@ class Week2Test : WorldTestBase() {
 
     @Test
     fun quantize() {
-        executeGoal(Problem.quantize)
+        executeGoal(Problem.quantizeBits)
         assertKarelAt(9, 9, EAST)
         for (x in 0..9) {
             val expected = initialWorld.beeperAt(x, 4)

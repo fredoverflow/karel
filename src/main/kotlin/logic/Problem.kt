@@ -329,7 +329,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
             world.dropBeeper(x, y).withKarelAt(0, 0, EAST)
         }
 
-        val quantize = Problem("2.4.2", "quantize",
+        val quantizeBits = Problem("2.4.2", "quantizeBits",
                 "Karel the hacker is eavesdropping\non an analog communications line\nand writes down 10 bits encoded\nas 0..5 (0) or 6..10 (1). Convert\nto always 0 (0) or always 10 (1).",
                 "\u8009\ua104\u0001\u9101\u0007\uc124\u0002\u8005\u0001\u9108\u0007\uc11a\u0008\uc110\u0001\ub10c\u000a\uc115\u0001\u0006\ub110\u0003\u0001\u000a\ud116\ub123\u0003\u0008\ud11f\u0001\ub11b\u0001\u0005\u0008\ud11f\u0002\u0000", 0) {
             pillars().withKarelAt(0, 9, EAST)
@@ -442,7 +442,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
                 findTeddyBear,
                 jumpTheHurdles,
                 solveTheMaze,
-                quantize,
+                quantizeBits,
                 addFast,
 
                 partyAgain,
