@@ -91,4 +91,6 @@ class Parser(private val lexer: Lexer) {
             parse()
         }
     }
+
+    val sema = Sema()
 }

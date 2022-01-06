@@ -1,6 +1,5 @@
 package vm
 
-import common.Diagnostic
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import syntax.lexer.Lexer
@@ -12,12 +11,8 @@ class CodeGeneratorTest {
         val lexer = Lexer(sourceCode)
         val parser = Parser(lexer)
         val program = parser.program()
-
-        val semantics = KarelSemantics(program)
-        assertEquals(emptyList<Diagnostic>(), semantics.errors())
-
-        val codeGenerator = CodeGenerator(semantics)
-        return codeGenerator.generate()
+        val main = program.commands.first()
+        return CodeGenerator(parser.sema).generate(main)
     }
 
     private fun assertBytecode(sourceCode: String, vararg bytecodes: Int) {

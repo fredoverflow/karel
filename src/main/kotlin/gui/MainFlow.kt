@@ -9,7 +9,6 @@ import syntax.parser.Parser
 import syntax.parser.program
 import vm.CodeGenerator
 import vm.Instruction
-import vm.KarelSemantics
 import vm.VirtualMachine
 
 import java.util.concurrent.atomic.AtomicReference
@@ -41,14 +40,22 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.crea
     }
 
     fun parseAndExecute() {
-        processProgram { semantics ->
-            if (semantics.commands.contains(currentProblem.name)) {
-                val instructions = CodeGenerator(semantics).generate()
+        editor.indent()
+        editor.autosaver.save()
+        try {
+            val lexer = Lexer(editor.text)
+            val parser = Parser(lexer)
+            parser.program()
+            val main = parser.sema.command(currentProblem.name)
+            if (main != null) {
+                val instructions = CodeGenerator(parser.sema).generate(main)
                 start(instructions)
             } else {
                 editor.setCursorTo(editor.length())
                 showDiagnostic("void ${currentProblem.name}() not found")
             }
+        } catch (diagnostic: Diagnostic) {
+            showDiagnostic(diagnostic)
         }
     }
 
@@ -111,26 +118,6 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.crea
             stop()
             update()
             showDiagnostic(error.message!!)
-        }
-    }
-
-    fun processProgram(how: (KarelSemantics) -> Unit) {
-        editor.indent()
-        editor.autosaver.save()
-        try {
-            val lexer = Lexer(editor.text)
-            val parser = Parser(lexer)
-            val program = parser.program()
-
-            val semantics = KarelSemantics(program, currentProblem.name)
-            val errors = semantics.errors()
-            if (errors.isEmpty()) {
-                how(semantics)
-            } else {
-                showDiagnostic(errors[0])
-            }
-        } catch (diagnostic: Diagnostic) {
-            showDiagnostic(diagnostic)
         }
     }
 

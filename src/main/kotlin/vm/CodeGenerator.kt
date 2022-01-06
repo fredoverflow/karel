@@ -1,12 +1,13 @@
 package vm
 
 import syntax.lexer.Token
+import syntax.parser.Sema
 import syntax.tree.*
 
 typealias CommandNameId = Int
 typealias Address = Int
 
-class CodeGenerator(private val semantics: KarelSemantics) {
+class CodeGenerator(private val sema: Sema) {
 
     private val program: MutableList<Instruction> = createInstructionBuffer()
 
@@ -38,11 +39,20 @@ class CodeGenerator(private val semantics: KarelSemantics) {
         }
     }
 
-    fun generate(): List<Instruction> {
-        semantics.reachableCommands.forEach { it.generate() }
+    fun generate(main: Command): List<Instruction> {
+        todo.add(main)
+        while (todo.isNotEmpty()) {
+            val command = todo.removeFirst()
+            if (done.add(command)) {
+                command.generate()
+            }
+        }
         translateCallTargets()
         return program
     }
+
+    private val todo = ArrayDeque<Command>()
+    private val done = HashSet<Command>()
 
     private fun Command.generate() {
         addressOfCommandNameId[id(identifier.lexeme)] = pc
@@ -102,8 +112,15 @@ class CodeGenerator(private val semantics: KarelSemantics) {
             }
             is Call -> {
                 val builtin = builtinCommands[target.lexeme]
-                val bytecode = builtin ?: CALL + id(target.lexeme)
-                generateInstruction(bytecode, target)
+                if (builtin != null) {
+                    generateInstruction(builtin, target)
+                } else {
+                    generateInstruction(CALL + id(target.lexeme), target)
+                    val command = sema.command(target.lexeme)!!
+                    if (!done.contains(command)) {
+                        todo.add(command)
+                    }
+                }
             }
         }
     }

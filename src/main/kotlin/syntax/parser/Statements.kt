@@ -6,11 +6,11 @@ import syntax.tree.*
 fun Parser.program(): Program {
     if (current != VOID) token.error("expected void")
 
-    return Program(list1Until(END_OF_INPUT, ::command))
+    return sema(Program(list1Until(END_OF_INPUT, ::command)))
 }
 
 fun Parser.command(): Command = when (current) {
-    VOID -> Command(accept(), expect(IDENTIFIER).emptyParens(), block())
+    VOID -> sema(Command(accept(), expect(IDENTIFIER).emptyParens(), block()))
 
     CLOSING_BRACE -> token.error("too many closing braces")
 
@@ -32,7 +32,7 @@ fun Parser.block(): Block {
 }
 
 fun Parser.statement(): Statement = when (current) {
-    IDENTIFIER -> Call(accept().emptyParens()).semicolon()
+    IDENTIFIER -> sema(Call(accept().emptyParens()).semicolon())
 
     REPEAT -> Repeat(accept(), parenthesized { expect(NUMBER).toInt(2..4095) }, block())
     WHILE -> While(accept(), parenthesized(::disjunction), block())
