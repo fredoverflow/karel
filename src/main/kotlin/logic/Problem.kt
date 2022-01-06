@@ -18,7 +18,7 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
             var world = emptyWorld
 
             for (x in 0..9) {
-                for (y in rng.nextInt(10)..9) {
+                for (y in rng.nextInt(11)..9) {
                     world = world.dropBeeper(x, y)
                 }
             }
