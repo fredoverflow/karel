@@ -76,7 +76,7 @@ class Week1Test : WorldTestBase() {
     @Test
     fun harvestTheField() {
         executeGoal(Problem.harvestTheField)
-        assertKarelAt(1, 4, SOUTH)
+        assertKarelAt(2, 4, SOUTH)
         assertNoBeepers()
     }
 

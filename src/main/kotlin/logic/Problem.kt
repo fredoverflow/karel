@@ -112,10 +112,10 @@ class Problem(val index: String, val name: String, val story: String, val goal: 
 
         val harvestTheField = Problem("1.3.1", "harvestTheField",
                 "Karel's uncle is an agricult --\nerm... farmer. Having helped his\naunt, Karel can't reject the des-\nperate plea for help on the farm.\nThe wheat is already overripe!",
-                "\ua102\u0003\ua108\u8002\u0001\u0001\u0002\u9104\u8004\u0001\u0005\u0004\u0001\u0002\u9109\u0000", 0) {
+                "\ua105\u0004\u0001\u0004\u0001\ua10a\u0001\u0002\u0001\u0002\u8003\u0005\u0004\u0001\u0002\u0001\u910b\u0005\u0000", 0) {
             val world = emptyWorld
 
-            world.withBeepers(0x805L, 0x2a1542a05008000L).withKarelAt(5, 8, NORTH)
+            world.withBeepers(0x805L, 0x2a1542a05008000L).withKarelAt(5, 7, NORTH)
         }
 
         val repairTheStreet = Problem("1.3.2", "repairTheStreet",
