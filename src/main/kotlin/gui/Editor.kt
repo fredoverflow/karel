@@ -92,7 +92,7 @@ void karelsFirstProgram()
             if (input != null) {
                 val newName = input.toString()
                 if (NAME.matches(newName) && newName !in keywords && newName !in builtinCommands) {
-                    replace("""$oldName(\s*\(\s*\))""", "$newName$1")
+                    replace("""\b$oldName(\s*\(\s*\))""", "$newName$1")
                 }
             }
         }
