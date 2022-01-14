@@ -49,88 +49,95 @@ open class FloorPlan(protected val walls: LongArray) {
         }
 
         val empty = FloorPlan(
-                0x6222222223L,
-                0x4000000001L,
-                0x4000000001L,
-                0x4000000001L,
-                0x4000000001L,
-                0x4000000001L,
-                0x4000000001L,
-                0x4000000001L,
-                0x4000000001L,
-                0xc888888889L)
+            0x6222222223L,
+            0x4000000001L,
+            0x4000000001L,
+            0x4000000001L,
+            0x4000000001L,
+            0x4000000001L,
+            0x4000000001L,
+            0x4000000001L,
+            0x4000000001L,
+            0xc888888889L,
+        )
 
         val first = FloorPlan(
-                0x0000000000L,
-                0x0000000000L,
-                0x0000000000L,
-                0x0000000000L,
-                0x0000000000L,
-                0x0000000000L,
-                0x0000000000L,
-                0x6222300000L,
-                0x4008900000L,
-                0xc890000000L)
+            0x0000000000L,
+            0x0000000000L,
+            0x0000000000L,
+            0x0000000000L,
+            0x0000000000L,
+            0x0000000000L,
+            0x0000000000L,
+            0x6222300000L,
+            0x4008900000L,
+            0xc890000000L,
+        )
 
         val holes = FloorPlan(
-                0x6222222223L,
-                0x4000000001L,
-                0x4000000001L,
-                0x4000000001L,
-                0x4000000001L,
-                0x4000000001L,
-                0x4000000001L,
-                0xc000000001L,
-                0x3c08080809L,
-                0x03d7d7d7d6L)
+            0x6222222223L,
+            0x4000000001L,
+            0x4000000001L,
+            0x4000000001L,
+            0x4000000001L,
+            0x4000000001L,
+            0x4000000001L,
+            0xc000000001L,
+            0x3c08080809L,
+            0x03d7d7d7d6L,
+        )
 
         val stairs = FloorPlan(
-                0x6222222223L,
-                0x4000000001L,
-                0x4000000001L,
-                0x4000000801L,
-                0x4000009741L,
-                0x4000096141L,
-                0x4000960141L,
-                0x4009600141L,
-                0x4096000141L,
-                0xc9e88889c9L)
+            0x6222222223L,
+            0x4000000001L,
+            0x4000000001L,
+            0x4000000801L,
+            0x4000009741L,
+            0x4000096141L,
+            0x4000960141L,
+            0x4009600141L,
+            0x4096000141L,
+            0xc9e88889c9L,
+        )
 
         val mountain = FloorPlan(
-                0x6222222223L,
-                0x4000080001L,
-                0x4000174001L,
-                0x400095c001L,
-                0x4001603401L,
-                0x4009401c01L,
-                0x4016000341L,
-                0x40940001c1L,
-                0x4160000035L,
-                0xc9c888889dL)
+            0x6222222223L,
+            0x4000080001L,
+            0x4000174001L,
+            0x400095c001L,
+            0x4001603401L,
+            0x4009401c01L,
+            0x4016000341L,
+            0x40940001c1L,
+            0x4160000035L,
+            0xc9c888889dL,
+        )
 
         val maze = FloorPlan(
-                0xffffffffffL,
-                0xffffffffffL,
-                0xffffffffffL,
-                0xffffffffffL,
-                0xffffffffffL,
-                0xffffffffffL,
-                0xffffffffffL,
-                0xffffffffffL,
-                0xffffffffffL,
-                0xffffffffffL)
+            0xffffffffffL,
+            0xffffffffffL,
+            0xffffffffffL,
+            0xffffffffffL,
+            0xffffffffffL,
+            0xffffffffffL,
+            0xffffffffffL,
+            0xffffffffffL,
+            0xffffffffffL,
+            0xffffffffffL,
+        )
 
         val trap = FloorPlan(
-                0x6222222223L,
-                0x4000000001L,
-                0x4000000001L,
-                0x4000000001L,
-                0x4000000001L,
-                0x4000000001L,
-                0x4000000001L,
-                0x4000000001L,
-                0x4000000001L,
-                0xeaaaaaaaabL)
+            0x6222222223L,
+            0x4000000001L,
+            0x4000000001L,
+            0x4000000001L,
+            0x4000000001L,
+            0x4000000001L,
+            0x4000000001L,
+            0x4000000001L,
+            0x4000000001L,
+            0xeaaaaaaaabL,
+        )
     }
 }
 
