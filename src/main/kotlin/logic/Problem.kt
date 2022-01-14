@@ -33,7 +33,7 @@ class Problem(
         }
 
         private fun randomByte(): World {
-            var world = emptyWorld
+            var world = FloorPlan.binary.world()
 
             for (x in 2..9) {
                 if (rng.nextBoolean()) {
@@ -309,7 +309,7 @@ class Problem(
             "\ua114\u000a\uc11c\u0003\ua11e\u0004\u0001\u0004\u0007\uc10d\u0005\u0001\ub108\u0006\u0003\ua11e\u0002\u0001\u0002\ub100\u0007\ud11b\u0006\u000a\uc11b\u0001\ub114\u0005\u0000\u0001\u000a\ud11d\u0000",
             2
         ) {
-            var world = emptyWorld
+            var world = FloorPlan.binary.world()
 
             for (y in 0..1) {
                 for (x in 2..9) {
@@ -461,7 +461,7 @@ class Problem(
             "\u8008\u0007\u0001\u0007\u0001\u0007\u0001\u0004\uc115\uc11c\uc10c\u0006\u0001\u0004\u0001\u0006\u0001\u0001\u0003\u9101\u0000\ud11c\uc118\u0006\u0001\u0004\u0001\ub110\ud10c\ub117",
             4
         ) {
-            var world = emptyWorld
+            var world = FloorPlan.binary.world()
 
             for (y in 0..1) {
                 for (x in 2..9) {

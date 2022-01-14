@@ -126,6 +126,19 @@ open class FloorPlan(protected val walls: LongArray) {
             0xffffffffffL,
         )
 
+        val binary = FloorPlan(
+            0x0622222223L,
+            0x0400000001L,
+            0x0400000001L,
+            0x0c88888889L,
+            0x00000000000,
+            0x00000000000,
+            0x00000000000,
+            0x00000000000,
+            0x00000000000,
+            0x00000000000,
+        )
+
         val trap = FloorPlan(
             0x6222222223L,
             0x4000000001L,
