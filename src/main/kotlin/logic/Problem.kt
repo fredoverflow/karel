@@ -287,7 +287,7 @@ class Problem(
         val increment = Problem(
             "2.2.1",
             "increment",
-            "Do you know binary numbers?\nen.wikipedia.org/wiki/Binary_number\nde.wikipedia.org/wiki/Dualsystem\nKarel wants to add 1 to a number.\nThis is almost trivial in binary.",
+            "Do you know binary numbers?\nen.wikipedia.org/wiki/Binary_number\nde.wikipedia.org/wiki/Dualsystem\nKarel wants to add 1 to a byte.\nThis is almost trivial in binary.",
             "\u0007\uc105\u0005\u0001\ub100\u0006\u0000",
             1,
             ::randomByte
@@ -296,7 +296,7 @@ class Problem(
         val decrement = Problem(
             "2.2.2",
             "decrement",
-            "Karel wants to subtract 1 from\na number. Notice any similarity\nto increment? (What happens if\nKarel decrements the number zero?\nYou can click in Karel's word!)",
+            "Karel wants to subtract 1 from\na byte. Notice any similarity\nto increment? (What happens if\nKarel decrements the byte zero?\nYou can click in Karel's world!)",
             "\u0007\ud107\u0006\u000a\uc107\u0001\ub100\u0005\u0000",
             1,
             ::randomByte
@@ -305,7 +305,7 @@ class Problem(
         val addSlow = Problem(
             "2.2.3",
             "addSlow",
-            "Welcome to the slowest adding\nmachine in the world! Karel just\ndecrements the first number\nand increments the second number\nuntil the first number is zero.",
+            "Welcome to the slowest adding\nmachine in the world! Karel just\ndecrements the first byte\nand increments the second byte\nuntil the first byte is zero.",
             "\ua114\u000a\uc11c\u0003\ua11e\u0004\u0001\u0004\u0007\uc10d\u0005\u0001\ub108\u0006\u0003\ua11e\u0002\u0001\u0002\ub100\u0007\ud11b\u0006\u000a\uc11b\u0001\ub114\u0005\u0000\u0001\u000a\ud11d\u0000",
             2
         ) {
@@ -457,7 +457,7 @@ class Problem(
         val addFast = Problem(
             "2.4.3",
             "addFast",
-            "Karel adds two numbers from the\n1st and 2nd row and stores the\nsum in the 4th row. The 3rd row\nis reserved for the carry bits.\n(Does \"carry the 1\" ring a bell?)",
+            "Karel adds two bytes from the\n1st and 2nd row and stores the\nsum in the 4th row. The 3rd row\nis reserved for the carry bits.\n(Does \"carry the 1\" ring a bell?)",
             "\u8008\u0007\u0001\u0007\u0001\u0007\u0001\u0004\uc115\uc11c\uc10c\u0006\u0001\u0004\u0001\u0006\u0001\u0001\u0003\u9101\u0000\ud11c\uc118\u0006\u0001\u0004\u0001\ub110\ud10c\ub117",
             4
         ) {
