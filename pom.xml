@@ -110,11 +110,7 @@
                         <!-- remove compiler-generated null checks for unneeded Java->Kotlin interoperability -->
                         <option>-assumenosideeffects class kotlin.jvm.internal.Intrinsics { static void checkParameterIsNotNull(java.lang.Object, java.lang.String); }</option>
                         <!-- hide annoying but harmless reflection warnings -->
-                        <option>-dontnote kotlin.internal.PlatformImplementationsKt</option>
-                        <option>-dontnote kotlin.jvm.internal.Reflection</option>
-                        <option>-dontnote kotlin.jvm.internal.ReflectionFactory</option>
-                        <option>-dontnote kotlin.coroutines.jvm.internal.DebugMetadataKt</option>
-                        <option>-dontnote kotlin.coroutines.jvm.internal.ModuleNameRetriever</option>
+                        <option>-dontnote kotlin.**</option>
                     </options>
                 </configuration>
             </plugin>
