@@ -32,15 +32,17 @@ class Problem(
             return world
         }
 
-        private fun randomByte(): World {
+        private fun randomBytes(n: Int, direction: Int): World {
             var world = FloorPlan.binary.world()
 
-            for (x in 2..9) {
-                if (rng.nextBoolean()) {
-                    world = world.dropBeeper(x, 0)
+            for (y in 0 until n) {
+                for (x in 2..9) {
+                    if (rng.nextBoolean()) {
+                        world = world.dropBeeper(x, y)
+                    }
                 }
             }
-            return world.withKarelAt(9, 0, WEST)
+            return world.withKarelAt(9, 0, direction)
         }
 
         private val rng = java.util.Random()
@@ -289,18 +291,20 @@ class Problem(
             "increment",
             "Do you know binary numbers?\nen.wikipedia.org/wiki/Binary_number\nde.wikipedia.org/wiki/Dualsystem\nKarel wants to add 1 to a byte.\nThis is almost trivial in binary.",
             "\u0007\uc105\u0005\u0001\ub100\u0006\u0000",
-            1,
-            ::randomByte
-        )
+            1
+        ) {
+            randomBytes(1, WEST)
+        }
 
         val decrement = Problem(
             "2.2.2",
             "decrement",
             "Karel wants to subtract 1 from\na byte. Notice any similarity\nto increment? (What happens if\nKarel decrements the byte zero?\nYou can click in Karel's world!)",
             "\u0007\ud107\u0006\u000a\uc107\u0001\ub100\u0005\u0000",
-            1,
-            ::randomByte
-        )
+            1
+        ) {
+            randomBytes(1, WEST)
+        }
 
         val addSlow = Problem(
             "2.2.3",
@@ -309,16 +313,7 @@ class Problem(
             "\ua114\u000a\uc11c\u0003\ua11e\u0004\u0001\u0004\u0007\uc10d\u0005\u0001\ub108\u0006\u0003\ua11e\u0002\u0001\u0002\ub100\u0007\ud11b\u0006\u000a\uc11b\u0001\ub114\u0005\u0000\u0001\u000a\ud11d\u0000",
             2
         ) {
-            var world = FloorPlan.binary.world()
-
-            for (y in 0..1) {
-                for (x in 2..9) {
-                    if (rng.nextBoolean()) {
-                        world = world.dropBeeper(x, y)
-                    }
-                }
-            }
-            world.withKarelAt(9, 0, WEST)
+            randomBytes(2, WEST)
         }
 
         val saveTheFlowers = Problem(
@@ -461,16 +456,7 @@ class Problem(
             "\u8008\u0007\u0001\u0007\u0001\u0007\u0001\u0004\uc115\uc11c\uc10c\u0006\u0001\u0004\u0001\u0006\u0001\u0001\u0003\u9101\u0000\ud11c\uc118\u0006\u0001\u0004\u0001\ub110\ud10c\ub117",
             4
         ) {
-            var world = FloorPlan.binary.world()
-
-            for (y in 0..1) {
-                for (x in 2..9) {
-                    if (rng.nextBoolean()) {
-                        world = world.dropBeeper(x, y)
-                    }
-                }
-            }
-            world.withKarelAt(9, 0, SOUTH)
+            randomBytes(2, SOUTH)
         }
 
         val partyAgain = Problem(
