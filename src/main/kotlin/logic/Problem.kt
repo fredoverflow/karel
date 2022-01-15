@@ -542,6 +542,16 @@ class Problem(
             builder.world().withKarelAt(x, y, dir)
         }
 
+        val addSmart = Problem(
+            "3.3.2",
+            "addSmart",
+            "Karel adds two bytes from the\n1st and 2nd row and stores the\nsum in the 3rd row. Dropping and\nchecking carry bits is no longer\nnecessary. What a smart robot!",
+            "\u000b\uc123\u0007\u0008\u000e\ud108\ua120\ub100\u0007\u0008\u000d\uc10e\ua120\ub110\ua124\ub100\u000b\uc123\u0007\u0008\u000e\ud118\ua124\ub100\u0007\u0008\u000d\uc11e\ua124\ub110\ua120\ub110\u0004\u0001\u0002\u0000\u0001\u0001\u0006\u0004\u0001\u0004\u0001\u0001\u0003\u0000",
+            3
+        ) {
+            randomBytes(2, SOUTH)
+        }
+
         val problems: List<Problem> = listOf(
             karelsFirstProgram,
 
@@ -578,7 +588,8 @@ class Problem(
             fetchTheStars,
             secureTheCave,
             layAndRemoveTiles,
-            findShelters
+            findShelters,
+            addSmart,
         )
     }
 }

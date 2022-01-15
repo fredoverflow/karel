@@ -84,4 +84,13 @@ class Week3Test : WorldTestBase() {
         assertEquals(floodWorld.beepersHi, world.beepersHi)
         assertEquals(floodWorld.beepersLo, world.beepersLo)
     }
+
+    @Test
+    fun addSmart() {
+        executeGoal(Problem.addSmart)
+        val one = initialWorld.binaryNumber(0)
+        val two = initialWorld.binaryNumber(1)
+        val sum = world.binaryNumber(2)
+        assertEquals((one + two).and(255), sum)
+    }
 }
