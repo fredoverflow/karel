@@ -1,15 +1,29 @@
 package syntax.parser
 
 import freditor.Levenshtein
+import syntax.lexer.Token
+import syntax.lexer.TokenKind.VOID
+import syntax.tree.Block
 import syntax.tree.Call
 import syntax.tree.Command
 import syntax.tree.Program
 
-val BUILTIN_COMMANDS = setOf("moveForward", "turnLeft", "turnAround", "turnRight", "pickBeeper", "dropBeeper")
+private val TOKEN = Token(VOID, 0, "")
+private val BLOCK = Block(TOKEN, emptyList(), TOKEN)
+private val BUILTIN = Command(TOKEN, TOKEN, emptyList(), BLOCK)
 
 class Sema {
-    private val commands = HashMap<String, Command>()
-    private val calls = ArrayList<Call>()
+    private val commands = mutableMapOf(
+        "moveForward" to BUILTIN,
+        "turnLeft" to BUILTIN,
+        "turnAround" to BUILTIN,
+        "turnRight" to BUILTIN,
+        "pickBeeper" to BUILTIN,
+        "dropBeeper" to BUILTIN
+    )
+
+    private var callsInCurrentCommand = ArrayList<Call>()
+    private val callsByCommand = LinkedHashMap<Command, ArrayList<Call>>()
 
     fun command(name: String): Command? = commands[name]
 
@@ -17,34 +31,64 @@ class Sema {
         if (commands.containsKey(command.identifier.lexeme)) {
             command.identifier.error("duplicate command ${command.identifier.lexeme}")
         }
-        if (BUILTIN_COMMANDS.contains(command.identifier.lexeme)) {
-            command.identifier.error("cannot redefine builtin command ${command.identifier.lexeme}")
-        }
         commands[command.identifier.lexeme] = command
+        callsByCommand[command] = callsInCurrentCommand
+        callsInCurrentCommand = ArrayList()
         return command
     }
 
     operator fun invoke(call: Call): Call {
-        if (!BUILTIN_COMMANDS.contains(call.target.lexeme)) {
-            calls.add(call)
-        }
+        callsInCurrentCommand.add(call)
         return call
     }
 
     operator fun invoke(program: Program): Program {
-        for (call in calls) {
-            if (!commands.containsKey(call.target.lexeme)) {
-                val bestMatches = Levenshtein.bestMatches(call.target.lexeme, commands.keys + BUILTIN_COMMANDS)
-                if (bestMatches.size == 1) {
-                    val bestMatch = bestMatches.first()
-                    val prefix = bestMatch.commonPrefixWith(call.target.lexeme)
-                    call.target.error("Did you mean $bestMatch?", prefix.length)
+        for ((caller, calls) in callsByCommand) {
+            val previous = LinkedHashMap<String, Command?>()
+            for (parameter in caller.parameters) {
+                if (previous.put(parameter.lexeme, commands.put(parameter.lexeme, BUILTIN)) != null) {
+                    parameter.error("duplicate parameter ${parameter.lexeme}")
+                }
+            }
+
+            for (call in calls) {
+                val callee = command(call.target)
+
+                val parameterCount = callee.parameters.size
+                val argumentCount = call.arguments.size
+                if (parameterCount != argumentCount) {
+                    call.target.error("${call.target.lexeme} takes $parameterCount arguments, not $argumentCount")
+                }
+
+                for (argument in call.arguments) {
+                    if (command(argument).parameters.isNotEmpty()) {
+                        argument.error("cannot pass higher-order commands")
+                    }
+                }
+            }
+            for ((name, command) in previous) {
+                if (command != null) {
+                    commands[name] = command
                 } else {
-                    val commaSeparated = bestMatches.joinToString(", ")
-                    call.target.error("Did you mean $commaSeparated?")
+                    commands.remove(name)
                 }
             }
         }
         return program
+    }
+
+    private fun command(target: Token): Command {
+        val result = commands[target.lexeme]
+        if (result != null) return result
+
+        val bestMatches = Levenshtein.bestMatches(target.lexeme, commands.keys)
+        if (bestMatches.size == 1) {
+            val bestMatch = bestMatches.first()
+            val prefix = bestMatch.commonPrefixWith(target.lexeme)
+            target.error("Did you mean $bestMatch?", prefix.length)
+        } else {
+            val commaSeparated = bestMatches.joinToString(", ")
+            target.error("Did you mean $commaSeparated?")
+        }
     }
 }

@@ -34,7 +34,7 @@ class SemaTest {
 
     @Test
     fun redefineBuiltin() {
-        assertIllegal("redefine builtin", """
+        assertIllegal("duplicate", """
         void turnRight() {
             turnLeft();
             turnLeft();
@@ -51,6 +51,63 @@ class SemaTest {
         }
 
         void b() {
+        }
+        """)
+    }
+
+    @Test
+    fun tooManyArguments() {
+        assertIllegal("takes 0 arguments, not 1", """
+        void main() {
+            first(moveForward);
+        }
+        
+        void first() {
+        }
+        """)
+    }
+
+    @Test
+    fun tooFewArguments() {
+        assertIllegal("takes 1 arguments, not 0", """
+        void main() {
+            second();
+        }
+        
+        void second(void f()) {
+        }
+        """)
+    }
+
+    @Test
+    fun thirdOrder() {
+        assertIllegal("order", """
+        void main() {
+            second(second);
+        }
+        
+        void second(void f()) {
+        }
+        """)
+    }
+
+    @Test
+    fun shadowing1() {
+        assertIllegal("takes 0 arguments, not 1", """
+        void f(void f()) {
+            f(f);
+        }
+        """)
+    }
+
+    @Test
+    fun shadowing2() {
+        assertIllegal("takes 1 arguments, not 0", """
+        void f(void f()) {
+        }
+        
+        void main() {
+            f();
         }
         """)
     }

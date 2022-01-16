@@ -76,6 +76,27 @@ class Parser(private val lexer: Lexer) {
         return list0While({ current != terminator }, parse)
     }
 
+    inline fun <T> commaSeparatedList1(first: T, parse: () -> T): List<T> {
+        val list = mutableListOf(first)
+        while (current == COMMA) {
+            next()
+            list.add(parse())
+        }
+        return list
+    }
+
+    inline fun <T> commaSeparatedList1(parse: () -> T): List<T> {
+        return commaSeparatedList1(parse(), parse)
+    }
+
+    inline fun <T> commaSeparatedList0(terminator: TokenKind, parse: () -> T): List<T> {
+        return if (current == terminator) {
+            emptyList()
+        } else {
+            commaSeparatedList1(parse)
+        }
+    }
+
     inline fun <T> parenthesized(parse: () -> T): T {
         expect(OPENING_PAREN)
         val result = parse()

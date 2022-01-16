@@ -1,6 +1,7 @@
 package vm
 
 import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.Handle
 import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes.*
@@ -13,6 +14,14 @@ import java.util.concurrent.atomic.AtomicInteger
 private const val CONSTRUCTOR_DESCRIPTOR = "(Ljava/util/concurrent/atomic/AtomicReference;Lvm/Karel\$Callbacks;)V"
 private const val INSTRUMENT = true
 private val id = AtomicInteger(0)
+
+private val methodDescriptors = HashMap<Int, String>()
+
+fun methodDescriptor(countMethodHandles: Int): String {
+    return methodDescriptors.computeIfAbsent(countMethodHandles) { n ->
+        "(I" + "Ljava/lang/invoke/MethodHandle;".repeat(n) + ")V"
+    }
+}
 
 class Emitter(private val program: Program) {
     private val className = "Karel_${id.incrementAndGet()}"
@@ -53,8 +62,11 @@ class Emitter(private val program: Program) {
         mv.visitMaxs(0, 0) // compute automatically
     }
 
+    private var currentCommand = program.commands.first()
+
     private fun Command.emit() {
-        mv = classWriter.visitMethod(ACC_PUBLIC, identifier.lexeme, "(I)V", null, null)
+        currentCommand = this
+        mv = classWriter.visitMethod(ACC_PUBLIC, identifier.lexeme, methodDescriptor(parameters.size), null, null)
         mv.visitCode()
 
         emitPrologue()
@@ -163,14 +175,43 @@ class Emitter(private val program: Program) {
                 mv.visitInsn(POP)
             }
             is Call -> {
-                mv.visitVarInsn(ALOAD, 0)
-                if (INSTRUMENT) {
-                    mv.visitPushInt(target.start)
+                val parameterIndex = currentCommand.parameters.indexOfFirst { it.lexeme == target.lexeme }
+                if (parameterIndex != -1) {
+                    // parameter();
+                    mv.visitVarInsn(ALOAD, 2 + parameterIndex)
+                    pushThisAndPosition()
+                    mv.visitMethodInsn(
+                        INVOKEVIRTUAL,
+                        "java/lang/invoke/MethodHandle",
+                        "invokeExact",
+                        "(L$className;I)V",
+                        false
+                    )
                 } else {
-                    mv.visitInsn(ICONST_0)
+                    // command(arguments);
+                    pushThisAndPosition()
+                    for (argument in arguments) {
+                        val parameterIndex = currentCommand.parameters.indexOfFirst { it.lexeme == argument.lexeme }
+                        if (parameterIndex != -1) {
+                            // argument is parameter
+                            mv.visitVarInsn(ALOAD, 2 + parameterIndex)
+                        } else {
+                            // argument is command
+                            mv.visitLdcInsn(Handle(H_INVOKEVIRTUAL, className, argument.lexeme, "(I)V", false))
+                        }
+                    }
+                    mv.visitMethodInsn(INVOKEVIRTUAL, className, target.lexeme, methodDescriptor(arguments.size), false)
                 }
-                mv.visitMethodInsn(INVOKEVIRTUAL, className, target.lexeme, "(I)V", false)
             }
+        }
+    }
+
+    private fun Call.pushThisAndPosition() {
+        mv.visitVarInsn(ALOAD, 0)
+        if (INSTRUMENT) {
+            mv.visitPushInt(target.start)
+        } else {
+            mv.visitInsn(ICONST_0)
         }
     }
 

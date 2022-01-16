@@ -6,7 +6,6 @@ import freditor.Autosaver
 import freditor.FreditorUI
 import freditor.JavaIndenter
 import syntax.lexer.keywords
-import syntax.parser.BUILTIN_COMMANDS
 
 import java.awt.*
 import java.awt.event.KeyEvent
@@ -14,6 +13,7 @@ import java.awt.geom.Line2D
 import javax.swing.JOptionPane
 
 private val NAME = Regex("""[A-Z_a-z][0-9A-Z_a-z]*""")
+private val BUILTIN_COMMANDS = setOf("moveForward", "turnLeft", "turnAround", "turnRight", "pickBeeper", "dropBeeper")
 
 class Editor : FreditorUI(Flexer, JavaIndenter.instance, 60, 1) {
     val autosaver: Autosaver = newAutosaver("karel")
@@ -92,7 +92,7 @@ void karelsFirstProgram()
             if (input != null) {
                 val newName = input.toString()
                 if (NAME.matches(newName) && newName !in keywords && newName !in BUILTIN_COMMANDS) {
-                    replace("""\b$oldName(\s*\(\s*\))""", "$newName$1")
+                    replace("""\b$oldName(\s*\()""", "$newName$1")
                 }
             }
         }

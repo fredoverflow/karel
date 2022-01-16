@@ -29,6 +29,7 @@ class Lexer(input: String) : LexerBase(input) {
 
             '(' -> nextVerbatim(OPENING_PAREN)
             ')' -> nextVerbatim(CLOSING_PAREN)
+            ',' -> nextVerbatim(COMMA)
             ';' -> nextVerbatim(SEMICOLON)
             '{' -> nextVerbatim(OPENING_BRACE)
             '}' -> nextVerbatim(CLOSING_BRACE)

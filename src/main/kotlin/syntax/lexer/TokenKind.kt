@@ -11,9 +11,10 @@ enum class TokenKind(val lexeme: String) {
 
     OPENING_PAREN("("),
     CLOSING_PAREN(")"),
+    COMMA(","),
+    SEMICOLON(";"),
     OPENING_BRACE("{"),
     CLOSING_BRACE("}"),
-    SEMICOLON(";"),
     BANG("!"),
     AMPERSAND_AMPERSAND("&&"),
     BAR_BAR("||"),

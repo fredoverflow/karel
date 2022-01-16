@@ -7,14 +7,14 @@ sealed class Node
 
 data class Program(val commands: List<Command>) : Node()
 
-data class Command(val void: Token, val identifier: Token, val body: Block) : Node()
+data class Command(val void: Token, val identifier: Token, val parameters: List<Token>, val body: Block) : Node()
 
 data class Block(val openingBrace: Token, val statements: List<Statement>, val closingBrace: Token) : Statement()
 
 
 sealed class Statement : Node()
 
-data class Call(val target: Token) : Statement()
+data class Call(val target: Token, val arguments: List<Token>) : Statement()
 
 data class Repeat(val repeat: Token, val times: Int, val body: Block) : Statement()
 

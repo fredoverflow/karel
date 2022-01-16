@@ -46,11 +46,13 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.crea
             val parser = Parser(lexer)
             val program = parser.program()
             val main = parser.sema.command(currentProblem.name)
-            if (main != null) {
-                execute(Emitter(program).emit())
-            } else {
+            if (main == null) {
                 editor.setCursorTo(editor.length())
                 showDiagnostic("void ${currentProblem.name}() not found")
+            } else if (main.parameters.isNotEmpty()) {
+                main.parameters.first().error("${currentProblem.name} cannot have parameters")
+            } else {
+                execute(Emitter(program).emit())
             }
         } catch (diagnostic: Diagnostic) {
             showDiagnostic(diagnostic)

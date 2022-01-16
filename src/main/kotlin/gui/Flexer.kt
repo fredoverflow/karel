@@ -35,7 +35,7 @@ object Flexer : freditor.Flexer() {
             .set("AZ__az", IDENTIFIER_HEAD)
             .build()
             .verbatim(IDENTIFIER_TAIL, "else", "false", "if", "repeat", "true", "void", "while")
-            .verbatim(EMPTY, "!", "&&", ";", "||")
+            .verbatim(EMPTY, ", ", ";", "!", "&&", "||")
             .setDefault(ERROR)
 
     override fun start(): FlexerState = START

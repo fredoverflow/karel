@@ -10,7 +10,19 @@ fun Parser.program(): Program {
 }
 
 fun Parser.command(): Command = when (current) {
-    VOID -> sema(Command(accept(), expect(IDENTIFIER).emptyParens(), block()))
+    VOID -> sema(
+        Command(
+            accept(),
+            expect(IDENTIFIER),
+            parenthesized {
+                if (current != VOID)
+                    emptyList()
+                else
+                    commaSeparatedList0(CLOSING_PAREN) { expect(VOID); expect(IDENTIFIER).emptyParens() }
+            },
+            block()
+        )
+    )
 
     CLOSING_BRACE -> token.error("too many closing braces")
 
@@ -32,7 +44,12 @@ fun Parser.block(): Block {
 }
 
 fun Parser.statement(): Statement = when (current) {
-    IDENTIFIER -> sema(Call(accept().emptyParens()).semicolon())
+    IDENTIFIER -> sema(
+        Call(
+            accept(),
+            parenthesized { commaSeparatedList0(CLOSING_PAREN) { expect(IDENTIFIER) } }
+        ).semicolon()
+    )
 
     REPEAT -> Repeat(accept(), parenthesized { expect(NUMBER).toInt(2..32767) }, block())
 
