@@ -42,6 +42,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.crea
     fun parseAndExecute() {
         editor.indent()
         editor.autosaver.save()
+        editor.clearDiagnostics()
         try {
             val lexer = Lexer(editor.text)
             val parser = Parser(lexer)
