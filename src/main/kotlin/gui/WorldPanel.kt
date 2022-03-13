@@ -120,6 +120,7 @@ class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
     var binaryLines = 0
 
     private fun Graphics.drawNumbers(world: World) {
+        val shift = if (world.beeperAt(2, 7)) 24 else 0
         for (y in 0 until binaryLines) {
             var totalValue = 0
             var beeperValue = 1
@@ -128,7 +129,7 @@ class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
                     drawNumber(x, y, beeperValue, 0x000000)
                     totalValue += beeperValue
                 }
-                beeperValue = beeperValue.shl(1)
+                beeperValue = beeperValue.shl(shift + 1).shr(shift)
             }
             drawNumber(0, y, totalValue, 0x008000)
         }
