@@ -291,7 +291,7 @@ class Problem(
             "increment",
             "Do you know binary numbers?\nen.wikipedia.org/wiki/Binary_number\nde.wikipedia.org/wiki/Dualsystem\nKarel wants to add 1 to a byte.\nThis is almost trivial in binary.",
             "\u0007\uc105\u0005\u0001\ub100\u0006\u0000",
-            1
+            0b1
         ) {
             randomBytes(1, WEST)
         }
@@ -301,7 +301,7 @@ class Problem(
             "decrement",
             "Karel wants to subtract 1 from\na byte. Notice any similarity\nto increment? (What happens if\nKarel decrements the byte zero?\nYou can click in Karel's world!)",
             "\u0007\ud107\u0006\u000a\uc107\u0001\ub100\u0005\u0000",
-            1
+            0b1
         ) {
             randomBytes(1, WEST)
         }
@@ -311,7 +311,7 @@ class Problem(
             "addSlow",
             "Welcome to the slowest adding\nmachine in the world! Karel just\ndecrements the first byte\nand increments the second byte\nuntil the first byte is zero.",
             "\ua114\u000a\uc11c\u0003\ua11e\u0004\u0001\u0004\u0007\uc10d\u0005\u0001\ub108\u0006\u0003\ua11e\u0002\u0001\u0002\ub100\u0007\ud11b\u0006\u000a\uc11b\u0001\ub114\u0005\u0000\u0001\u000a\ud11d\u0000",
-            2
+            0b11
         ) {
             randomBytes(2, WEST)
         }
@@ -454,7 +454,7 @@ class Problem(
             "addFast",
             "Karel adds two bytes from the\n1st and 2nd row and stores the\nsum in the 4th row. The 3rd row\nis reserved for the carry bits.\n(Does \"carry the 1\" ring a bell?)",
             "\u8008\u0007\u0001\u0007\u0001\u0007\u0001\u0004\uc115\uc11c\uc10c\u0006\u0001\u0004\u0001\u0006\u0001\u0001\u0003\u9101\u0000\ud11c\uc118\u0006\u0001\u0004\u0001\ub110\ud10c\ub117",
-            4
+            0b1011
         ) {
             randomBytes(2, SOUTH)
         }
@@ -547,7 +547,7 @@ class Problem(
             "addSmart",
             "Karel adds two bytes from the\n1st and 2nd row and stores the\nsum in the 3rd row. Dropping and\nchecking carry bits is no longer\nnecessary. What a smart robot!",
             "\u000b\uc123\u0007\u0008\u000e\ud108\ua120\ub100\u0007\u0008\u000d\uc10e\ua120\ub110\ua124\ub100\u000b\uc123\u0007\u0008\u000e\ud118\ua124\ub100\u0007\u0008\u000d\uc11e\ua124\ub110\ua120\ub110\u0004\u0001\u0002\u0000\u0001\u0001\u0006\u0004\u0001\u0004\u0001\u0001\u0003\u0000",
-            3
+            0b111
         ) {
             randomBytes(2, SOUTH)
         }
