@@ -1,3 +1,6 @@
+😕 Brauchst du Hilfe beim Installieren in Windows?<br>
+📺 Dann schau dir [Karel The Robot installieren in Windows](https://www.youtube.com/watch?v=69du58tb_48&list=PL5vhQpd0v6Y5dVcY8_9Ru6dANaz6UmPnL) an!
+
 ![hangTheLampions](https://i.imgur.com/EMKIohi.png)
 
 ## Background
@@ -47,6 +50,9 @@ hang laundry: 🧺
 If we keep delving deeper into lower levels of abstraction until we reach individual muscle movements, even the most simple-minded being can do the laundry by following the given instructions carefully. And how do we call such beings? Robots!
 
 ## Getting started
+
+😕 Brauchst du Hilfe beim Installieren in Windows?<br>
+📺 Dann schau dir [Karel The Robot installieren in Windows](https://www.youtube.com/watch?v=69du58tb_48&list=PL5vhQpd0v6Y5dVcY8_9Ru6dANaz6UmPnL) an!
 
 Please take the time to **read the following instructions carefully.**
 Most problems stem from skipping or misunderstanding important steps.
