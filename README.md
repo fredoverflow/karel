@@ -55,7 +55,7 @@ Most problems stem from skipping or misunderstanding important steps.
 
 1. Visit https://adoptium.net
 
-2. Click "Latest release" to download Java installer
+2. Click "Latest release" button to download Java installer
 
 3. Wait for download to finish
 
@@ -63,19 +63,19 @@ Most problems stem from skipping or misunderstanding important steps.
 
 5. Click Next, Next, Install, Finish
 
-6. Click [karel.jar](https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar) to download Karel
+6. Click [karel.jar](https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar) to download Karel<br>
+**If Karel fails to download**, continue with ⚠️ Troubleshooting *Windows*, or ⚠️ Troubleshooting *macOS*
 
-7. Open the `Downloads` folder and double-click `karel.jar` to start Karel
-
-**If Karel fails to start**, continue with ⚠️ Troubleshooting *Windows*, or ⚠️ Troubleshooting *macOS*.
+7. Open the `Downloads` folder and double-click `karel.jar` to start Karel<br>
+**If Karel fails to start**, continue with ⚠️ Troubleshooting *Windows*, or ⚠️ Troubleshooting *macOS*
 
 ### ⚠️ Troubleshooting *Windows*
 
 Steps 1 through 5 (install Java) worked, but steps 6 (download Karel) or 7 (start Karel) failed? Then read on.
 
-Move your mouse over the script below.
-A button appears in the top right corner of the script.
-Click that button to copy the script.
+- Move your mouse over the script below
+- A button appears in the top right corner of the script
+- Click that button to copy the script
 ```cmd
 cd Downloads
 if exist karel.jar.zip erase karel.jar.zip
@@ -85,9 +85,10 @@ echo java -jar karel.jar >> karel.cmd
 karel.cmd
 
 ```
-Press the Windows key (the key on the bottom left with the Windows logo ⊞ on it), write `cmd` and confirm with Enter.
-A terminal appears. Right-click anywhere inside that terminal to paste and execute the script.
-(Should copy/paste not work for some reason, just type every line manually.)
+- Press the Windows key (the key on the bottom left with the Windows logo ⊞ on it)
+- Write `cmd` and confirm with Enter
+- A terminal appears
+- Right-click anywhere inside that terminal to paste and execute the script
 
 From now on, simply double-click `karel.cmd` in the `Downloads` folder to start Karel.<br>
 Feel free to move `karel.jar` and `karel.cmd` to the Desktop or any other folder you prefer.
@@ -96,22 +97,23 @@ Feel free to move `karel.jar` and `karel.cmd` to the Desktop or any other folder
 
 Steps 1 through 5 (install Java) worked, but steps 6 (download Karel) or 7 (start Karel) failed? Then read on.
 
-Move your mouse over the script below.
-A button appears in the top right corner of the script.
-Click that button to copy the script.
+- Move your mouse over the script below
+- A button appears in the top right corner of the script
+- Click that button to copy the script
 ```sh
 cd Downloads
 curl -o karel.jar https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar
+chmod +x karel.jar
 echo java -version > karel.sh
 echo java -jar karel.jar >> karel.sh
 chmod +x karel.sh
 ./karel.sh
 
 ```
-Press `Command⌘ Space` (or click the magnifying glass 🔍 in the top right corner of the screen) to open Spotlight.
-Write `terminal` and confirm with Enter. A terminal appears.
-Press `Command⌘ V` to paste and execute the script.
-(Should copy/paste not work for some reason, just type every line manually.)
+- Press `Command⌘ Space` (or click the magnifying glass 🔍 in the top right corner of the screen) to open Spotlight
+- Write `terminal` and confirm with Enter
+- A terminal appears
+- Press `Command⌘ V` to paste and execute the script
 
 From now on, simply double-click `karel.sh` in the `Downloads` folder to start Karel.<br>
 Feel free to move `karel.jar` and `karel.sh` to the Desktop or any other folder you prefer.
@@ -122,6 +124,7 @@ Feel free to move `karel.jar` and `karel.sh` to the Desktop or any other folder 
 sudo apt install default-jdk
 cd Downloads
 curl -o karel.jar https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar
+chmod +x karel.jar
 echo java -version > karel.sh
 echo java -jar -Dsun.java2d.opengl=True karel.jar >> karel.sh
 chmod +x karel.sh
