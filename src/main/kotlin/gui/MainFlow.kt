@@ -73,7 +73,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.crea
 
     fun stop() {
         timer.stop()
-        controlPanel.executionFinished()
+        controlPanel.executionFinished(currentProblem.isRandom)
         virtualMachinePanel.clearStack()
         editor.clearStack()
         editor.requestFocusInWindow()

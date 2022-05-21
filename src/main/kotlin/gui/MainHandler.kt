@@ -4,6 +4,14 @@ import java.awt.event.KeyEvent
 
 class MainHandler : MainFlow() {
     init {
+        controlPanel.randomize.addActionListener {
+            initialWorld = currentProblem.createWorld()
+            atomicWorld.set(initialWorld)
+            worldPanel.repaint()
+
+            editor.requestFocusInWindow()
+        }
+
         controlPanel.goal.addActionListener {
             atomicWorld.set(initialWorld)
             worldPanel.repaint()
@@ -17,6 +25,7 @@ class MainHandler : MainFlow() {
 
         controlPanel.problemPicker.addActionListener {
             controlPanel.startStopReset.text = "start"
+            controlPanel.randomize.isEnabled = currentProblem.isRandom
 
             initialWorld = currentProblem.createWorld()
             atomicWorld.set(initialWorld)

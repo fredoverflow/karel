@@ -8,6 +8,10 @@ import javax.swing.JSlider
 
 class ControlPanel(problems: List<Problem>) : VerticalBoxPanel() {
 
+    val randomize = JButton("\uD83C\uDFB2").apply {
+        isEnabled = false
+    }
+
     val goal = JButton("goal")
 
     val problemPicker = JComboBox(problems.toTypedArray()).apply {
@@ -16,7 +20,7 @@ class ControlPanel(problems: List<Problem>) : VerticalBoxPanel() {
 
     val startStopReset = JButton("start")
 
-    val firstRow = HorizontalBoxPanel(goal, problemPicker, startStopReset)
+    val firstRow = HorizontalBoxPanel(randomize, goal, problemPicker, startStopReset)
 
     val stepInto = JButton("step into (F12)")
     val stepOver = JButton("step over")
@@ -46,15 +50,17 @@ class ControlPanel(problems: List<Problem>) : VerticalBoxPanel() {
     }
 
     fun executionStarted() {
-        problemPicker.isEnabled = false
+        randomize.isEnabled = false
         goal.isEnabled = false
+        problemPicker.isEnabled = false
         startStopReset.text = "stop"
         setEnabledStepButtons(true)
     }
 
-    fun executionFinished() {
-        problemPicker.isEnabled = true
+    fun executionFinished(isRandom: Boolean) {
+        randomize.isEnabled = isRandom
         goal.isEnabled = true
+        problemPicker.isEnabled = true
         startStopReset.text = "reset"
         setEnabledStepButtons(false)
     }

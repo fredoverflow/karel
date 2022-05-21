@@ -6,6 +6,7 @@ class Problem(
     val story: String,
     val goal: String,
     val binaryLines: Int,
+    val isRandom: Boolean,
     val createWorld: () -> World
 ) {
     override fun toString(): String = "$index $name"
@@ -52,7 +53,8 @@ class Problem(
             "karelsFirstProgram",
             "Click the GOAL button (top left)\nand watch Karel go. Drag slider\nto adjust animation speed.\nCan you program Karel to perform\nthe same steps? Test with START!",
             "\u0001\u0005\u0001\u0002\u0001\u0004\u0001\u0006\u0001\u0000",
-            0
+            0,
+            false,
         ) {
             val world = FloorPlan.first.world()
 
@@ -64,7 +66,8 @@ class Problem(
             "obtainArtifact",
             "Karel auditions for the new Indy\nmovie. To demonstrate his talent,\nKarel re-enacts the classic scene\nwhere Indy saves some valuable\nartifact from an ancient temple.",
             "\u0004\ua106\u0005\ua106\u0006\u0000\u0001\u0002\u0001\u0001\u0001\u0002\u0001\u0000",
-            0
+            0,
+            false,
         ) {
             val world = FloorPlan.empty.builder().buildVerticalWall(5, 5).world()
 
@@ -76,7 +79,8 @@ class Problem(
             "defuseOneBomb",
             "Karel the demolition expert\ndefuses a bomb at the other end\nof the room and returns filled\nwith pride and self-confidence:\nHe did it without duplicate code!",
             "\ua106\u0005\u0003\ua106\u0003\u0000\u8009\u0001\u9107\u0000",
-            0
+            0,
+            false,
         ) {
             val world = emptyWorld.dropBeeper(9, 9)
 
@@ -88,7 +92,8 @@ class Problem(
             "defuseTwoBombs",
             "One bomb is no problem for Karel.\nLet's spice up the challenge!\nShouldn't this be rather simple,\ngiven that Karel already knows\nhow to defuse one single bomb?",
             "\ua102\u0002\ua108\u0005\u0003\ua108\u0003\u0000\u8009\u0001\u9109\u0000",
-            0
+            0,
+            false,
         ) {
             val world = emptyWorld.dropBeeper(0, 0).dropBeeper(9, 9)
 
@@ -100,7 +105,8 @@ class Problem(
             "practiceHomeRun",
             "Karel's heart burns for baseball,\nbut he has become bored of just\nwatching. Tonight, he will sneak\ninto the stadium and perform his\nfirst home run. Adrenaline rush!",
             "\u8004\u8009\u0001\u9102\u0005\u0002\u9101\u0000",
-            0
+            0,
+            false,
         ) {
             val world = emptyWorld.dropBeeper(0, 0).dropBeeper(9, 0).dropBeeper(0, 9).dropBeeper(9, 9)
 
@@ -112,7 +118,8 @@ class Problem(
             "climbTheStairs",
             "Karel's elevator seems to be\nout of service as of late...\nBut Karel is still pumped from\nthe home run and full of energy!",
             "\u0001\u8006\u0002\u0001\u0004\u0001\u9102\u0000",
-            0
+            0,
+            false,
         ) {
             val world = FloorPlan.stairs.world()
 
@@ -124,7 +131,8 @@ class Problem(
             "fillTheHoles",
             "Karel considers a career in den-\ndistry. The local dental school\nhas Open House day. Coincidence?\nKarel gets to fill 4 carious\nteeth with dental amalgam. Ouch!",
             "\u8004\u0001\u0004\u0001\u0006\u0003\u0001\u0004\u0001\u9101\u0000",
-            0
+            0,
+            false,
         ) {
             val world = FloorPlan.holes.world()
 
@@ -136,7 +144,8 @@ class Problem(
             "saveTheFlower",
             "During a vacation in the alps,\nKarel discovers a rare flower\nwhich has trouble blooming\nat such low altitude...\nIt's a long way to the top!",
             "\u0001\u0005\u8004\u0002\u0001\u0001\u0004\u0001\u9103\u0006\u8004\u0001\u0004\u0001\u0001\u0002\u910b\u0000",
-            0
+            0,
+            false,
         ) {
             val world = FloorPlan.mountain.world().dropBeeper(1, 9)
 
@@ -148,7 +157,8 @@ class Problem(
             "mowTheLawn",
             "Karel promised his aunt to help\nin the garden. She has already\npulled up the weeds, so Karel\ncan focus on mowing the lawn.",
             "\u8002\ua106\u0004\u0001\u0004\u9101\ua10a\u0002\u0001\u0002\u8006\u0001\u0005\u910b\u0001\u0000",
-            0
+            0,
+            false,
         ) {
             val world = emptyWorld
 
@@ -160,7 +170,8 @@ class Problem(
             "harvestTheField",
             "Karel's uncle is an agricult --\nerm... farmer. Having helped his\naunt, Karel can't reject the des-\nperate plea for help on the farm.\nThe wheat is already overripe!",
             "\ua105\u0004\u0001\u0004\u0001\ua10a\u0001\u0002\u0001\u0002\u8003\u0005\u0004\u0001\u0002\u0001\u910b\u0005\u0000",
-            0
+            0,
+            false,
         ) {
             val world = emptyWorld
 
@@ -170,9 +181,10 @@ class Problem(
         val repairTheStreet = Problem(
             "1.3.2",
             "repairTheStreet",
-            "Load this problem again. Notice\nsomething? Not all streets are\ncreated equal! Have you learned\nabout the if/else statement yet?\nF7..F11 are Karel's conditions.",
+            "Click the DICE button. Notice\nsomething? Not all streets are\ncreated equal! Have you learned\nabout the if/else statement yet?\nF7..F11 are Karel's conditions.",
             "\u8009\ua104\u0001\u9101\u000b\uc10c\u0004\u0001\u0006\u0003\u0001\u0004\u0000",
-            0
+            0,
+            true,
         ) {
             val builder = FloorPlan.empty.builder()
 
@@ -192,7 +204,8 @@ class Problem(
             "cleanTheRoom",
             "Karel's parents are paying him\na surprise visit. His apartment\nis *really* out of shape :(\nThe chaos is almost overwhelming.\nCan you help him clean up?",
             "\u8004\ua106\u0004\u0001\u0004\u9101\ua10a\u0002\u0001\u0002\u8009\ua10e\u0001\u910b\u0007\uc111\u0005\u0000",
-            0
+            0,
+            true,
         ) {
             var world = emptyWorld
 
@@ -211,7 +224,8 @@ class Problem(
             "tileTheFloor",
             "During his routine visit to the\nhardware store, Karel can't\nresist buying some flagstones.\nThey seem to be the perfect fit\nfor his luxurious bathroom!",
             "\u8064\u0006\u000a\u000c\u0008\u000e\uc108\u0002\u0001\u9101\u0000",
-            0
+            0,
+            false,
         ) {
             emptyWorld.withKarelAt(0, 9, EAST)
         }
@@ -221,7 +235,8 @@ class Problem(
             "stealOlympicFire",
             "Karel is mad with olympic fever\nand somehow his CPU decided\nit would be a good idea to\nsteal the olympic fire O_o\nLet's hope nobody will notice...",
             "\u0001\u8006\u0002\u0001\u0004\u0001\u9102\u0005\u0001\u0004\u8006\u0001\u910b\u0002\u0001\u0000",
-            0
+            0,
+            false,
         ) {
             val world = FloorPlan.stairs.world().dropBeeper(7, 3)
 
@@ -233,7 +248,8 @@ class Problem(
             "removeTheTiles",
             "The flagstones were supposed to\nbe a surprise for Karel's new\nsweetheart, Karoline. Too bad\ngreen is not her favourite color.\nOh well, back to square one...",
             "\u8064\u0005\u0008\ud105\u0002\u0001\u9101\u0000",
-            0
+            0,
+            false,
         ) {
             val world = emptyWorld.fillWithBeepers()
 
@@ -243,9 +259,10 @@ class Problem(
         val walkTheLabyrinth = Problem(
             "1.4.3",
             "walkTheLabyrinth",
-            "Load this problem several times.\nNote how the generated labyrinths\nare rather simple? They contain\nneither crossroads nor dead ends.\nExactly one path to the beeper!",
+            "Click DICE several times.\nNote how the generated labyrinths\nare rather simple? They contain\nneither crossroads nor dead ends.\nExactly one path to the beeper!",
             "\u8063\u000a\ud108\u0009\uc107\u0002\ub108\u0004\u0001\u9101\u0000",
             0,
+            true,
             ::generateRandomLabyrinth
         )
 
@@ -254,7 +271,8 @@ class Problem(
             "hangTheLampions",
             "Today is Karel's birthday! To\ncelebrate this special occasion,\nKarel bought 10 lampions. Now all\nthat's left to do is hang them\nfrom his (irregular) ceiling.",
             "\u8009\ua104\u0001\u9101\u0002\u0005\ua10d\u0006\u0003\ua10d\u0002\u0000\u0001\u000a\ud10c\u0000",
-            0
+            0,
+            true,
         ) {
             val builder = FloorPlan.empty.builder()
 
@@ -270,7 +288,8 @@ class Problem(
             "followTheSeeds",
             "Karel had insomnia and decided\nto take a walk in the forest.\nBeing the smart robot that he is,\nhe always leaves a trail of seeds\nso he can find his way back...",
             "\u0008\uc109\u0008\uc107\u0001\u0005\ub102\u0002\ub100\u0000",
-            0
+            0,
+            false,
         ) {
             val world = emptyWorld.withBeepers(0xffc017f50L, 0x55d5555157d405ffL)
             world.withKarelAt(5, 4, WEST)
@@ -281,7 +300,8 @@ class Problem(
             "cleanTheTunnels",
             "Karel the coal miner discovers\nten tunnels of varying lengths\nfilled with valuable coal.\n(Does your solution work for\ntunnels of length 0 and 10?)",
             "\u8009\ua104\u0001\u9101\u0007\uc113\u0002\u0005\u0008\uc10d\u0001\u0005\ub108\u0003\u000a\uc112\u0001\ub10e\u0002\u0000",
-            0
+            0,
+            true,
         ) {
             pillars().withKarelAt(0, 9, EAST)
         }
@@ -291,7 +311,8 @@ class Problem(
             "increment",
             "Do you know binary numbers?\nen.wikipedia.org/wiki/Binary_number\nde.wikipedia.org/wiki/Dualsystem\nKarel wants to add 1 to a byte.\nThis is almost trivial in binary.",
             "\u0007\uc105\u0005\u0001\ub100\u0006\u0000",
-            0b1
+            0b1,
+            true,
         ) {
             randomBytes(1, WEST)
         }
@@ -301,7 +322,8 @@ class Problem(
             "decrement",
             "Karel wants to subtract 1 from\na byte. Notice any similarity\nto increment? (What happens if\nKarel decrements the byte zero?\nYou can click in Karel's world!)",
             "\u0007\ud107\u0006\u000a\uc107\u0001\ub100\u0005\u0000",
-            0b1
+            0b1,
+            true,
         ) {
             randomBytes(1, WEST)
         }
@@ -311,7 +333,8 @@ class Problem(
             "addSlow",
             "Welcome to the slowest adding\nmachine in the world! Karel just\ndecrements the first byte\nand increments the second byte\nuntil the first byte is zero.",
             "\ua114\u000a\uc11c\u0003\ua11e\u0004\u0001\u0004\u0007\uc10d\u0005\u0001\ub108\u0006\u0003\ua11e\u0002\u0001\u0002\ub100\u0007\ud11b\u0006\u000a\uc11b\u0001\ub114\u0005\u0000\u0001\u000a\ud11d\u0000",
-            0b11
+            0b11,
+            true,
         ) {
             randomBytes(2, WEST)
         }
@@ -321,7 +344,8 @@ class Problem(
             "saveTheFlowers",
             "Karel climbs Mt. Everest. On his\nway up, he collects four flowers\nthat do not get enough sunlight\non the west side of the mountain.\nEast is where the sun comes up!",
             "\u8004\ua110\u0005\u9101\ua110\u8004\u0006\u0001\u0004\u000a\uc10d\u0001\ub109\u0002\u9106\u0000\u0002\u000b\ud115\u0001\ub111\u0004\u0001\u0000",
-            0
+            0,
+            true,
         ) {
             val builder = FloorPlan.empty.builder()
 
@@ -371,7 +395,8 @@ class Problem(
             "findTeddyBear",
             "In the middle of the night, Karel\nawakens from a terrible dream.\nHis teddy bear will give him\ncomfort. It should lay somewhere\nnear the edge of the bed...",
             "\u0007\ud108\u000a\uc106\u0001\ub100\u0002\ub100\u0000",
-            0
+            0,
+            true,
         ) {
             var world = emptyWorld
 
@@ -393,7 +418,8 @@ class Problem(
             "jumpTheHurdles",
             "Karel signs up for the Olympics\nand is allowed to participate\nin the hurdle runs. After jumping\nall the hurdles, he receives a\nspecial medal made of copper!",
             "\u0007\ud114\u000a\uc106\u0001\ub100\u0002\u000b\ud10b\u0001\ub107\u0004\u0001\u0004\u000a\uc112\u0001\ub10e\u0002\ub100\u0000",
-            0
+            0,
+            true,
         ) {
             val xBeeper = 5 + rng.nextInt(5)
             val builder = FloorPlan.empty.builder()
@@ -409,9 +435,10 @@ class Problem(
         val solveTheMaze = Problem(
             "2.4.1",
             "solveTheMaze",
-            "Study the random mazes carefully.\nThey contain crossroads and dead\nends, but no loops. So \"always\nkeep left\" or \"always keep right\"\nshould lead Karel to the beeper!",
+            "Study the random mazes carefully.\nThey contain both crossroads and\ndead ends, but no loops. Maintain\ncontact with Karel's left wall\nand he should find the beeper!",
             "\u0007\ud10f\u0009\uc106\u0002\ub10d\u000a\ud10d\u000b\uc10c\u0004\ub10d\u0003\u0001\ub100\u0000",
-            0
+            0,
+            true,
         ) {
             val builder = FloorPlan.maze.builder()
             var world = builder.world().fillWithBeepers()
@@ -444,7 +471,8 @@ class Problem(
             "quantizeBits",
             "Karel the hacker is eavesdropping\non an analog communications line\nand writes down 10 bits encoded\nas 0..5 (0) or 6..10 (1). Convert\nto always 0 (0) or always 10 (1).",
             "\u8009\ua104\u0001\u9101\u0007\uc124\u0002\u8005\u0001\u9108\u0007\uc11a\u0008\uc110\u0001\ub10c\u000a\uc115\u0001\u0006\ub110\u0003\u0001\u000a\ud116\ub123\u0003\u0008\ud11f\u0001\ub11b\u0001\u0005\u0008\ud11f\u0002\u0000",
-            0
+            0,
+            true,
         ) {
             pillars().withKarelAt(0, 9, EAST)
         }
@@ -454,7 +482,8 @@ class Problem(
             "addFast",
             "Karel adds two bytes from the\n1st and 2nd row and stores the\nsum in the 4th row. The 3rd row\nis reserved for the carry bits.\n(Does \"carry the 1\" ring a bell?)",
             "\u8008\u0007\u0001\u0007\u0001\u0007\u0001\u0004\uc115\uc11c\uc10c\u0006\u0001\u0004\u0001\u0006\u0001\u0001\u0003\u9101\u0000\ud11c\uc118\u0006\u0001\u0004\u0001\ub110\ud10c\ub117",
-            0b1011
+            0b1011,
+            true,
         ) {
             randomBytes(2, SOUTH)
         }
@@ -464,7 +493,8 @@ class Problem(
             "partyAgain",
             "Karel is preparing the next big\nparty. Unfortunately, the floor\nis so soaked from the last party\nthat he must be careful not to\nbreak through into the cellar!",
             "\u8009\ua104\u0001\u9101\u0002\u0005\ua109\u0002\u0000\u000a\ud10e\u0006\u0003\u0000\u0001\ua109\u0001\u0000",
-            0
+            0,
+            true,
         ) {
             val builder = FloorPlan.trap.builder()
 
@@ -480,7 +510,8 @@ class Problem(
             "fetchTheStars",
             "Karel arranges a romantic date\nwith Karoline on a frozen lake\nwhere he \"fetches the stars from\nthe sky\" (German for \"goes to the\nends of the world and back\").",
             "\u8009\ua104\u0001\u9101\u0002\ua109\u0006\u0002\u0000\u000a\ud10e\u0005\u0003\u0000\u0001\ua109\u0001\u0000",
-            0
+            0,
+            true,
         ) {
             val builder = FloorPlan.trap.builder()
             var world = builder.world()
@@ -498,7 +529,8 @@ class Problem(
             "secureTheCave",
             "Karel the cave explorer earns a\nliving as a tourist guide. For\nsafety measures, he breaks all\nstalactites from the ceiling and\nre-erects them as stalagmites.",
             "\u8009\ua104\u0001\u9101\u0002\ua109\ua10e\u0004\u0000\u0001\u000a\ud109\u0003\u0000\u0007\uc109\u0005\u0001\ua10e\u0006\u0001\u0000",
-            0
+            0,
+            true,
         ) {
             val builder = FloorPlan.empty.builder()
             var world = builder.world()
@@ -518,7 +550,8 @@ class Problem(
             "layAndRemoveTiles",
             "Karel tries a different set of\nflagstones. But again, Karoline\nis not enamored with the outcome.\nThis time he immediately removes\nthe flagstones, in reverse order.",
             "\u0007\uc104\u0003\u0000\u0006\u000a\u0008\u000c\u000d\uc10e\u0001\ua100\u0001\ub113\u0002\u0001\ua100\u0001\u0004\u0005\u0000",
-            0
+            0,
+            false,
         ) {
             emptyWorld.withKarelAt(0, 9, EAST)
         }
@@ -528,7 +561,8 @@ class Problem(
             "findShelters",
             "Karel is part of an expedition to\nthe north pole. His first task is\nfinding storm-proof shelters.\nMark Karel's path with beepers,\nbut leave the shelters empty!",
             "\u8004\u000a\u0008\u000c\u000d\uc112\u0001\u0009\u000a\u000b\u000e\u000e\uc10f\u0006\ua100\u0003\u0001\u0003\u0002\u9101\u0000",
-            0
+            0,
+            true,
         ) {
             val builder = FloorPlan.empty.builder()
 
@@ -547,7 +581,8 @@ class Problem(
             "addSmart",
             "Karel adds two bytes from the\n1st and 2nd row and stores the\nsum in the 3rd row. Dropping and\nchecking carry bits is no longer\nnecessary. What a smart robot!",
             "\u000b\uc123\u0007\u0008\u000e\ud108\ua120\ub100\u0007\u0008\u000d\uc10e\ua120\ub110\ua124\ub100\u000b\uc123\u0007\u0008\u000e\ud118\ua124\ub100\u0007\u0008\u000d\uc11e\ua124\ub110\ua120\ub110\u0004\u0001\u0002\u0000\u0001\u0001\u0006\u0004\u0001\u0004\u0001\u0001\u0003\u0000",
-            0b111
+            0b111,
+            true,
         ) {
             randomBytes(2, SOUTH)
         }
