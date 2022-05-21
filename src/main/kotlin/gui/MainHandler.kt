@@ -1,6 +1,8 @@
 package gui
 
+import logic.Problem
 import java.awt.event.KeyEvent
+import java.util.function.Consumer
 
 class MainHandler : MainFlow() {
     init {
@@ -103,6 +105,16 @@ class MainHandler : MainFlow() {
                     } else {
                         controlPanel.startStopReset.doClick()
                     }
+                }
+            }
+        }
+
+        editor.onRightClick = Consumer { lexeme ->
+            if (controlPanel.problemPicker.isEnabled) {
+                Problem.problems.firstOrNull {
+                    it.name == lexeme
+                }?.let {
+                    controlPanel.problemPicker.selectedItem = it
                 }
             }
         }
