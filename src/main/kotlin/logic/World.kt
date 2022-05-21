@@ -37,6 +37,10 @@ data class World(private val hi: Long, private val lo: Long, val floorPlan: Floo
     val y: Int
         get() = hi.ushr(Y_SHIFT).toInt().and(15)
 
+    fun equalsIgnoringDirection(that: World): Boolean {
+        return this.lo == that.lo && this.hi.shl(8) == that.hi.shl(8)
+    }
+
     val direction: Int
         get() = hi.ushr(D_SHIFT).toInt()
 

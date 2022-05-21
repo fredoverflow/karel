@@ -55,6 +55,13 @@ class MainHandler : MainFlow() {
             editor.requestFocusInWindow()
         }
 
+        controlPanel.check.addActionListener {
+            controlPanel.startStopReset.text = "reset"
+            checkAgainst(currentProblem.goal)
+
+            editor.requestFocusInWindow()
+        }
+
         controlPanel.stepInto.addActionListener {
             stepInto()
         }

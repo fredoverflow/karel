@@ -40,6 +40,77 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.crea
         start(instructions)
     }
 
+    fun checkAgainst(goal: String) {
+        editor.indent()
+        editor.autosaver.save()
+        editor.clearDiagnostics()
+        try {
+            val lexer = Lexer(editor.text)
+            val parser = Parser(lexer)
+            parser.program()
+            val main = parser.sema.command(currentProblem.name)
+            if (main != null) {
+                val instructions: List<Instruction> = CodeGenerator(parser.sema).generate(main)
+                virtualMachinePanel.setProgram(instructions)
+
+                val goalInstructions = vm.createInstructionBuffer()
+                goalInstructions.addAll(goal.map { vm.goalInstruction(it.code) })
+
+                try {
+                    repeat(if (currentProblem.isRandom) 1000 else 1) {
+                        checkOnce(instructions, goalInstructions)
+                    }
+                } finally {
+                    virtualMachinePanel.clearStack()
+                    editor.clearStack()
+                    update()
+                }
+            } else {
+                editor.setCursorTo(editor.length())
+                showDiagnostic("void ${currentProblem.name}() not found")
+            }
+        } catch (diagnostic: Diagnostic) {
+            showDiagnostic(diagnostic)
+        }
+    }
+
+    fun checkOnce(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
+        initialWorld = currentProblem.createWorld()
+
+        val goalWorldIterator = goalWorlds(goalInstructions).iterator()
+
+        atomicWorld.set(initialWorld)
+        virtualMachine = VirtualMachine(instructions, atomicWorld, this) { world ->
+            if (!goalWorldIterator.hasNext()) {
+                throw Diagnostic(virtualMachine.currentInstruction.position, "overshoots goal")
+            }
+            if (!goalWorldIterator.next().equalsIgnoringDirection(world)) {
+                throw Diagnostic(virtualMachine.currentInstruction.position, "deviates from goal")
+            }
+        }
+
+        try {
+            virtualMachine.stepReturn()
+        } catch (_: Stack.Exhausted) {
+        } catch (error: KarelError) {
+            throw Diagnostic(virtualMachine.currentInstruction.position, error.message!!)
+        }
+        if (goalWorldIterator.hasNext()) {
+            throw Diagnostic(virtualMachine.currentInstruction.position, "falls short of goal")
+        }
+    }
+
+    fun goalWorlds(goalInstructions: List<Instruction>): List<World> {
+        val goalWorlds = ArrayList<World>()
+        atomicWorld.set(initialWorld)
+        virtualMachine = VirtualMachine(goalInstructions, atomicWorld, this, goalWorlds::add)
+        try {
+            virtualMachine.stepReturn()
+        } catch (_: Stack.Exhausted) {
+        }
+        return goalWorlds
+    }
+
     fun parseAndExecute() {
         editor.indent()
         editor.autosaver.save()

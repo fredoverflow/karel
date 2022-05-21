@@ -5,9 +5,9 @@ import common.push
 import logic.World
 import java.util.concurrent.atomic.AtomicReference
 
-// If "step over" or "step return" do not finish within 10 seconds,
+// If "step over" or "step return" do not finish within 1 second,
 // we assume the code contains an infinite loop.
-const val TIMEOUT = 10000000000L
+const val TIMEOUT = 1_000_000_000L
 
 // The first instruction starts at address 256.
 // This makes it easier to distinguish addresses
@@ -16,7 +16,8 @@ const val ENTRY_POINT = 256
 
 class VirtualMachine(private val program: List<Instruction>,
                      private val atomicWorld: AtomicReference<World>,
-                     private val callbacks: Callbacks) {
+                     private val callbacks: Callbacks,
+                     private val onMoveOrBeeper: (World) -> Unit = {}) {
 
     interface Callbacks {
         fun onCall(callerPosition: Int, calleePosition: Int) {}
@@ -140,12 +141,12 @@ class VirtualMachine(private val program: List<Instruction>,
         when (bytecode) {
             RETURN -> executeReturn()
 
-            MOVE_FORWARD -> atomicWorld.updateAndGet(World::moveForward)
+            MOVE_FORWARD -> onMoveOrBeeper(atomicWorld.updateAndGet(World::moveForward))
             TURN_LEFT -> atomicWorld.updateAndGet(World::turnLeft)
             TURN_AROUND -> atomicWorld.updateAndGet(World::turnAround)
             TURN_RIGHT -> atomicWorld.updateAndGet(World::turnRight)
-            PICK_BEEPER -> atomicWorld.updateAndGet(World::pickBeeper)
-            DROP_BEEPER -> atomicWorld.updateAndGet(World::dropBeeper)
+            PICK_BEEPER -> onMoveOrBeeper(atomicWorld.updateAndGet(World::pickBeeper))
+            DROP_BEEPER -> onMoveOrBeeper(atomicWorld.updateAndGet(World::dropBeeper))
 
             ON_BEEPER -> push(atomicWorld.get().onBeeper())
             BEEPER_AHEAD -> push(atomicWorld.get().beeperAhead())

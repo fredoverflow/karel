@@ -19,8 +19,9 @@ class ControlPanel(problems: List<Problem>) : VerticalBoxPanel() {
     }
 
     val startStopReset = JButton("start")
+    val check = JButton("\uD83D\uDC1C")
 
-    val firstRow = HorizontalBoxPanel(randomize, goal, problemPicker, startStopReset)
+    val firstRow = HorizontalBoxPanel(randomize, goal, problemPicker, startStopReset, check)
 
     val stepInto = JButton("step into (F12)")
     val stepOver = JButton("step over")
@@ -54,6 +55,7 @@ class ControlPanel(problems: List<Problem>) : VerticalBoxPanel() {
         goal.isEnabled = false
         problemPicker.isEnabled = false
         startStopReset.text = "stop"
+        check.isEnabled = false
         setEnabledStepButtons(true)
     }
 
@@ -62,6 +64,7 @@ class ControlPanel(problems: List<Problem>) : VerticalBoxPanel() {
         goal.isEnabled = true
         problemPicker.isEnabled = true
         startStopReset.text = "reset"
+        check.isEnabled = true
         setEnabledStepButtons(false)
     }
 
