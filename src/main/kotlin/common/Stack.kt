@@ -1,6 +1,8 @@
 package common
 
 sealed class Stack<out T> {
+    object Exhausted : NoSuchElementException()
+
     abstract fun isEmpty(): Boolean
 
     abstract fun top(): T
@@ -10,9 +12,9 @@ sealed class Stack<out T> {
     object Nil : Stack<Nothing>() {
         override fun isEmpty(): Boolean = true
 
-        override fun top(): Nothing = throw AssertionError("top on empty stack")
+        override fun top(): Nothing = throw Exhausted
 
-        override fun pop(): Nothing = throw AssertionError("pop on empty stack")
+        override fun pop(): Nothing = throw Exhausted
     }
 
     class Cons<out T>(private val head: T, private val tail: Stack<T>) : Stack<T>() {

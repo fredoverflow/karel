@@ -1,6 +1,7 @@
 package gui
 
 import common.Diagnostic
+import common.Stack
 import logic.KarelError
 import logic.Problem
 import logic.World
@@ -109,10 +110,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.crea
         try {
             how()
             update()
-        } catch (error: AssertionError) {
-            // TODO Does Kotlin have exception filters/guards?
-            if (!error.message!!.contains("empty")) throw error
-            // The final RET instruction tried to pop off the empty stack.
+        } catch (_: Stack.Exhausted) {
             stop()
             update()
         } catch (error: KarelError) {

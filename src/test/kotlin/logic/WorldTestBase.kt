@@ -1,5 +1,6 @@
 package logic
 
+import common.Stack
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import vm.VirtualMachine
@@ -18,10 +19,7 @@ open class WorldTestBase : VirtualMachine.Callbacks {
         val virtualMachine = VirtualMachine(instructions, atomicWorld, this)
         try {
             virtualMachine.stepReturn()
-        } catch (error: AssertionError) {
-            // TODO Does Kotlin have exception filters/guards?
-            if (!error.message!!.contains("empty")) throw error
-            // The final RET instruction tried to pop off the empty stack.
+        } catch (_: Stack.Exhausted) {
         }
         world = atomicWorld.get()
     }
