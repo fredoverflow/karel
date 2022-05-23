@@ -64,7 +64,7 @@ class Problem(
         val obtainArtifact = Problem(
             "1.1.1",
             "obtainArtifact",
-            "Karel auditions for the new Indy\nmovie. To demonstrate his talent,\nKarel re-enacts the classic scene\nwhere Indy saves some valuable\nartifact from an ancient temple.",
+            "Karel auditions for the new Indy\nmovie. To demonstrate talent,\nKarel re-enacts the classic scene\nwhere Indy saves some valuable\nartifact from an ancient temple.",
             "\u0004\ua106\u0005\ua106\u0006\u0000\u0001\u0002\u0001\u0001\u0001\u0002\u0001\u0000",
             0,
             false,
@@ -77,7 +77,7 @@ class Problem(
         val defuseOneBomb = Problem(
             "1.1.2",
             "defuseOneBomb",
-            "Karel the demolition expert\ndefuses a bomb at the other end\nof the room and returns filled\nwith pride and self-confidence:\nHe did it without duplicate code!",
+            "Karel the demolition expert\ndefuses a bomb at the other end\nof the room and returns filled\nwith pride and self-confidence.\nHave you learned repeat (n) yet?",
             "\ua106\u0005\u0003\ua106\u0003\u0000\u8009\u0001\u9107\u0000",
             0,
             false,
@@ -103,7 +103,7 @@ class Problem(
         val practiceHomeRun = Problem(
             "1.1.4",
             "practiceHomeRun",
-            "Karel's heart burns for baseball,\nbut he has become bored of just\nwatching. Tonight, he will sneak\ninto the stadium and perform his\nfirst home run. Adrenaline rush!",
+            "Karel's heart burns for baseball,\nbut merely watching does not cut\nit anymore. Tonight, let's sneak\ninto the stadium and perform our\nfirst home run. Adrenaline rush!",
             "\u8004\u8009\u0001\u9102\u0005\u0002\u9101\u0000",
             0,
             false,
@@ -116,7 +116,7 @@ class Problem(
         val climbTheStairs = Problem(
             "1.2.1",
             "climbTheStairs",
-            "Karel's elevator seems to be\nout of service as of late...\nBut Karel is still pumped from\nthe home run and full of energy!",
+            "The elevator seems to be\nout of service as of late...\nBut Karel is still pumped from\nthat home run and full of energy!",
             "\u0001\u8006\u0002\u0001\u0004\u0001\u9102\u0000",
             0,
             false,
@@ -155,7 +155,7 @@ class Problem(
         val mowTheLawn = Problem(
             "1.2.4",
             "mowTheLawn",
-            "Karel promised his aunt to help\nin the garden. She has already\npulled up the weeds, so Karel\ncan focus on mowing the lawn.",
+            "Karel promised Granger to help in\nthe garden. Granger has already\npulled up the weeds, so Karel\ncan focus on mowing the lawn.",
             "\u8002\ua106\u0004\u0001\u0004\u9101\ua10a\u0002\u0001\u0002\u8006\u0001\u0005\u910b\u0001\u0000",
             0,
             false,
@@ -168,7 +168,7 @@ class Problem(
         val harvestTheField = Problem(
             "1.3.1",
             "harvestTheField",
-            "Karel's uncle is an agricult --\nerm... farmer. Having helped his\naunt, Karel can't reject the des-\nperate plea for help on the farm.\nThe wheat is already overripe!",
+            "Granger is an agricult -- erm...\nfarmer. After mowing the lawn,\nKarel can't reject the desperate\nplea for help on the farm.\nThe wheat is already overripe!",
             "\ua105\u0004\u0001\u0004\u0001\ua10a\u0001\u0002\u0001\u0002\u8003\u0005\u0004\u0001\u0002\u0001\u910b\u0005\u0000",
             0,
             false,
@@ -202,7 +202,7 @@ class Problem(
         val cleanTheRoom = Problem(
             "1.3.3",
             "cleanTheRoom",
-            "Karel's parents are paying him\na surprise visit. His apartment\nis *really* out of shape :(\nThe chaos is almost overwhelming.\nCan you help him clean up?",
+            "Granger is paying Karel a surprise\nvisit. But Karel's apartment\nis *really* out of shape :(\nThe chaos is almost overwhelming.\nCan Karel clean up in time?",
             "\u8004\ua106\u0004\u0001\u0004\u9101\ua10a\u0002\u0001\u0002\u8009\ua10e\u0001\u910b\u0007\uc111\u0005\u0000",
             0,
             true,
@@ -222,7 +222,7 @@ class Problem(
         val tileTheFloor = Problem(
             "1.3.4",
             "tileTheFloor",
-            "During his routine visit to the\nhardware store, Karel can't\nresist buying some flagstones.\nThey seem to be the perfect fit\nfor his luxurious bathroom!",
+            "During a routine visit to the\nhardware store, Karel can't\nresist buying some flagstones.\nThey seem to be a perfect fit\nfor the luxurious bathroom!",
             "\u8064\u0006\u000a\u000c\u0008\u000e\uc108\u0002\u0001\u9101\u0000",
             0,
             false,
@@ -233,7 +233,7 @@ class Problem(
         val stealOlympicFire = Problem(
             "1.4.1",
             "stealOlympicFire",
-            "Karel is mad with olympic fever\nand somehow his CPU decided\nit would be a good idea to\nsteal the olympic fire O_o\nLet's hope nobody will notice...",
+            "Karel is mad with olympic fever\nand somehow comes to believe\nit would be a good idea to\nsteal the olympic fire O_o\nLet's hope nobody will notice...",
             "\u0001\u8006\u0002\u0001\u0004\u0001\u9102\u0005\u0001\u0004\u8006\u0001\u910b\u0002\u0001\u0000",
             0,
             false,
@@ -246,7 +246,7 @@ class Problem(
         val removeTheTiles = Problem(
             "1.4.2",
             "removeTheTiles",
-            "The flagstones were supposed to\nbe a surprise for Karel's new\nsweetheart, Karoline. Too bad\ngreen is not her favourite color.\nOh well, back to square one...",
+            "The flagstones were supposed to\nbe a surprise for Karel's new\nsweetheart, Taylor. Too bad green\nis not Taylor's favourite color.\nOh well, back to square one...",
             "\u8064\u0005\u0008\ud105\u0002\u0001\u9101\u0000",
             0,
             false,
@@ -269,7 +269,7 @@ class Problem(
         val hangTheLampions = Problem(
             "2.1.1",
             "hangTheLampions",
-            "Today is Karel's birthday! To\ncelebrate this special occasion,\nKarel bought 10 lampions. Now all\nthat's left to do is hang them\nfrom his (irregular) ceiling.",
+            "Karel was assembled 10 years ago!\nTo celebrate this anniversary,\nKarel bought 10 lampions. Now all\nthat's left to do is hang them\nfrom the (irregular) ceiling.",
             "\u8009\ua104\u0001\u9101\u0002\u0005\ua10d\u0006\u0003\ua10d\u0002\u0000\u0001\u000a\ud10c\u0000",
             0,
             true,
@@ -286,7 +286,7 @@ class Problem(
         val followTheSeeds = Problem(
             "2.1.2",
             "followTheSeeds",
-            "Karel had insomnia and decided\nto take a walk in the forest.\nBeing the smart robot that he is,\nhe always leaves a trail of seeds\nso he can find his way back...",
+            "Karel had insomnia and decided\nto take a walk in the forest.\nFortunately, Karel was smart\nenough to leave a trail of seeds\nto find the way back...",
             "\u0008\uc109\u0008\uc107\u0001\u0005\ub102\u0002\ub100\u0000",
             0,
             false,
@@ -342,7 +342,7 @@ class Problem(
         val saveTheFlowers = Problem(
             "2.3.1",
             "saveTheFlowers",
-            "Karel climbs Mt. Everest. On his\nway up, he collects four flowers\nthat do not get enough sunlight\non the west side of the mountain.\nEast is where the sun comes up!",
+            "Karel climbs Mt. Everest. On the\nway up, Karel collects 4 flowers\nthat do not get enough sunlight\non the west side of the mountain.\nEast is where the sun comes up!",
             "\u8004\ua110\u0005\u9101\ua110\u8004\u0006\u0001\u0004\u000a\uc10d\u0001\ub109\u0002\u9106\u0000\u0002\u000b\ud115\u0001\ub111\u0004\u0001\u0000",
             0,
             true,
@@ -393,7 +393,7 @@ class Problem(
         val findTeddyBear = Problem(
             "2.3.2",
             "findTeddyBear",
-            "In the middle of the night, Karel\nawakens from a terrible dream.\nHis teddy bear will give him\ncomfort. It should lay somewhere\nnear the edge of the bed...",
+            "In the middle of the night, Karel\nawakens from a terrible dream.\nThe teddy bear will provide\ncomfort. It should lay somewhere\nnear the edge of the bed...",
             "\u0007\ud108\u000a\uc106\u0001\ub100\u0002\ub100\u0000",
             0,
             true,
@@ -416,7 +416,7 @@ class Problem(
         val jumpTheHurdles = Problem(
             "2.3.3",
             "jumpTheHurdles",
-            "Karel signs up for the Olympics\nand is allowed to participate\nin the hurdle runs. After jumping\nall the hurdles, he receives a\nspecial medal made of copper!",
+            "Karel signs up for the Olympics\nand is allowed to participate\nin the hurdle runs. After jumping\nall the hurdles, Karel receives a\nspecial medal made of copper!",
             "\u0007\ud114\u000a\uc106\u0001\ub100\u0002\u000b\ud10b\u0001\ub107\u0004\u0001\u0004\u000a\uc112\u0001\ub10e\u0002\ub100\u0000",
             0,
             true,
@@ -435,7 +435,7 @@ class Problem(
         val solveTheMaze = Problem(
             "2.4.1",
             "solveTheMaze",
-            "Study the random mazes carefully.\nThey contain both crossroads and\ndead ends, but no loops. Maintain\ncontact with Karel's left wall\nand he should find the beeper!",
+            "Study the random mazes carefully.\nThey contain both crossroads and\ndead ends, but no loops. Maintain\ncontact with Karel's left wall\nand you should find the beeper!",
             "\u0007\ud10f\u0009\uc106\u0002\ub10d\u000a\ud10d\u000b\uc10c\u0004\ub10d\u0003\u0001\ub100\u0000",
             0,
             true,
@@ -491,7 +491,7 @@ class Problem(
         val partyAgain = Problem(
             "3.1.1",
             "partyAgain",
-            "Karel is preparing the next big\nparty. Unfortunately, the floor\nis so soaked from the last party\nthat he must be careful not to\nbreak through into the cellar!",
+            "Karel is preparing the next big\nparty. Unfortunately, the floor\nis so soaked from the last party\nthat care must be taken not to\nbreak through into the cellar!",
             "\u8009\ua104\u0001\u9101\u0002\u0005\ua109\u0002\u0000\u000a\ud10e\u0006\u0003\u0000\u0001\ua109\u0001\u0000",
             0,
             true,
@@ -508,7 +508,7 @@ class Problem(
         val fetchTheStars = Problem(
             "3.1.2",
             "fetchTheStars",
-            "Karel arranges a romantic date\nwith Karoline on a frozen lake\nwhere he \"fetches the stars from\nthe sky\" (German for \"goes to the\nends of the world and back\").",
+            "Karel arranges a romantic date\nwith Taylor on a frozen lake to\n\"fetch the stars from the sky\",\nwhich is German for \"goes to\nthe ends of the world and back\".",
             "\u8009\ua104\u0001\u9101\u0002\ua109\u0006\u0002\u0000\u000a\ud10e\u0005\u0003\u0000\u0001\ua109\u0001\u0000",
             0,
             true,
@@ -527,7 +527,7 @@ class Problem(
         val secureTheCave = Problem(
             "3.2.1",
             "secureTheCave",
-            "Karel the cave explorer earns a\nliving as a tourist guide. For\nsafety measures, he breaks all\nstalactites from the ceiling and\nre-erects them as stalagmites.",
+            "Karel the cave explorer earns a\nliving as a tourist guide. For\nsafety measures, Karel breaks all\nstalactites from the ceiling and\nre-erects them as stalagmites.",
             "\u8009\ua104\u0001\u9101\u0002\ua109\ua10e\u0004\u0000\u0001\u000a\ud109\u0003\u0000\u0007\uc109\u0005\u0001\ua10e\u0006\u0001\u0000",
             0,
             true,
@@ -548,7 +548,7 @@ class Problem(
         val layAndRemoveTiles = Problem(
             "3.2.2",
             "layAndRemoveTiles",
-            "Karel tries a different set of\nflagstones. But again, Karoline\nis not enamored with the outcome.\nThis time he immediately removes\nthe flagstones, in reverse order.",
+            "Karel tries a different set of\nflagstones. But again, Taylor\nis not enamored with the result.\nHence Karel immediately removes\nthe flagstones, in reverse order.",
             "\u0007\uc104\u0003\u0000\u0006\u000a\u0008\u000c\u000d\uc10e\u0001\ua100\u0001\ub113\u0002\u0001\ua100\u0001\u0004\u0005\u0000",
             0,
             false,
@@ -559,7 +559,7 @@ class Problem(
         val findShelters = Problem(
             "3.3.1",
             "findShelters",
-            "Karel is part of an expedition to\nthe north pole. His first task is\nfinding storm-proof shelters.\nMark Karel's path with beepers,\nbut leave the shelters empty!",
+            "Karel is part of an expedition to\nthe north pole. The first task is\nfinding storm-proof shelters.\nMark Karel's path with beepers,\nbut leave the shelters empty!",
             "\u8004\u000a\u0008\u000c\u000d\uc112\u0001\u0009\u000a\u000b\u000e\u000e\uc10f\u0006\ua100\u0003\u0001\u0003\u0002\u9101\u0000",
             0,
             true,
