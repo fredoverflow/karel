@@ -5,20 +5,10 @@ import logic.Problem.Companion.NORTH
 import logic.Problem.Companion.SOUTH
 import logic.Problem.Companion.WEST
 
-import java.util.concurrent.Callable
-import java.util.concurrent.Executors
-
-// Sometimes, due to "bad luck" with the random number generator,
-// the labyrinth generation algorithm causes a noticeable pause.
-// A practical fix is to run the algorithm multiple times in parallel
-// and let the quickest execution "win".
-private const val PARALLEL_TASKS = 16
-private val pool = Executors.newFixedThreadPool(PARALLEL_TASKS)
-
-fun generateRandomLabyrinth(): World {
-    val labyrinthGenerators = List(PARALLEL_TASKS) { LabyrinthGenerator() }
-    val firstWorld = pool.invokeAny(labyrinthGenerators)
-    return firstWorld.withKarelAt(0, 0, EAST)
+fun generateLabyrinth(): World {
+    while (true) {
+        LabyrinthGenerator().generateOrNull()?.let { return it }
+    }
 }
 
 private const val CHARTED = '#'
@@ -84,7 +74,7 @@ private val directionPermutations: Array<IntArray> = arrayOf(
         intArrayOf(SOUTH, WEST, NORTH, EAST)
 )
 
-class LabyrinthGenerator : Callable<World> {
+class LabyrinthGenerator {
 
     private val randomNumberGenerator = java.util.Random()
 
@@ -94,12 +84,18 @@ class LabyrinthGenerator : Callable<World> {
 
     private val labyrinth = LABYRINTH.toCharArray()
 
-    private data class Solution(val destination: Int) : Exception()
+    private var backtrackBudget = 1000
 
-    override fun call(): World {
+    private class BacktrackBudgetExhausted : Exception()
+
+    private class Solution(val destination: Int) : Exception()
+
+    fun generateOrNull(): World? {
         try {
             destinationOpen(ORIGIN, EAST, 99)
             throw AssertionError("search space exhausted")
+        } catch (_: BacktrackBudgetExhausted) {
+            return null
         } catch (solution: Solution) {
             val walls = LongArray(10)
             for (y in 1..10) {
@@ -119,8 +115,6 @@ class LabyrinthGenerator : Callable<World> {
             val y = destination / NEIGHBOUR_Y
             val x = destination % NEIGHBOUR_Y / NEIGHBOUR_X
             return FloorPlan(walls).world().dropBeeper(x - 1, y - 1)
-        } catch (ex: InterruptedException) {
-            return Problem.emptyWorld
         }
     }
 
@@ -136,7 +130,6 @@ class LabyrinthGenerator : Callable<World> {
     }
 
     private fun destinationOpen(position: Int, direction: Int, uncharted: Int) {
-        if (Thread.interrupted()) throw InterruptedException()
         if (causesPartition(position, direction)) return
         if (uncharted == 0) throw Solution(position)
 
@@ -203,7 +196,8 @@ class LabyrinthGenerator : Callable<World> {
             }
         }
 
-        // backtrack
+        if (--backtrackBudget == 0) throw BacktrackBudgetExhausted()
+
         ++labyrinth[east]
         ++labyrinth[north]
         ++labyrinth[west]
@@ -213,7 +207,6 @@ class LabyrinthGenerator : Callable<World> {
     }
 
     private fun destinationFound(position: Int, direction: Int, uncharted: Int) {
-        if (Thread.interrupted()) throw InterruptedException()
         if (causesPartition(position, direction)) return
         if (uncharted == 0) throw Solution(position)
 
@@ -265,7 +258,8 @@ class LabyrinthGenerator : Callable<World> {
             }
         }
 
-        // backtrack
+        if (--backtrackBudget == 0) throw BacktrackBudgetExhausted()
+
         ++labyrinth[east]
         ++labyrinth[north]
         ++labyrinth[west]

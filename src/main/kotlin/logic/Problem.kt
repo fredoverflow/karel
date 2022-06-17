@@ -263,7 +263,7 @@ class Problem(
             "\u8063\u000a\ud108\u0009\uc107\u0002\ub108\u0004\u0001\u9101\u0000",
             0,
             true,
-            ::generateRandomLabyrinth
+            ::generateLabyrinth
         )
 
         val hangTheLampions = Problem(
