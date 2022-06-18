@@ -349,14 +349,12 @@ class Problem(
         ) {
             val builder = FloorPlan.empty.builder()
 
-            var y1 = rng.nextInt(5)
-            var y2 = rng.nextInt(1 + y1)
-            var y3 = rng.nextInt(1 + y2)
-            var y4 = rng.nextInt(1 + y3)
-            y1 += 5
-            y2 += 4
-            y3 += 3
-            y4 += 2
+            val upPermutations = "5432643265326542654374327532754275437632764276437652765376548432853285428543863286428643865286538654873287428743875287538754876287638764876594329532954295439632964296439652965396549732974297439752975397549762976397649765983298429843985298539854986298639864986598729873987498759876"
+            val up = rng.nextInt(upPermutations.length / 4) * 4
+            val y1 = upPermutations[up] - '0'
+            val y2 = upPermutations[up + 1] - '0'
+            val y3 = upPermutations[up + 2] - '0'
+            val y4 = upPermutations[up + 3] - '0'
 
             for (y in y1 until 10) builder.buildVerticalWall(1, y)
             builder.buildHorizontalWall(1, y1)
@@ -370,12 +368,11 @@ class Problem(
 
             builder.buildHorizontalWall(5, 1)
 
-            var y7 = rng.nextInt(6)
-            var y6 = rng.nextInt(1 + y7)
-            var y5 = rng.nextInt(1 + y6)
-            y7 += 4
-            y6 += 3
-            y5 += 2
+            val downPermutations = "234235236237238239245246247248249256257258259267268269278279289345346347348349356357358359367368369378379389456457458459467468469478479489567568569578579589678679689789"
+            val down = rng.nextInt(downPermutations.length / 3) * 3
+            val y5 = downPermutations[down] - '0'
+            val y6 = downPermutations[down + 1] - '0'
+            val y7 = downPermutations[down + 2] - '0'
 
             for (y in 1 until y5) builder.buildVerticalWall(6, y)
             builder.buildHorizontalWall(6, y5)
