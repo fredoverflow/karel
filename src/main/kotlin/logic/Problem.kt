@@ -33,16 +33,19 @@ class Problem(
             return world
         }
 
-        private fun randomBytes(n: Int, direction: Int): World {
+        private fun randomByte(): World {
             var world = FloorPlan.binary.world()
 
-            for (y in 0 until n) {
-                for (x in 2..9) {
-                    if (rng.nextBoolean()) {
-                        world = world.dropBeeper(x, y)
-                    }
-                }
-            }
+            world = world.withBeepers(0, rng.nextLong(256).shl(2))
+
+            return world.withKarelAt(9, 0, WEST)
+        }
+
+        private fun randomBytes(direction: Int): World {
+            var world = FloorPlan.binary.world()
+
+            world = world.withBeepers(0, rng.nextLong(256).shl(2) + rng.nextLong(256).shl(12))
+
             return world.withKarelAt(9, 0, direction)
         }
 
@@ -209,13 +212,8 @@ class Problem(
         ) {
             var world = emptyWorld
 
-            for (y in 0..9) {
-                for (x in 0..9) {
-                    if (rng.nextBoolean()) {
-                        world = world.dropBeeper(x, y)
-                    }
-                }
-            }
+            world = world.withBeepers(rng.nextLong(), rng.nextLong())
+
             world.withKarelAt(0, 9, EAST)
         }
 
@@ -314,7 +312,7 @@ class Problem(
             0b1,
             true,
         ) {
-            randomBytes(1, WEST)
+            randomByte()
         }
 
         val decrement = Problem(
@@ -325,7 +323,7 @@ class Problem(
             0b1,
             true,
         ) {
-            randomBytes(1, WEST)
+            randomByte()
         }
 
         val addSlow = Problem(
@@ -336,7 +334,7 @@ class Problem(
             0b11,
             true,
         ) {
-            randomBytes(2, WEST)
+            randomBytes(WEST)
         }
 
         val saveTheFlowers = Problem(
@@ -482,7 +480,7 @@ class Problem(
             0b1011,
             true,
         ) {
-            randomBytes(2, SOUTH)
+            randomBytes(SOUTH)
         }
 
         val partyAgain = Problem(
@@ -581,7 +579,7 @@ class Problem(
             0b111,
             true,
         ) {
-            randomBytes(2, SOUTH)
+            randomBytes(SOUTH)
         }
 
         val problems: List<Problem> = listOf(
