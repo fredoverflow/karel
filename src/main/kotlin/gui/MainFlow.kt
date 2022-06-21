@@ -4,6 +4,7 @@ import common.Diagnostic
 import common.Stack
 import logic.KarelError
 import logic.Problem
+import logic.UNKNOWN
 import logic.World
 import syntax.lexer.Lexer
 import syntax.parser.Parser
@@ -11,12 +12,11 @@ import syntax.parser.program
 import vm.CodeGenerator
 import vm.Instruction
 import vm.VirtualMachine
-
+import java.awt.EventQueue
 import java.util.concurrent.atomic.AtomicReference
-
 import javax.swing.Timer
 
-open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.createWorld())), VirtualMachine.Callbacks {
+open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.randomWorld())), VirtualMachine.Callbacks {
 
     val currentProblem: Problem
         get() = controlPanel.problemPicker.selectedItem as Problem
@@ -56,15 +56,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.crea
                 val goalInstructions = vm.createInstructionBuffer()
                 goalInstructions.addAll(goal.map { vm.goalInstruction(it.code) })
 
-                try {
-                    repeat(if (currentProblem.isRandom) 1000 else 1) {
-                        checkOnce(instructions, goalInstructions)
-                    }
-                } finally {
-                    virtualMachinePanel.clearStack()
-                    editor.clearStack()
-                    update()
-                }
+                check(instructions, goalInstructions)
             } else {
                 editor.setCursorTo(editor.length())
                 showDiagnostic("void ${currentProblem.name}() not found")
@@ -74,9 +66,63 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.crea
         }
     }
 
-    fun checkOnce(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
-        initialWorld = currentProblem.createWorld()
+    private fun check(instructions: List<Instruction>, goalInstructions: MutableList<Instruction>) {
+        controlPanel.checkStarted()
 
+        fun cleanup() {
+            controlPanel.checkFinished(currentProblem.isRandom)
+
+            virtualMachinePanel.clearStack()
+            editor.clearStack()
+            update()
+        }
+
+        val ids = currentProblem.randomWorldIds().iterator()
+        var checked = 0
+        initialWorld = currentProblem.createWorld(ids.next())
+        val start = System.currentTimeMillis()
+        var lastRepaint = start
+
+        fun report() {
+            if (!ids.hasNext()) {
+                showDiagnostic("checked all ${currentProblem.numWorlds} possible worlds")
+            } else if (currentProblem.numWorlds == UNKNOWN) {
+                showDiagnostic("checked $checked random worlds")
+            } else {
+                showDiagnostic("checked $checked random worlds\nfrom ${currentProblem.numWorlds} possible worlds")
+            }
+        }
+
+        fun oneMoreTime() {
+            try {
+                var now: Long
+                do {
+                    checkOnce(instructions, goalInstructions)
+                    ++checked
+                    now = System.currentTimeMillis()
+                    if (!ids.hasNext() || now - start >= 2000) {
+                        cleanup()
+                        report()
+                        return
+                    }
+                    initialWorld = currentProblem.createWorld(ids.next())
+                } while (now - lastRepaint < 100)
+                lastRepaint = now
+
+                atomicWorld.set(initialWorld)
+                worldPanel.repaint()
+                EventQueue.invokeLater(::oneMoreTime)
+            } catch (diagnostic: Diagnostic) {
+                cleanup()
+                showDiagnostic(diagnostic)
+            }
+        }
+        atomicWorld.set(initialWorld)
+        worldPanel.repaint()
+        EventQueue.invokeLater(::oneMoreTime)
+    }
+
+    fun checkOnce(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
         val goalWorldIterator = goalWorlds(goalInstructions).iterator()
 
         atomicWorld.set(initialWorld)

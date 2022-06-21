@@ -7,7 +7,7 @@ import java.util.function.Consumer
 class MainHandler : MainFlow() {
     init {
         controlPanel.randomize.addActionListener {
-            initialWorld = currentProblem.createWorld()
+            initialWorld = currentProblem.randomWorld()
             atomicWorld.set(initialWorld)
             worldPanel.repaint()
 
@@ -29,7 +29,7 @@ class MainHandler : MainFlow() {
             controlPanel.startStopReset.text = "start"
             controlPanel.randomize.isEnabled = currentProblem.isRandom
 
-            initialWorld = currentProblem.createWorld()
+            initialWorld = currentProblem.randomWorld()
             atomicWorld.set(initialWorld)
             worldPanel.binaryLines = currentProblem.binaryLines
             worldPanel.repaint()

@@ -14,7 +14,7 @@ open class WorldTestBase : VirtualMachine.Callbacks {
     protected fun executeGoal(problem: Problem) {
         val instructions = vm.createInstructionBuffer()
         instructions.addAll(problem.goal.map { vm.goalInstruction(it.code) })
-        initialWorld = problem.createWorld()
+        initialWorld = problem.randomWorld()
         val atomicWorld = AtomicReference(initialWorld)
         val virtualMachine = VirtualMachine(instructions, atomicWorld, this)
         try {
