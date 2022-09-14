@@ -1,11 +1,11 @@
 package logic
 
 import java.math.BigInteger
-import java.math.BigInteger.ONE
-import java.math.BigInteger.TWO
 
-val UNKNOWN = BigInteger.ZERO
-val SHUFFLE = TWO..BigInteger.valueOf(65536)
+val UNKNOWN = 0.toBigInteger()
+val ONE = 1.toBigInteger()
+val TWO = 2.toBigInteger()
+val SHUFFLE = TWO..65536.toBigInteger()
 
 class Problem(
     val index: String,
@@ -292,7 +292,7 @@ class Problem(
             "Karel was assembled 10 years ago!\nTo celebrate this anniversary,\nKarel bought 10 lampions. Now all\nthat's left to do is hang them\nfrom the (irregular) ceiling.",
             "\u8009\ua104\u0001\u9101\u0002\u0005\ua10d\u0006\u0003\ua10d\u0002\u0000\u0001\u000a\ud10c\u0000",
             0,
-            BigInteger.valueOf(3).pow(10),
+            3.toBigInteger().pow(10),
         ) { id ->
             val rng = WorldEntropy(id)
             val builder = FloorPlan.empty.builder()
@@ -322,7 +322,7 @@ class Problem(
             "Karel the coal miner discovers\nten tunnels of varying lengths\nfilled with valuable coal.\n(Does your solution work for\ntunnels of length 0 and 10?)",
             "\u8009\ua104\u0001\u9101\u0007\uc113\u0002\u0005\u0008\uc10d\u0001\u0005\ub108\u0003\u000a\uc112\u0001\ub10e\u0002\u0000",
             0,
-            BigInteger.valueOf(11).pow(10),
+            11.toBigInteger().pow(10),
         ) {
             pillars().withKarelAt(0, 9, EAST)
         }
@@ -366,7 +366,7 @@ class Problem(
             "Karel climbs Mt. Everest. On the\nway up, Karel collects 4 flowers\nthat do not get enough sunlight\non the west side of the mountain.\nEast is where the sun comes up!",
             "\u8004\ua110\u0005\u9101\ua110\u8004\u0006\u0001\u0004\u000a\uc10d\u0001\ub109\u0002\u9106\u0000\u0002\u000b\ud115\u0001\ub111\u0004\u0001\u0000",
             0,
-            BigInteger.valueOf(3920),
+            3920.toBigInteger(),
         ) { id ->
             val rng = WorldEntropy(id)
             val builder = FloorPlan.empty.builder()
@@ -415,7 +415,7 @@ class Problem(
             "In the middle of the night, Karel\nawakens from a terrible dream.\nThe teddy bear will provide\ncomfort. It should lay somewhere\nnear the edge of the bed...",
             "\u0007\ud108\u000a\uc106\u0001\ub100\u0002\ub100\u0000",
             0,
-            BigInteger.valueOf(16000),
+            16000.toBigInteger(),
         ) { id ->
             val rng = WorldEntropy(id)
             var world = emptyWorld
@@ -439,7 +439,7 @@ class Problem(
             "Karel signs up for the Olympics\nand is allowed to participate\nin the hurdle runs. After jumping\nall the hurdles, Karel receives a\nspecial medal made of copper!",
             "\u0007\ud114\u000a\uc106\u0001\ub100\u0002\u000b\ud10b\u0001\ub107\u0004\u0001\u0004\u000a\uc112\u0001\ub10e\u0002\ub100\u0000",
             0,
-            BigInteger.valueOf(1111100000),
+            1111100000.toBigInteger(),
         ) {
             val xBeeper = 5 + rng.nextInt(5)
             val builder = FloorPlan.empty.builder()
@@ -492,7 +492,7 @@ class Problem(
             "Karel the hacker is eavesdropping\non an analog communications line\nand writes down 10 bits encoded\nas 0..5 (0) or 6..10 (1). Convert\nto always 0 (0) or always 10 (1).",
             "\u8009\ua104\u0001\u9101\u0007\uc124\u0002\u8005\u0001\u9108\u0007\uc11a\u0008\uc110\u0001\ub10c\u000a\uc115\u0001\u0006\ub110\u0003\u0001\u000a\ud116\ub123\u0003\u0008\ud11f\u0001\ub11b\u0001\u0005\u0008\ud11f\u0002\u0000",
             0,
-            BigInteger.valueOf(11).pow(10),
+            11.toBigInteger().pow(10),
         ) {
             pillars().withKarelAt(0, 9, EAST)
         }
@@ -514,7 +514,7 @@ class Problem(
             "Karel is preparing the next big\nparty. Unfortunately, the floor\nis so soaked from the last party\nthat care must be taken not to\nbreak through into the cellar!",
             "\u8009\ua104\u0001\u9101\u0002\u0005\ua109\u0002\u0000\u000a\ud10e\u0006\u0003\u0000\u0001\ua109\u0001\u0000",
             0,
-            BigInteger.valueOf(3).pow(10),
+            3.toBigInteger().pow(10),
         ) { id ->
             val rng = WorldEntropy(id)
             val builder = FloorPlan.trap.builder()
@@ -532,7 +532,7 @@ class Problem(
             "Karel arranges a romantic date\nwith Taylor on a frozen lake to\n\"fetch the stars from the sky\",\nwhich is German for \"goes to\nthe ends of the world and back\".",
             "\u8009\ua104\u0001\u9101\u0002\ua109\u0006\u0002\u0000\u000a\ud10e\u0005\u0003\u0000\u0001\ua109\u0001\u0000",
             0,
-            BigInteger.valueOf(3).pow(10),
+            3.toBigInteger().pow(10),
         ) { id ->
             val rng = WorldEntropy(id)
             val builder = FloorPlan.trap.builder()
@@ -552,7 +552,7 @@ class Problem(
             "Karel the cave explorer earns a\nliving as a tourist guide. For\nsafety measures, Karel breaks all\nstalactites from the ceiling and\nre-erects them as stalagmites.",
             "\u8009\ua104\u0001\u9101\u0002\ua109\ua10e\u0004\u0000\u0001\u000a\ud109\u0003\u0000\u0007\uc109\u0005\u0001\ua10e\u0006\u0001\u0000",
             0,
-            BigInteger.valueOf(9).pow(10),
+            9.toBigInteger().pow(10),
         ) {
             val builder = FloorPlan.empty.builder()
             var world = builder.world()
