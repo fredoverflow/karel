@@ -120,7 +120,7 @@ class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
     var binaryLines = 0
 
     private fun Graphics.drawNumbers(world: World) {
-        val shift = if (world.beeperAt(2, 7)) 24 else 0
+        val shift = if (world.beeperAt(0, 9)) 24 else 0
         var y = 0
         var lines = binaryLines
         while (lines != 0) {

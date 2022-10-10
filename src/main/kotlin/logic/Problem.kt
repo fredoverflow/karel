@@ -609,6 +609,25 @@ class Problem(
             randomBytes(WorldEntropy(id), SOUTH)
         }
 
+        val computeFibonacci = Problem(
+            "3.3.3",
+            "computeFibonacci",
+            "Given 2 Fibonacci numbers,\nKarel computes the next 8.\n\nen.wikipedia.org/wiki/Fibonacci_number\nde.wikipedia.org/wiki/Fibonacci-Folge",
+            "\u8008\ua10b\u0001\u0002\u000a\uc108\u0001\ub104\u0004\u9101\u0000\u000b\uc12e\u0007\u0008\u000e\ud113\ua12b\ub10b\u0007\u0008\u000d\uc119\ua12b\ub11b\ua12f\ub10b\u000b\uc12e\u0007\u0008\u000e\ud123\ua12f\ub10b\u0007\u0008\u000d\uc129\ua12f\ub11b\ua12b\ub11b\u0004\u0001\u0002\u0000\u0001\u0001\u0006\u0004\u0001\u0004\u0001\u0001\u0003\u0000",
+            0b1111111111,
+            5.toBigInteger(),
+        ) { id ->
+            val world = FloorPlan.binary.world().withKarelAt(9, 0, SOUTH)
+            when (id % 5) {
+                0 -> world.dropBeeper(9, 1) // 0 1
+                1 -> world.dropBeeper(9, 0).dropBeeper(9, 1) // 1 1
+                2 -> world.dropBeeper(9, 0).dropBeeper(8, 1) // 1 2
+                3 -> world.dropBeeper(8, 0).dropBeeper(8, 1).dropBeeper(9, 1) // 2 3
+                4 -> world.dropBeeper(8, 0).dropBeeper(9, 0).dropBeeper(7, 1).dropBeeper(9, 1) // 3 5
+                else -> error(id)
+            }
+        }
+
         val problems: List<Problem> = listOf(
             karelsFirstProgram,
 
@@ -647,6 +666,7 @@ class Problem(
             layAndRemoveTiles,
             findShelters,
             addSmart,
+            computeFibonacci,
         )
     }
 }

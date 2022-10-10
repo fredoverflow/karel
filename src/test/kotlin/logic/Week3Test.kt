@@ -93,4 +93,13 @@ class Week3Test : WorldTestBase() {
         val sum = world.binaryNumber(2)
         assertEquals((one + two).and(255), sum)
     }
+
+    @Test
+    fun computeFibonacci() {
+        executeGoal(Problem.computeFibonacci)
+        val numbers = (0..9).map(world::binaryNumber)
+        for ((a, b, c) in numbers.windowed(3)) {
+            assertEquals(a + b, c)
+        }
+    }
 }
