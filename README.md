@@ -3,6 +3,25 @@
 
 ![hangTheLampions](https://i.imgur.com/EMKIohi.png)
 
+## Table of contents
+
+1. [Background](#background)
+2. [Getting started](#getting-started)
+   - [Autosave](#autosave)
+3. [Language reference](#language-reference)
+   - [Primitive commands](#primitive-commands)
+   - [Custom commands](#custom-commands)
+   - [Repeat](#repeat)
+   - [If/else](#ifelse)
+   - [Primitive conditions](#primitive-conditions)
+   - [If/else if](#ifelse-if)
+   - [Not `!`](#not-)
+   - [And `&&`](#and-)
+   - [Or `||`](#or-)
+   - [Summary compound conditions](#summary-compound-conditions)
+   - [While](#while)
+4. [Keyboard shortcuts](#keyboard-shortcuts)
+
 ## Background
 
 Karel The Robot is a simple teaching environment for imperative programming basics.
@@ -112,7 +131,7 @@ chmod +x karel.sh
 From now on, simply double-click `karel.sh` in the `Downloads` folder to start Karel.<br>
 Feel free to move `karel.jar` and `karel.sh` to the Desktop or any other folder you prefer.
 
-## Autosave
+### Autosave
 
 Your code is automatically saved to a new file each time you click the start button.
 The save folder is named `karel`, and it is located in your home directory.
