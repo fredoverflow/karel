@@ -17,6 +17,7 @@ private const val FREE = ' '
 
 private const val SENTINEL = "# # # # # # # # # # # #"
 private const val VERTICAL = "/ / / / / / / / / / / /"
+
 // The number on an uncharted cell denotes its uncharted neighbours
 private const val EDGE = "#/2/3/3/3/3/3/3/3/3/2/#"
 private const val NORM = "#/3/4/4/4/4/4/4/4/4/3/#"
@@ -45,33 +46,33 @@ private val WALLS = intArrayOf(WALL_X, -WALL_Y, -WALL_X, WALL_Y)
 private val NEIGHBOURS = intArrayOf(NEIGHBOUR_X, -NEIGHBOUR_Y, -NEIGHBOUR_X, NEIGHBOUR_Y)
 
 private val directionPermutations: Array<IntArray> = arrayOf(
-        intArrayOf(EAST, NORTH, WEST, SOUTH),
-        intArrayOf(EAST, NORTH, SOUTH, WEST),
-        intArrayOf(EAST, WEST, NORTH, SOUTH),
-        intArrayOf(EAST, WEST, SOUTH, NORTH),
-        intArrayOf(EAST, SOUTH, NORTH, WEST),
-        intArrayOf(EAST, SOUTH, WEST, NORTH),
+    intArrayOf(EAST, NORTH, WEST, SOUTH),
+    intArrayOf(EAST, NORTH, SOUTH, WEST),
+    intArrayOf(EAST, WEST, NORTH, SOUTH),
+    intArrayOf(EAST, WEST, SOUTH, NORTH),
+    intArrayOf(EAST, SOUTH, NORTH, WEST),
+    intArrayOf(EAST, SOUTH, WEST, NORTH),
 
-        intArrayOf(NORTH, EAST, WEST, SOUTH),
-        intArrayOf(NORTH, EAST, SOUTH, WEST),
-        intArrayOf(NORTH, WEST, EAST, SOUTH),
-        intArrayOf(NORTH, WEST, SOUTH, EAST),
-        intArrayOf(NORTH, SOUTH, EAST, WEST),
-        intArrayOf(NORTH, SOUTH, WEST, EAST),
+    intArrayOf(NORTH, EAST, WEST, SOUTH),
+    intArrayOf(NORTH, EAST, SOUTH, WEST),
+    intArrayOf(NORTH, WEST, EAST, SOUTH),
+    intArrayOf(NORTH, WEST, SOUTH, EAST),
+    intArrayOf(NORTH, SOUTH, EAST, WEST),
+    intArrayOf(NORTH, SOUTH, WEST, EAST),
 
-        intArrayOf(WEST, EAST, NORTH, SOUTH),
-        intArrayOf(WEST, EAST, SOUTH, NORTH),
-        intArrayOf(WEST, NORTH, EAST, SOUTH),
-        intArrayOf(WEST, NORTH, SOUTH, EAST),
-        intArrayOf(WEST, SOUTH, EAST, NORTH),
-        intArrayOf(WEST, SOUTH, NORTH, EAST),
+    intArrayOf(WEST, EAST, NORTH, SOUTH),
+    intArrayOf(WEST, EAST, SOUTH, NORTH),
+    intArrayOf(WEST, NORTH, EAST, SOUTH),
+    intArrayOf(WEST, NORTH, SOUTH, EAST),
+    intArrayOf(WEST, SOUTH, EAST, NORTH),
+    intArrayOf(WEST, SOUTH, NORTH, EAST),
 
-        intArrayOf(SOUTH, EAST, NORTH, WEST),
-        intArrayOf(SOUTH, EAST, WEST, NORTH),
-        intArrayOf(SOUTH, NORTH, EAST, WEST),
-        intArrayOf(SOUTH, NORTH, WEST, EAST),
-        intArrayOf(SOUTH, WEST, EAST, NORTH),
-        intArrayOf(SOUTH, WEST, NORTH, EAST)
+    intArrayOf(SOUTH, EAST, NORTH, WEST),
+    intArrayOf(SOUTH, EAST, WEST, NORTH),
+    intArrayOf(SOUTH, NORTH, EAST, WEST),
+    intArrayOf(SOUTH, NORTH, WEST, EAST),
+    intArrayOf(SOUTH, WEST, EAST, NORTH),
+    intArrayOf(SOUTH, WEST, NORTH, EAST),
 )
 
 class LabyrinthGenerator {

@@ -26,6 +26,7 @@ class CodeGenerator(private val sema: Sema) {
     }
 
     private val id = IdentityGenerator()
+
     // Forward calls cannot know their target address during code generation.
     // For simplicity, ALL call targets are therefore initially encoded as command name ids.
     // In a subsequent phase, the command name ids are then translated into addresses.
@@ -79,6 +80,7 @@ class CodeGenerator(private val sema: Sema) {
             is Block -> {
                 statements.forEach { it.generate() }
             }
+
             is IfThenElse -> {
                 if (e1se == null) {
                     condition.generate()
@@ -96,6 +98,7 @@ class CodeGenerator(private val sema: Sema) {
                     patchForwardJumpFrom(overElse)
                 }
             }
+
             is While -> {
                 val back = pc
                 condition.generate()
@@ -104,12 +107,14 @@ class CodeGenerator(private val sema: Sema) {
                 generateInstruction(JUMP + back, body.closingBrace)
                 patchForwardJumpFrom(over)
             }
+
             is Repeat -> {
                 generateInstruction(PUSH + times, repeat)
                 val back = pc
                 body.generate()
                 generateInstruction(LOOP + back, body.closingBrace)
             }
+
             is Call -> {
                 val builtin = builtinCommands[target.lexeme]
                 if (builtin != null) {

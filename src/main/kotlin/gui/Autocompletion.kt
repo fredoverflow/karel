@@ -18,11 +18,11 @@ private fun fittingSuffixes(sourceCode: String, lineBeforeSelection: String): Li
     val prefixLength = prefix.length
 
     return command
-            .findAll(sourceCode)
-            .map { it.groups[1]!!.value + "();" }
-            .filter { it.length > prefixLength && it.startsWith(prefix) }
-            .map { it.substring(prefixLength) }
-            .toList()
+        .findAll(sourceCode)
+        .map { it.groups[1]!!.value + "();" }
+        .filter { it.length > prefixLength && it.startsWith(prefix) }
+        .map { it.substring(prefixLength) }
+        .toList()
 }
 
 private fun longestCommonPrefix(strings: List<String>): String {

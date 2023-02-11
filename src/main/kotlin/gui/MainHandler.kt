@@ -42,11 +42,9 @@ class MainHandler : MainFlow() {
 
         controlPanel.startStopReset.addActionListener {
             when (controlPanel.startStopReset.text) {
-                "start" ->
-                    parseAndExecute()
+                "start" -> parseAndExecute()
 
-                "stop" ->
-                    stop()
+                "stop" -> stop()
 
                 "reset" -> {
                     controlPanel.startStopReset.text = "start"
@@ -99,6 +97,7 @@ class MainHandler : MainFlow() {
                 KeyEvent.VK_M -> if (event.isControlDown && event.isShiftDown) {
                     virtualMachinePanel.isVisible = !virtualMachinePanel.isVisible
                 }
+
                 KeyEvent.VK_F12 -> {
                     if (controlPanel.isRunning()) {
                         stepInto()

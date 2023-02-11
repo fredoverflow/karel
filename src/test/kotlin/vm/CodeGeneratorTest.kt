@@ -23,7 +23,8 @@ class CodeGeneratorTest {
 
     @Test
     fun basicCommands() {
-        assertBytecode("""
+        assertBytecode(
+            """
             void main() {
                 moveForward();
                 turnLeft();
@@ -33,18 +34,20 @@ class CodeGeneratorTest {
                 dropBeeper();
             }
             """,
-                MOVE_FORWARD,
-                TURN_LEFT,
-                TURN_AROUND,
-                TURN_RIGHT,
-                PICK_BEEPER,
-                DROP_BEEPER,
-                RETURN)
+            MOVE_FORWARD,
+            TURN_LEFT,
+            TURN_AROUND,
+            TURN_RIGHT,
+            PICK_BEEPER,
+            DROP_BEEPER,
+            RETURN,
+        )
     }
 
     @Test
     fun call() {
-        assertBytecode("""
+        assertBytecode(
+            """
             void main() {
                 moveForward();
                 turns();
@@ -64,42 +67,45 @@ class CodeGeneratorTest {
                 dropBeeper();
             }
             """,
-                MOVE_FORWARD,
-                CALL + 0x106,
-                MOVE_FORWARD,
-                CALL + 0x10a,
-                MOVE_FORWARD,
-                RETURN,
+            MOVE_FORWARD,
+            CALL + 0x106,
+            MOVE_FORWARD,
+            CALL + 0x10a,
+            MOVE_FORWARD,
+            RETURN,
 
-                TURN_LEFT,
-                TURN_AROUND,
-                TURN_RIGHT,
-                RETURN,
+            TURN_LEFT,
+            TURN_AROUND,
+            TURN_RIGHT,
+            RETURN,
 
-                PICK_BEEPER,
-                DROP_BEEPER,
-                RETURN
+            PICK_BEEPER,
+            DROP_BEEPER,
+            RETURN,
         )
     }
 
     @Test
     fun repeat() {
-        assertBytecode("""
+        assertBytecode(
+            """
             void main() {
                 repeat (9) {
                     moveForward();
                 }
             }
             """,
-                PUSH + 9,
-                MOVE_FORWARD,
-                LOOP + 0x101,
-                RETURN)
+            PUSH + 9,
+            MOVE_FORWARD,
+            LOOP + 0x101,
+            RETURN,
+        )
     }
 
     @Test
     fun nestedRepeat() {
-        assertBytecode("""
+        assertBytecode(
+            """
             void main() {
                 repeat (4) {
                     repeat (9) {
@@ -108,45 +114,51 @@ class CodeGeneratorTest {
                 }
             }
             """,
-                PUSH + 4,
-                PUSH + 9,
-                MOVE_FORWARD,
-                LOOP + 0x102,
-                LOOP + 0x101,
-                RETURN)
+            PUSH + 4,
+            PUSH + 9,
+            MOVE_FORWARD,
+            LOOP + 0x102,
+            LOOP + 0x101,
+            RETURN
+        )
     }
 
     @Test
     fun ifThenTrue() {
-        assertBytecode("""
+        assertBytecode(
+            """
             void main() {
                 if (onBeeper()) {
                     pickBeeper();
                 }
             }
             """,
-                ON_BEEPER, ELSE + 0x103,
-                PICK_BEEPER,
-                RETURN)
+            ON_BEEPER, ELSE + 0x103,
+            PICK_BEEPER,
+            RETURN,
+        )
     }
 
     @Test
     fun ifThenFalse() {
-        assertBytecode("""
+        assertBytecode(
+            """
             void main() {
                 if (!onBeeper()) {
                     dropBeeper();
                 }
             }
             """,
-                ON_BEEPER, THEN + 0x103,
-                DROP_BEEPER,
-                RETURN)
+            ON_BEEPER, THEN + 0x103,
+            DROP_BEEPER,
+            RETURN,
+        )
     }
 
     @Test
     fun ifElseTrue() {
-        assertBytecode("""
+        assertBytecode(
+            """
             void main() {
                 if (onBeeper()) {
                     pickBeeper();
@@ -155,16 +167,18 @@ class CodeGeneratorTest {
                 }
             }
             """,
-                ON_BEEPER, ELSE + 0x104,
-                PICK_BEEPER,
-                JUMP + 0x105,
-                DROP_BEEPER,
-                RETURN)
+            ON_BEEPER, ELSE + 0x104,
+            PICK_BEEPER,
+            JUMP + 0x105,
+            DROP_BEEPER,
+            RETURN,
+        )
     }
 
     @Test
     fun ifElseFalse() {
-        assertBytecode("""
+        assertBytecode(
+            """
             void main() {
                 if (!onBeeper()) {
                     dropBeeper();
@@ -173,49 +187,55 @@ class CodeGeneratorTest {
                 }
             }
             """,
-                ON_BEEPER, THEN + 0x104,
-                DROP_BEEPER,
-                JUMP + 0x105,
-                PICK_BEEPER,
-                RETURN)
+            ON_BEEPER, THEN + 0x104,
+            DROP_BEEPER,
+            JUMP + 0x105,
+            PICK_BEEPER,
+            RETURN,
+        )
     }
 
     @Test
     fun and() {
-        assertBytecode("""
+        assertBytecode(
+            """
             void main() {
                 if (!leftIsClear() && !frontIsClear() && !rightIsClear()) {
                     turnAround();
                 }
             }
             """,
-                LEFT_IS_CLEAR, NOT,
-                FRONT_IS_CLEAR, NOT,
-                RIGHT_IS_CLEAR, NOT,
-                AND, AND,
-                ELSE + 0x10a,
-                TURN_AROUND,
-                RETURN)
+            LEFT_IS_CLEAR, NOT,
+            FRONT_IS_CLEAR, NOT,
+            RIGHT_IS_CLEAR, NOT,
+            AND, AND,
+            ELSE + 0x10a,
+            TURN_AROUND,
+            RETURN,
+        )
     }
 
     @Test
     fun or() {
-        assertBytecode("""
+        assertBytecode(
+            """
             void main() {
                 if (!(leftIsClear() || frontIsClear() || rightIsClear())) {
                     turnAround();
                 }
             }
             """,
-                LEFT_IS_CLEAR, FRONT_IS_CLEAR, RIGHT_IS_CLEAR,
-                OR, OR, THEN + 0x107,
-                TURN_AROUND,
-                RETURN)
+            LEFT_IS_CLEAR, FRONT_IS_CLEAR, RIGHT_IS_CLEAR,
+            OR, OR, THEN + 0x107,
+            TURN_AROUND,
+            RETURN,
+        )
     }
 
     @Test
     fun elseIf() {
-        assertBytecode("""
+        assertBytecode(
+            """
             void main() {
                 if (leftIsClear()) {
                     turnLeft();
@@ -227,21 +247,23 @@ class CodeGeneratorTest {
                 }
             }
             """,
-                LEFT_IS_CLEAR, ELSE + 0x104,
-                TURN_LEFT,
-                JUMP + 0x10c,
-                FRONT_IS_CLEAR, ELSE + 0x107,
-                JUMP + 0x10c,
-                RIGHT_IS_CLEAR, ELSE + 0x10b,
-                TURN_RIGHT,
-                JUMP + 0x10c,
-                TURN_AROUND,
-                RETURN)
+            LEFT_IS_CLEAR, ELSE + 0x104,
+            TURN_LEFT,
+            JUMP + 0x10c,
+            FRONT_IS_CLEAR, ELSE + 0x107,
+            JUMP + 0x10c,
+            RIGHT_IS_CLEAR, ELSE + 0x10b,
+            TURN_RIGHT,
+            JUMP + 0x10c,
+            TURN_AROUND,
+            RETURN,
+        )
     }
 
     @Test
     fun whi1e() {
-        assertBytecode("""
+        assertBytecode(
+            """
             void hangTheLampions() {
                 while (beeperAhead()) {
                     moveForward();
@@ -249,16 +271,18 @@ class CodeGeneratorTest {
                 }
             }
             """,
-                BEEPER_AHEAD, ELSE + 0x105,
-                MOVE_FORWARD,
-                PICK_BEEPER,
-                JUMP + 0x100,
-                RETURN)
+            BEEPER_AHEAD, ELSE + 0x105,
+            MOVE_FORWARD,
+            PICK_BEEPER,
+            JUMP + 0x100,
+            RETURN,
+        )
     }
 
     @Test
     fun recursion() {
-        assertBytecode("""
+        assertBytecode(
+            """
             void partyAgain() {
                 if (!frontIsClear()) {
                     turnAround();
@@ -269,62 +293,70 @@ class CodeGeneratorTest {
                 }
             }
             """,
-                FRONT_IS_CLEAR, THEN + 0x104,
-                TURN_AROUND,
-                JUMP + 0x107,
-                MOVE_FORWARD,
-                CALL + 0x100,
-                MOVE_FORWARD,
-                RETURN)
+            FRONT_IS_CLEAR, THEN + 0x104,
+            TURN_AROUND,
+            JUMP + 0x107,
+            MOVE_FORWARD,
+            CALL + 0x100,
+            MOVE_FORWARD,
+            RETURN,
+        )
     }
 
     @Test
     fun oddNumberOfNegations() {
-        assertBytecode("""
+        assertBytecode(
+            """
             void main() {
                 if (!!!onBeeper()) {
                     dropBeeper();
                 }
             }
             """,
-                ON_BEEPER, THEN + 0x103,
-                DROP_BEEPER,
-                RETURN)
+            ON_BEEPER, THEN + 0x103,
+            DROP_BEEPER,
+            RETURN,
+        )
     }
 
     @Test
     fun evenNumberOfNegations() {
-        assertBytecode("""
+        assertBytecode(
+            """
             void main() {
                 if (!!!!frontIsClear()) {
                     moveForward();
                 }
             }
             """,
-                FRONT_IS_CLEAR, ELSE + 0x103,
-                MOVE_FORWARD,
-                RETURN)
+            FRONT_IS_CLEAR, ELSE + 0x103,
+            MOVE_FORWARD,
+            RETURN,
+        )
     }
 
     @Test
     fun infiniteLoop() {
-        assertBytecode("""
+        assertBytecode(
+            """
             void hangTheLampions() {
                 while (true) {
                     turnLeft();
                 }
             }
             """,
-                TRUE,
-                ELSE + 0x104,
-                TURN_LEFT,
-                JUMP + 0x100,
-                RETURN)
+            TRUE,
+            ELSE + 0x104,
+            TURN_LEFT,
+            JUMP + 0x100,
+            RETURN,
+        )
     }
 
     @Test
     fun disabledViaIf() {
-        assertBytecode("""
+        assertBytecode(
+            """
             void main() {
                 if (false) {
                     turnAround();
@@ -333,11 +365,12 @@ class CodeGeneratorTest {
                 }
             }
             """,
-                FALSE,
-                ELSE + 0x105,
-                TURN_AROUND,
-                MOVE_FORWARD,
-                TURN_AROUND,
-                RETURN)
+            FALSE,
+            ELSE + 0x105,
+            TURN_AROUND,
+            MOVE_FORWARD,
+            TURN_AROUND,
+            RETURN,
+        )
     }
 }

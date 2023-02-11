@@ -32,7 +32,8 @@ class LexerTest {
 
     @Test
     fun singleLineComments() {
-        lexer = Lexer("""
+        lexer = Lexer(
+            """
         // comment #1
         a
         // comment #2
@@ -41,7 +42,8 @@ class LexerTest {
         c // comment #4
         d// comment #5
         e//
-        """)
+        """
+        )
 
         assertIdentifier("a")
         assertIdentifier("b")
@@ -59,7 +61,8 @@ class LexerTest {
 
     @Test
     fun multiLineComments() {
-        lexer = Lexer("""
+        lexer = Lexer(
+            """
         /*
         comment #1
         */
@@ -69,7 +72,8 @@ class LexerTest {
         d/***/
         e /* / ** / *** /*/
         f
-        """)
+        """
+        )
 
         assertIdentifier("a")
         assertIdentifier("b")
@@ -124,7 +128,8 @@ class LexerTest {
 
     @Test
     fun identifiers() {
-        lexer = Lexer("a z a0 z9 a_z foo _bar the_quick_brown_fox_jumps_over_the_lazy_dog THE_QUICK_BROWN_FOX_JUMPS_OVER_THE_LAZY_DOG")
+        lexer =
+            Lexer("a z a0 z9 a_z foo _bar the_quick_brown_fox_jumps_over_the_lazy_dog THE_QUICK_BROWN_FOX_JUMPS_OVER_THE_LAZY_DOG")
 
         assertIdentifier("a")
         assertIdentifier("z")

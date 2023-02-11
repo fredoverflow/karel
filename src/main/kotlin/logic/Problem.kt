@@ -27,7 +27,9 @@ class Problem(
 
     fun randomWorldIds(): Sequence<Int> = when (numWorlds) {
         ONE -> sequenceOf(0)
+
         in SHUFFLE -> (0 until numWorlds.toInt()).asSequence().shuffled()
+
         else -> generateSequence { 0 }
     }
 
@@ -371,7 +373,8 @@ class Problem(
             val rng = WorldEntropy(id)
             val builder = FloorPlan.empty.builder()
 
-            val upPermutations = "5432643265326542654374327532754275437632764276437652765376548432853285428543863286428643865286538654873287428743875287538754876287638764876594329532954295439632964296439652965396549732974297439752975397549762976397649765983298429843985298539854986298639864986598729873987498759876"
+            val upPermutations =
+                "5432643265326542654374327532754275437632764276437652765376548432853285428543863286428643865286538654873287428743875287538754876287638764876594329532954295439632964296439652965396549732974297439752975397549762976397649765983298429843985298539854986298639864986598729873987498759876"
             val up = rng.nextInt(upPermutations.length / 4) * 4
             val y1 = upPermutations[up] - '0'
             val y2 = upPermutations[up + 1] - '0'
@@ -390,7 +393,8 @@ class Problem(
 
             builder.buildHorizontalWall(5, 1)
 
-            val downPermutations = "234235236237238239245246247248249256257258259267268269278279289345346347348349356357358359367368369378379389456457458459467468469478479489567568569578579589678679689789"
+            val downPermutations =
+                "234235236237238239245246247248249256257258259267268269278279289345346347348349356357358359367368369378379389456457458459467468469478479489567568569578579589678679689789"
             val down = rng.nextInt(downPermutations.length / 3) * 3
             val y5 = downPermutations[down] - '0'
             val y6 = downPermutations[down + 1] - '0'
@@ -624,6 +628,7 @@ class Problem(
                 2 -> world.dropBeeper(9, 0).dropBeeper(8, 1) // 1 2
                 3 -> world.dropBeeper(8, 0).dropBeeper(8, 1).dropBeeper(9, 1) // 2 3
                 4 -> world.dropBeeper(8, 0).dropBeeper(9, 0).dropBeeper(7, 1).dropBeeper(9, 1) // 3 5
+
                 else -> error(id)
             }
         }

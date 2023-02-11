@@ -18,10 +18,12 @@ class Lexer(input: String) : LexerBase(input) {
                     skipSingleLineComment()
                     nextToken()
                 }
+
                 '*' -> {
                     skipMultiLineComment()
                     nextToken()
                 }
+
                 else -> error("comments start with // or /*")
             }
 
@@ -92,7 +94,9 @@ class Lexer(input: String) : LexerBase(input) {
             val lexeme = lexeme()
             when (val value: Any? = identifiersOrKeywords[lexeme]) {
                 is TokenKind -> verbatim(value)
+
                 is String -> token(IDENTIFIER, value)
+
                 else -> {
                     identifiersOrKeywords = identifiersOrKeywords.put(lexeme)
                     token(IDENTIFIER, lexeme)

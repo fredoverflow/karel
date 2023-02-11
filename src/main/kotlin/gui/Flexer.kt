@@ -1,11 +1,10 @@
 package gui
 
 import freditor.FlexerState
-import freditor.FlexerStateBuilder
-import freditor.persistent.ChampMap
-
 import freditor.FlexerState.EMPTY
 import freditor.FlexerState.THIS
+import freditor.FlexerStateBuilder
+import freditor.persistent.ChampMap
 
 object Flexer : freditor.Flexer() {
     private val SLASH_SLASH = FlexerState('\n', null).setDefault(THIS)
@@ -24,19 +23,19 @@ object Flexer : freditor.Flexer() {
     private val IDENTIFIER_HEAD = IDENTIFIER_TAIL.head()
 
     private val START = FlexerStateBuilder()
-            .set('(', OPENING_PAREN)
-            .set(')', CLOSING_PAREN)
-            .set('{', OPENING_BRACE)
-            .set('}', CLOSING_BRACE)
-            .set('\n', NEWLINE)
-            .set(' ', SPACE_HEAD)
-            .set('/', FlexerState('*', SLASH_ASTERISK, '/', SLASH_SLASH).head())
-            .set("09", NUMBER_HEAD)
-            .set("AZ__az", IDENTIFIER_HEAD)
-            .build()
-            .verbatim(IDENTIFIER_TAIL, "else", "false", "if", "repeat", "true", "void", "while")
-            .verbatim(EMPTY, "!", "&&", ";", "||")
-            .setDefault(ERROR)
+        .set('(', OPENING_PAREN)
+        .set(')', CLOSING_PAREN)
+        .set('{', OPENING_BRACE)
+        .set('}', CLOSING_BRACE)
+        .set('\n', NEWLINE)
+        .set(' ', SPACE_HEAD)
+        .set('/', FlexerState('*', SLASH_ASTERISK, '/', SLASH_SLASH).head())
+        .set("09", NUMBER_HEAD)
+        .set("AZ__az", IDENTIFIER_HEAD)
+        .build()
+        .verbatim(IDENTIFIER_TAIL, "else", "false", "if", "repeat", "true", "void", "while")
+        .verbatim(EMPTY, "!", "&&", ";", "||")
+        .setDefault(ERROR)
 
     override fun start(): FlexerState = START
 
@@ -45,11 +44,11 @@ object Flexer : freditor.Flexer() {
     }
 
     private val lexemeColors = ChampMap.of(ERROR, 0x808080)
-            .put(START.read("/", "&", "|"), 0x808080)
-            .put(SLASH_SLASH, SLASH_ASTERISK, SLASH_ASTERISK___ASTERISK, SLASH_ASTERISK___ASTERISK_SLASH, 0x008000)
-            .put(NUMBER_HEAD, NUMBER_TAIL, 0x6400c8)
-            .put(START.read("else", "false", "if", "repeat", "true", "while"), 0x0000ff)
-            .put(START.read("void"), 0x008080)
-            .put(START.read("(", ")", "{", "}"), 0xff0000)
-            .put(START.read("!", "&&", "||"), 0x804040)
+        .put(START.read("/", "&", "|"), 0x808080)
+        .put(SLASH_SLASH, SLASH_ASTERISK, SLASH_ASTERISK___ASTERISK, SLASH_ASTERISK___ASTERISK_SLASH, 0x008000)
+        .put(NUMBER_HEAD, NUMBER_TAIL, 0x6400c8)
+        .put(START.read("else", "false", "if", "repeat", "true", "while"), 0x0000ff)
+        .put(START.read("void"), 0x008080)
+        .put(START.read("(", ")", "{", "}"), 0xff0000)
+        .put(START.read("!", "&&", "||"), 0x804040)
 }

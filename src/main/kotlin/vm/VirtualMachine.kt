@@ -14,10 +14,12 @@ const val TIMEOUT = 1_000_000_000L
 // from truth values and loop counters on the stack.
 const val ENTRY_POINT = 256
 
-class VirtualMachine(private val program: List<Instruction>,
-                     private val atomicWorld: AtomicReference<World>,
-                     private val callbacks: Callbacks,
-                     private val onMoveOrBeeper: (World) -> Unit = {}) {
+class VirtualMachine(
+    private val program: List<Instruction>,
+    private val atomicWorld: AtomicReference<World>,
+    private val callbacks: Callbacks,
+    private val onMoveOrBeeper: (World) -> Unit = {}
+) {
 
     interface Callbacks {
         fun onCall(callerPosition: Int, calleePosition: Int) {}
@@ -105,11 +107,13 @@ class VirtualMachine(private val program: List<Instruction>,
     }
 
     private fun Instruction.executePush() {
-        push(when (target) {
-            0 -> Bool.FALSE
-            1 -> Bool.TRUE
-            else -> LoopCounter(target)
-        })
+        push(
+            when (target) {
+                0 -> Bool.FALSE
+                1 -> Bool.TRUE
+                else -> LoopCounter(target)
+            }
+        )
         ++pc
     }
 

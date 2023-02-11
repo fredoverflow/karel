@@ -19,7 +19,8 @@ class Editor : FreditorUI(Flexer, JavaIndenter.instance, 60, 1) {
     val autosaver: Autosaver = newAutosaver("karel")
 
     init {
-        autosaver.loadOrDefault("""/*
+        autosaver.loadOrDefault(
+            """/*
 F1 = moveForward();
 F2 = turnLeft();
 F3 = turnAround();
@@ -33,7 +34,8 @@ void karelsFirstProgram()
     // your code here
     
 }
-""")
+"""
+        )
         listenToKeyboard()
     }
 
@@ -88,7 +90,15 @@ void karelsFirstProgram()
     private fun renameCommand() {
         val oldName = symbolNearCursor(Flexer.IDENTIFIER_TAIL)
         if (oldName.isNotEmpty() && oldName !in keywords && oldName !in builtinCommands) {
-            val input = JOptionPane.showInputDialog(this, oldName, "rename command", JOptionPane.QUESTION_MESSAGE, null, null, oldName)
+            val input = JOptionPane.showInputDialog(
+                this,
+                oldName,
+                "rename command",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                null,
+                oldName
+            )
             if (input != null) {
                 val newName = input.toString()
                 if (NAME.matches(newName) && newName !in keywords && newName !in builtinCommands) {

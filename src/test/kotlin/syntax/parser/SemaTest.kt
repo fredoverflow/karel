@@ -1,7 +1,7 @@
 package syntax.parser
 
 import common.Diagnostic
-import org.junit.Assert.*
+import org.junit.Assert.fail
 import org.junit.Test
 import syntax.lexer.Lexer
 
@@ -21,7 +21,8 @@ class SemaTest {
 
     @Test
     fun duplicateCommand() {
-        assertIllegal("duplicate", """
+        assertIllegal(
+            "duplicate", """
         void main() {
             pickBeeper();
         }
@@ -29,29 +30,34 @@ class SemaTest {
         void main() {
             dropBeeper();
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun redefineBuiltin() {
-        assertIllegal("redefine builtin", """
+        assertIllegal(
+            "redefine builtin", """
         void turnRight() {
             turnLeft();
             turnLeft();
             turnLeft();
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun undefinedCommand() {
-        assertIllegal("Did you mean b?", """
+        assertIllegal(
+            "Did you mean b?", """
         void main() {
             a();
         }
 
         void b() {
         }
-        """)
+        """
+        )
     }
 }

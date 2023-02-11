@@ -19,294 +19,354 @@ class ParserNegativeTest {
 
     @Test
     fun tooManyClosingBraces() {
-        assertDiagnostic("too many closing braces", """
+        assertDiagnostic(
+            "too many closing braces", """
         void main() {
           }
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun firstCommandMissingVoid() {
-        assertDiagnostic("expected void", """
+        assertDiagnostic(
+            "expected void", """
         main() {
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun secondCommandMissingVoid() {
-        assertDiagnostic("expected void", """
+        assertDiagnostic(
+            "expected void", """
         void first() {
         }
         second() {
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun repeatBelongsInsideCommand() {
-        assertDiagnostic("repeat belongs inside command", """
+        assertDiagnostic(
+            "repeat belongs inside command", """
         void main() {
         }
         repeat
-        """)
+        """
+        )
     }
 
     @Test
     fun whileBelongsInsideCommand() {
-        assertDiagnostic("while belongs inside command", """
+        assertDiagnostic(
+            "while belongs inside command", """
         void main() {
         }
         while
-        """)
+        """
+        )
     }
 
     @Test
     fun ifBelongsInsideCommand() {
-        assertDiagnostic("if belongs inside command", """
+        assertDiagnostic(
+            "if belongs inside command", """
         void main() {
         }
         if
-        """)
+        """
+        )
     }
 
     @Test
     fun commandCallsBelongInsideCommand() {
-        assertDiagnostic("Command calls belong inside command", """
+        assertDiagnostic(
+            "Command calls belong inside command", """
         void main() {
         }
         moveForward();
-        """)
+        """
+        )
     }
 
     @Test
     fun commandMissingName() {
-        assertDiagnostic("missing IDENTIFIER", """
+        assertDiagnostic(
+            "missing IDENTIFIER", """
         void () {
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun commandMissingParameters() {
-        assertDiagnostic("missing (", """
+        assertDiagnostic(
+            "missing (", """
         void main {
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun commandMissingBody() {
-        assertDiagnostic("missing {", """
+        assertDiagnostic(
+            "missing {", """
         void main()
-        """)
+        """
+        )
     }
 
     @Test
     fun nestedCommands() {
-        assertDiagnostic("nested", """
+        assertDiagnostic(
+            "nested", """
         void outer() {
             void inner() {
             }
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun unclosedBlock() {
-        assertDiagnostic("unclosed block", """
+        assertDiagnostic(
+            "unclosed block", """
         void main() {
             if (onBeeper()) {
                 pickBeeper();
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun numbersAreNotStatements() {
-        assertDiagnostic("illegal start of statement", """
+        assertDiagnostic(
+            "illegal start of statement", """
         void main() {
             123
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun commandMissingArguments() {
-        assertDiagnostic("missing (", """
+        assertDiagnostic(
+            "missing (", """
         void main() {
             other;
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun commandMissingSemicolon() {
-        assertDiagnostic("missing ;", """
+        assertDiagnostic(
+            "missing ;", """
         void main() {
             other()
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun commandSuperfluousVoid() {
-        assertDiagnostic("void", """
+        assertDiagnostic(
+            "void", """
         void main() {
             void other();
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun repeatMissingParens() {
-        assertDiagnostic("missing (", """
+        assertDiagnostic(
+            "missing (", """
         void main() {
             repeat 9 {
                 moveForward();
             }
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun repeatMissingNumber() {
-        assertDiagnostic("missing NUMBER", """
+        assertDiagnostic(
+            "missing NUMBER", """
         void main() {
             repeat () {
                 moveForward();
             }
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun repeatMissingBlock() {
-        assertDiagnostic("missing {", """
+        assertDiagnostic(
+            "missing {", """
         void main() {
             repeat (9)
                 moveForward();
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun zeroRepetitions() {
-        assertDiagnostic("0 out of range", """
+        assertDiagnostic(
+            "0 out of range", """
         void main() {
             repeat (0) {
                 moveForward();
             }
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun oneRepetition() {
-        assertDiagnostic("1 out of range", """
+        assertDiagnostic(
+            "1 out of range", """
         void main() {
             repeat (1) {
                 moveForward();
             }
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun tooManyRepetitions() {
-        assertDiagnostic("4096 out of range", """
+        assertDiagnostic(
+            "4096 out of range", """
         void main() {
             repeat (4096) {
                 moveForward();
             }
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun integerOverflow() {
-        assertDiagnostic("2147483648 out of range", """
+        assertDiagnostic(
+            "2147483648 out of range", """
         void main() {
             repeat (2147483648) {
                 moveForward();
             }
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun ifMissingParens() {
-        assertDiagnostic("missing (", """
+        assertDiagnostic(
+            "missing (", """
         void main() {
             if frontIsClear() {
                 moveForward();
             }
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun ifMissingBlock() {
-        assertDiagnostic("missing {", """
+        assertDiagnostic(
+            "missing {", """
         void main() {
             if (frontIsClear())
                 moveForward();
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun elseRequiresBlockOrIf() {
-        assertDiagnostic("{ or if", """
+        assertDiagnostic(
+            "{ or if", """
         void main() {
             if (onBeeper()) {
                 pickBeeper();
             }
             else dropBeeper();
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun whileMissingParens() {
-        assertDiagnostic("missing (", """
+        assertDiagnostic(
+            "missing (", """
         void main() {
             while frontIsClear() {
                 moveForward();
             }
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun whileMissingBlock() {
-        assertDiagnostic("missing {", """
+        assertDiagnostic(
+            "missing {", """
         void main() {
             while (frontIsClear())
                 moveForward();
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun statementAsCondition() {
-        assertDiagnostic("Did you mean", """
+        assertDiagnostic(
+            "Did you mean", """
         void main() {
             if (turnAround()) {
             }
         }
-        """)
+        """
+        )
     }
 
     @Test
     fun conditionMissingParens() {
-        assertDiagnostic("missing (", """
+        assertDiagnostic(
+            "missing (", """
         void main() {
             while (frontIsClear) {
                 moveForward();
             }
         }
-        """)
+        """
+        )
     }
 }

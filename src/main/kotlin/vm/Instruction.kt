@@ -24,8 +24,11 @@ data class Instruction(val bytecode: Int, val position: Int) {
     fun shouldPause(): Boolean {
         return when (bytecode) {
             RETURN -> compiledFromSource
+
             MOVE_FORWARD, TURN_LEFT, TURN_AROUND, TURN_RIGHT, PICK_BEEPER, DROP_BEEPER -> true
+
             ON_BEEPER, BEEPER_AHEAD, LEFT_IS_CLEAR, FRONT_IS_CLEAR, RIGHT_IS_CLEAR, NOT, AND, OR, XOR -> false
+
             else -> compiledFromSource && (category != JUMP)
         }
     }
@@ -58,6 +61,7 @@ data class Instruction(val bytecode: Int, val position: Int) {
                     1 -> "TRUE"
                     else -> "PUSH %03x".format(target)
                 }
+
                 LOOP -> "LOOP %03x".format(target)
                 CALL -> "CALL %03x".format(target)
 
@@ -104,12 +108,13 @@ const val ELSE = 0xc000
 const val THEN = 0xd000
 
 val builtinCommands: ChampMap<String, Int> = ChampMap.of(
-        "moveForward", MOVE_FORWARD,
-        "turnLeft", TURN_LEFT,
-        "turnAround", TURN_AROUND,
-        "turnRight", TURN_RIGHT,
-        "pickBeeper", PICK_BEEPER,
-        "dropBeeper", DROP_BEEPER)
+    "moveForward", MOVE_FORWARD,
+    "turnLeft", TURN_LEFT,
+    "turnAround", TURN_AROUND,
+    "turnRight", TURN_RIGHT,
+    "pickBeeper", PICK_BEEPER,
+    "dropBeeper", DROP_BEEPER,
+)
 
 private val basicGoalInstructions = Array(XOR + 1) { Instruction(it, 0) }
 
