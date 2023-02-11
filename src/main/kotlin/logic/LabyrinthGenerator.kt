@@ -4,6 +4,7 @@ import logic.Problem.Companion.EAST
 import logic.Problem.Companion.NORTH
 import logic.Problem.Companion.SOUTH
 import logic.Problem.Companion.WEST
+import kotlin.random.Random
 
 fun generateLabyrinth(): World {
     while (true) {
@@ -77,10 +78,8 @@ private val directionPermutations: Array<IntArray> = arrayOf(
 
 class LabyrinthGenerator {
 
-    private val randomNumberGenerator = java.util.Random()
-
     private fun randomDirectionPermutation(): IntArray {
-        return directionPermutations[randomNumberGenerator.nextInt(directionPermutations.size)]
+        return directionPermutations[Random.nextInt(directionPermutations.size)]
     }
 
     private val labyrinth = LABYRINTH.toCharArray()

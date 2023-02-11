@@ -1,6 +1,7 @@
 package logic
 
 import java.math.BigInteger
+import kotlin.random.Random
 
 val UNKNOWN = 0.toBigInteger()
 val ONE = 1.toBigInteger()
@@ -22,7 +23,7 @@ class Problem(
         get() = numWorlds != ONE
 
     fun randomWorld(): World {
-        return createWorld(rng.nextInt().ushr(1))
+        return createWorld(Random.nextInt().ushr(1))
     }
 
     fun randomWorldIds(): Sequence<Int> = when (numWorlds) {
@@ -48,7 +49,7 @@ class Problem(
             var world = emptyWorld
 
             for (x in 0..9) {
-                for (y in rng.nextInt(11)..9) {
+                for (y in Random.nextInt(11)..9) {
                     world = world.dropBeeper(x, y)
                 }
             }
@@ -70,8 +71,6 @@ class Problem(
 
             return world.withKarelAt(9, 0, direction)
         }
-
-        private val rng = java.util.Random()
 
         val karelsFirstProgram = Problem(
             "0.0.1",
@@ -235,7 +234,7 @@ class Problem(
         ) {
             var world = emptyWorld
 
-            world = world.withBeepers(rng.nextLong(), rng.nextLong())
+            world = world.withBeepers(Random.nextLong(), Random.nextLong())
 
             world.withKarelAt(0, 9, EAST)
         }
@@ -445,11 +444,11 @@ class Problem(
             0,
             1111100000.toBigInteger(),
         ) {
-            val xBeeper = 5 + rng.nextInt(5)
+            val xBeeper = 5 + Random.nextInt(5)
             val builder = FloorPlan.empty.builder()
 
             for (x in 1..xBeeper) {
-                for (y in 0 until rng.nextInt(10)) {
+                for (y in 0 until Random.nextInt(10)) {
                     builder.buildVerticalWall(x, 9 - y)
                 }
             }
@@ -468,7 +467,7 @@ class Problem(
             var world = builder.world().fillWithBeepers()
 
             fun generateMaze() {
-                val angle = rng.nextInt(4)
+                val angle = Random.nextInt(4)
                 world = world.pickBeeper().turn(angle)
                 repeat(4) {
                     if (world.beeperAhead()) {
@@ -485,8 +484,8 @@ class Problem(
             }
 
             generateMaze()
-            val x = rng.nextInt(10)
-            val y = rng.nextInt(10)
+            val x = Random.nextInt(10)
+            val y = Random.nextInt(10)
             world.dropBeeper(x, y).withKarelAt(0, 0, EAST)
         }
 
@@ -562,9 +561,9 @@ class Problem(
             var world = builder.world()
 
             for (x in 0..9) {
-                val y = 1 + rng.nextInt(3)
+                val y = 1 + Random.nextInt(3)
                 builder.buildHorizontalWall(x, y)
-                for (a in y..y + rng.nextInt(3)) {
+                for (a in y..y + Random.nextInt(3)) {
                     world = world.dropBeeper(x, a)
                 }
             }
@@ -593,12 +592,12 @@ class Problem(
             val builder = FloorPlan.empty.builder()
 
             repeat(25) {
-                builder.buildHorizontalWall(rng.nextInt(10), 1 + rng.nextInt(9))
-                builder.buildVerticalWall(1 + rng.nextInt(9), rng.nextInt(10))
+                builder.buildHorizontalWall(Random.nextInt(10), 1 + Random.nextInt(9))
+                builder.buildVerticalWall(1 + Random.nextInt(9), Random.nextInt(10))
             }
-            val x = rng.nextInt(10)
-            val y = rng.nextInt(10)
-            val dir = rng.nextInt(4)
+            val x = Random.nextInt(10)
+            val y = Random.nextInt(10)
+            val dir = Random.nextInt(4)
             builder.world().withKarelAt(x, y, dir)
         }
 
