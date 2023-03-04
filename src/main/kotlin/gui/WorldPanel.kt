@@ -23,15 +23,19 @@ private fun readTile(size: Int, name: String): BufferedImage {
 }
 
 private fun BufferedImage.rotatedCounterclockwise(): BufferedImage {
-    require(width == height) { "image is not a square" }
+    require(width == height) { "$width * $height is not a square" }
 
     val tileSize = width
     val src = IntArray(tileSize * tileSize)
     val dst = IntArray(tileSize * tileSize)
     getRGB(0, 0, tileSize, tileSize, src, 0, tileSize)
+
+    var j = 0
     for (y in 0 until tileSize) {
+        var i = tileSize - 1 - y
         for (x in 0 until tileSize) {
-            dst[y * tileSize + x] = src[x * tileSize + (tileSize - 1 - y)]
+            dst[j++] = src[i]
+            i += tileSize
         }
     }
     val rotated = BufferedImage(tileSize, tileSize, BufferedImage.TYPE_INT_ARGB)
