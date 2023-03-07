@@ -1,31 +1,38 @@
 package gui
 
+import freditor.Fronts
 import logic.Problem
 
 import javax.swing.JButton
 import javax.swing.JComboBox
+import javax.swing.JComponent
 import javax.swing.JSlider
+
+fun <T : JComponent> T.sansSerif(): T {
+    this.font = Fronts.sansSerif
+    return this
+}
 
 class ControlPanel(problems: List<Problem>) : VerticalBoxPanel() {
 
-    val randomize = JButton("\uD83C\uDFB2").apply {
+    val randomize = JButton("\uD83C\uDFB2").sansSerif().apply {
         isEnabled = false
     }
 
-    val goal = JButton("goal")
+    val goal = JButton("goal").sansSerif()
 
-    val problemPicker = JComboBox(problems.toTypedArray()).apply {
+    val problemPicker = JComboBox(problems.toTypedArray()).sansSerif().apply {
         maximumSize = minimumSize
     }
 
-    val startStopReset = JButton("start")
-    val check = JButton("\uD83D\uDC1C")
+    val startStopReset = JButton("start").sansSerif()
+    val check = JButton("\uD83D\uDC1C").sansSerif()
 
     val firstRow = HorizontalBoxPanel(randomize, goal, problemPicker, startStopReset, check)
 
-    val stepInto = JButton("step into (F12)")
-    val stepOver = JButton("step over")
-    val stepReturn = JButton("step return")
+    val stepInto = JButton("step into (F12)").sansSerif()
+    val stepOver = JButton("step over").sansSerif()
+    val stepReturn = JButton("step return").sansSerif()
 
     fun setEnabledStepButtons(enabled: Boolean) {
         stepInto.isEnabled = enabled
@@ -37,7 +44,7 @@ class ControlPanel(problems: List<Problem>) : VerticalBoxPanel() {
         setEmptyBorder(16)
     }
 
-    val slider = JSlider(0, 11, 2)
+    val slider = JSlider(0, 11, 2).sansSerif()
 
     fun delayLogarithm(): Int {
         return if (slider.value == 0) -1 else slider.maximum - slider.value

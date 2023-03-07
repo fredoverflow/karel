@@ -15,11 +15,35 @@ import javax.imageio.ImageIO
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
-private const val TILE_SIZE_MEDIUM = 40
-private const val TILE_SIZE_LARGE = 64
+private const val FOLDER_40 = "40"
+private const val FOLDER_64 = "64"
 
-private fun readTile(size: Int, name: String): BufferedImage {
-    return ImageIO.read(WorldPanel::class.java.getResourceAsStream("/tiles/$size/$name.png"))
+private fun loadTile(folder: String, name: String): BufferedImage {
+    val image = ImageIO.read(WorldPanel::class.java.getResourceAsStream("/tiles/$folder/$name.png"))
+    val scale: Int = Toolkit.getDefaultToolkit().screenSize.height / 1000
+    return if (scale <= 1) image else image.scaled(scale)
+}
+
+private fun BufferedImage.scaled(scale: Int): BufferedImage {
+    require(scale >= 2) { "scale $scale too small" }
+    require(width == height) { "$width * $height is not a square" }
+
+    val srcSize = width
+    val dstSize = srcSize * scale
+    val src = IntArray(srcSize * srcSize)
+    val dst = IntArray(dstSize * dstSize)
+    getRGB(0, 0, srcSize, srcSize, src, 0, srcSize)
+
+    var j = 0
+    for (y in 0 until dstSize) {
+        val i = (y / scale) * srcSize
+        for (x in 0 until dstSize) {
+            dst[j++] = src[i + (x / scale)]
+        }
+    }
+    val scaled = BufferedImage(dstSize, dstSize, BufferedImage.TYPE_INT_ARGB)
+    scaled.setRGB(0, 0, dstSize, dstSize, dst, 0, dstSize)
+    return scaled
 }
 
 private fun BufferedImage.rotatedCounterclockwise(): BufferedImage {
@@ -45,18 +69,19 @@ private fun BufferedImage.rotatedCounterclockwise(): BufferedImage {
 
 class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
 
-    private var tileSize: Int = Toolkit.getDefaultToolkit().screenSize.height.let { screenHeight ->
-        if (screenHeight < 1000) TILE_SIZE_MEDIUM else TILE_SIZE_LARGE
+    private var folder: String = Toolkit.getDefaultToolkit().screenSize.height.let { screenHeight ->
+        if (screenHeight < 1000) FOLDER_40 else FOLDER_64
     }
-
+    private var tileSize = 1 // smallest working dummy value before loadTiles() runs
     private var beeper = BufferedImage(tileSize, tileSize, BufferedImage.TYPE_INT_ARGB)
     private var karels = emptyArray<BufferedImage>()
     private var walls = emptyArray<BufferedImage>()
 
-    private fun initialize() {
-        beeper = readTile(tileSize, "beeper")
-        initializeKarels()
-        initializeWalls()
+    private fun loadTiles() {
+        beeper = loadTile(folder, "beeper")
+        tileSize = beeper.width
+        loadKarels()
+        loadWalls()
 
         val panelSize = Dimension(tileSize * Problem.WIDTH, tileSize * Problem.HEIGHT)
         minimumSize = panelSize
@@ -64,8 +89,8 @@ class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
         maximumSize = panelSize
     }
 
-    private fun initializeKarels() {
-        val east = readTile(tileSize, "karel")
+    private fun loadKarels() {
+        val east = loadTile(folder, "karel")
         val north = east.rotatedCounterclockwise()
         val west = north.rotatedCounterclockwise()
         val south = west.rotatedCounterclockwise()
@@ -73,10 +98,10 @@ class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
         karels = arrayOf(east, north, west, south)
     }
 
-    private fun initializeWalls() {
-        walls = Array(16) { readTile(tileSize, "cross") }
+    private fun loadWalls() {
+        walls = Array(16) { loadTile(folder, "cross") }
 
-        val east = readTile(tileSize, "wall")
+        val east = loadTile(folder, "wall")
         val north = east.rotatedCounterclockwise()
         val west = north.rotatedCounterclockwise()
         val south = west.rotatedCounterclockwise()
@@ -170,13 +195,16 @@ class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
     }
 
     private fun switchTileSize() {
-        tileSize = TILE_SIZE_MEDIUM + TILE_SIZE_LARGE - tileSize
-        initialize()
+        when (folder) {
+            FOLDER_40 -> folder = FOLDER_64
+            FOLDER_64 -> folder = FOLDER_40
+        }
+        loadTiles()
         revalidate()
     }
 
     init {
-        initialize()
+        loadTiles()
         listenToMouse()
     }
 }
