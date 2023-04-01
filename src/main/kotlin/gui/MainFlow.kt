@@ -75,31 +75,31 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.rand
         }
 
         val ids = currentProblem.randomWorldIds().iterator()
-        var checked = 0
+        var worldCounter = 0
         initialWorld = currentProblem.createWorld(ids.next())
         val start = System.currentTimeMillis()
         var lastRepaint = start
 
-        fun report() {
+        fun reportSuccess() {
             if (!ids.hasNext()) {
                 showDiagnostic("checked all ${currentProblem.numWorlds} possible worlds")
             } else if (currentProblem.numWorlds == UNKNOWN) {
-                showDiagnostic("checked $checked random worlds")
+                showDiagnostic("checked $worldCounter random worlds")
             } else {
-                showDiagnostic("checked $checked random worlds\nfrom ${currentProblem.numWorlds} possible worlds")
+                showDiagnostic("checked $worldCounter random worlds\nfrom ${currentProblem.numWorlds} possible worlds")
             }
         }
 
-        fun oneMoreTime() {
+        fun checkFor100ms() {
             try {
                 var now: Long
                 do {
-                    checkOnce(instructions, goalInstructions)
-                    ++checked
+                    checkOneWorld(instructions, goalInstructions)
+                    ++worldCounter
                     now = System.currentTimeMillis()
                     if (!ids.hasNext() || now - start >= 2000) {
                         cleanup()
-                        report()
+                        reportSuccess()
                         return
                     }
                     initialWorld = currentProblem.createWorld(ids.next())
@@ -108,18 +108,19 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.rand
 
                 atomicWorld.set(initialWorld)
                 worldPanel.repaint()
-                EventQueue.invokeLater(::oneMoreTime)
+                EventQueue.invokeLater(::checkFor100ms)
             } catch (diagnostic: Diagnostic) {
                 cleanup()
                 showDiagnostic(diagnostic)
             }
         }
+
         atomicWorld.set(initialWorld)
         worldPanel.repaint()
-        EventQueue.invokeLater(::oneMoreTime)
+        EventQueue.invokeLater(::checkFor100ms)
     }
 
-    fun checkOnce(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
+    private fun checkOneWorld(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
         val goalWorldIterator = goalWorlds(goalInstructions).iterator()
 
         atomicWorld.set(initialWorld)
@@ -143,7 +144,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.rand
         }
     }
 
-    fun goalWorlds(goalInstructions: List<Instruction>): List<World> {
+    private fun goalWorlds(goalInstructions: List<Instruction>): List<World> {
         val goalWorlds = ArrayList<World>()
         atomicWorld.set(initialWorld)
         virtualMachine = VirtualMachine(goalInstructions, atomicWorld, this, goalWorlds::add)
