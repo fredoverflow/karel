@@ -35,9 +35,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.rand
     }
 
     fun executeGoal(goal: String) {
-        val instructions = vm.createInstructionBuffer()
-        instructions.addAll(goal.map { vm.goalInstruction(it.code) })
-        start(instructions)
+        start(vm.createGoalInstructions(goal))
     }
 
     fun checkAgainst(goal: String) {
@@ -53,8 +51,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.rand
                 val instructions: List<Instruction> = CodeGenerator(parser.sema).generate(main)
                 virtualMachinePanel.setProgram(instructions)
 
-                val goalInstructions = vm.createInstructionBuffer()
-                goalInstructions.addAll(goal.map { vm.goalInstruction(it.code) })
+                val goalInstructions = vm.createGoalInstructions(goal)
 
                 check(instructions, goalInstructions)
             } else {
@@ -66,7 +63,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.rand
         }
     }
 
-    private fun check(instructions: List<Instruction>, goalInstructions: MutableList<Instruction>) {
+    private fun check(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
         controlPanel.checkStarted()
 
         fun cleanup() {

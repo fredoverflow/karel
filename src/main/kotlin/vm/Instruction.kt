@@ -122,10 +122,10 @@ fun createInstructionBuffer(): MutableList<Instruction> {
     return MutableList(ENTRY_POINT) { basicGoalInstructions[RETURN] }
 }
 
-fun goalInstruction(bytecode: Int): Instruction {
-    return if (bytecode <= XOR) {
-        basicGoalInstructions[bytecode]
-    } else {
-        Instruction(bytecode, 0)
+fun createGoalInstructions(goal: String): List<Instruction> {
+    return goal.mapTo(createInstructionBuffer()) { char ->
+        basicGoalInstructions.getOrElse(char.code) { code ->
+            Instruction(code, 0)
+        }
     }
 }
