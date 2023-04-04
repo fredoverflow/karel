@@ -124,7 +124,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.rand
         val goalWorldIterator = goalWorlds(goalInstructions).iterator()
 
         atomicWorld.set(initialWorld)
-        virtualMachine = VirtualMachine(instructions, atomicWorld, this) { world ->
+        virtualMachine = VirtualMachine(instructions, atomicWorld, ignoreCallAndReturn) { world ->
             if (!goalWorldIterator.hasNext()) {
                 throw Diagnostic(virtualMachine.currentInstruction.position, "overshoots goal")
             }
@@ -147,12 +147,18 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.rand
     private fun goalWorlds(goalInstructions: List<Instruction>): List<World> {
         val goalWorlds = ArrayList<World>()
         atomicWorld.set(initialWorld)
-        virtualMachine = VirtualMachine(goalInstructions, atomicWorld, this, goalWorlds::add)
+        virtualMachine = VirtualMachine(goalInstructions, atomicWorld, ignoreCallAndReturn, goalWorlds::add)
         try {
             virtualMachine.stepReturn()
         } catch (_: Stack.Exhausted) {
         }
         return goalWorlds
+    }
+
+    private val ignoreCallAndReturn = object : VirtualMachine.Callbacks {
+        override fun onInfiniteLoop() {
+            throw Diagnostic(virtualMachine.currentInstruction.position, "infinite loop detected")
+        }
     }
 
     fun parseAndExecute() {
