@@ -89,23 +89,22 @@ void karelsFirstProgram()
 
     private fun renameCommand() {
         val oldName = symbolNearCursor(Flexer.IDENTIFIER_TAIL)
-        if (oldName.isNotEmpty() && oldName !in keywords && oldName !in builtinCommands) {
-            val input = JOptionPane.showInputDialog(
-                this,
-                oldName,
-                "rename command",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                null,
-                oldName
-            )
-            if (input != null) {
-                val newName = input.toString()
-                if (NAME.matches(newName) && newName !in keywords && newName !in builtinCommands) {
-                    replace("""\b$oldName(\s*\(\s*\))""", "$newName$1")
-                }
-            }
-        }
+        if (oldName.isEmpty() || oldName in keywords || oldName in builtinCommands) return
+
+        val input = JOptionPane.showInputDialog(
+            this,
+            oldName,
+            "rename command",
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            null,
+            oldName
+        ) ?: return
+
+        val newName = input.toString().trim()
+        if (!NAME.matches(newName) || newName in keywords || newName in builtinCommands) return
+
+        replace("""\b$oldName(\s*\(\s*\))""", "$newName$1")
     }
 
     private var lines: Stack<Line2D.Double> = Stack.Nil
