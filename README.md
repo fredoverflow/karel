@@ -409,7 +409,7 @@ void moveToWall()
 | F11          | `rightIsClear()`            | F11              |
 | F12          | start<br>step into<br>reset | F12              |
 | Tab<br>Enter | auto-indent                 | Tab<br>Enter     |
-| Ctrl Space   | auto-complete               | Command Space    |
+| Ctrl Space   | auto-complete               | Control (Shift) Space |
 | Ctrl Alt R   | rename command              | Command Option R |
 | Ctrl D       | delete line                 | Command D        |
 | Ctrl C       | copy                        | Command C        |
