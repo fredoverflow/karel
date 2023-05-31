@@ -9,7 +9,7 @@ class BytecodeTable : FreditorUI(BytecodeFlexer, Indenter.instance, 18, 1) {
         val lines = program.asSequence().drop(vm.ENTRY_POINT).withIndex().map { (row, instruction) ->
             "%3x %4x %s".format(row + vm.ENTRY_POINT, instruction.bytecode, instruction.mnemonic())
         }
-        loadFromString((sequenceOf(" @  CODE MNEMONIC") + lines).joinToString("\n"))
+        load((sequenceOf(" @  CODE MNEMONIC") + lines).joinToString("\n"))
     }
 
     fun highlightLine(line: Int) {

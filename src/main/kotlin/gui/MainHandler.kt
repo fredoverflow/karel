@@ -1,8 +1,10 @@
 package gui
 
+import freditor.Freditor
 import logic.Problem
 import java.awt.event.KeyEvent
 import java.util.function.Consumer
+import kotlin.streams.asSequence
 
 class MainHandler : MainFlow() {
     init {
@@ -34,9 +36,16 @@ class MainHandler : MainFlow() {
             worldPanel.binaryLines = currentProblem.binaryLines
             worldPanel.repaint()
 
-            story.loadFromString(currentProblem.story)
+            story.load(currentProblem.story)
 
-            editor.setCursorTo("""\bvoid\s+(${currentProblem.name})\b""", 1)
+            val pattern = Regex("""\bvoid\s+(${currentProblem.name})\b""").toPattern()
+
+            tabbedEditors.stream().asSequence()
+                .minus(editor).plus(editor) // check current editor last
+                .filter { it.setCursorTo(pattern, 1) }
+                .lastOrNull()
+                ?.let(tabbedEditors::selectEditor)
+
             editor.requestFocusInWindow()
         }
 
@@ -92,6 +101,13 @@ class MainHandler : MainFlow() {
             editor.requestFocusInWindow()
         }
 
+        defaultCloseOperation = EXIT_ON_CLOSE
+        tabbedEditors.saveOnExit(this)
+    }
+
+    override fun createEditor(freditor: Freditor): Editor {
+        val editor = Editor(freditor)
+
         editor.onKeyPressed { event ->
             when (event.keyCode) {
                 KeyEvent.VK_M -> if (event.isControlDown && event.isShiftDown) {
@@ -118,10 +134,6 @@ class MainHandler : MainFlow() {
             }
         }
 
-        defaultCloseOperation = EXIT_ON_CLOSE
-
-        this.onWindowClosing {
-            editor.autosaver.save()
-        }
+        return editor
     }
 }

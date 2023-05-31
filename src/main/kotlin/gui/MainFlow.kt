@@ -16,7 +16,8 @@ import java.awt.EventQueue
 import java.util.concurrent.atomic.AtomicReference
 import javax.swing.Timer
 
-open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.randomWorld())), VirtualMachine.Callbacks {
+abstract class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.randomWorld())),
+    VirtualMachine.Callbacks {
 
     val currentProblem: Problem
         get() = controlPanel.problemPicker.selectedItem as Problem
@@ -40,7 +41,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.rand
 
     fun checkAgainst(goal: String) {
         editor.indent()
-        editor.autosaver.save()
+        editor.saveWithBackup()
         editor.clearDiagnostics()
         try {
             val lexer = Lexer(editor.text)
@@ -163,7 +164,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.rand
 
     fun parseAndExecute() {
         editor.indent()
-        editor.autosaver.save()
+        editor.saveWithBackup()
         editor.clearDiagnostics()
         try {
             val lexer = Lexer(editor.text)
@@ -183,6 +184,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.rand
     }
 
     fun start(instructions: List<Instruction>) {
+        tabbedEditors.tabs.isEnabled = false
         virtualMachinePanel.setProgram(instructions)
         virtualMachine = VirtualMachine(instructions, atomicWorld, this)
         controlPanel.executionStarted()
@@ -196,6 +198,7 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.rand
         timer.stop()
         controlPanel.executionFinished(currentProblem.isRandom)
         virtualMachinePanel.clearStack()
+        tabbedEditors.tabs.isEnabled = true
         editor.clearStack()
         editor.requestFocusInWindow()
     }
@@ -252,7 +255,26 @@ open class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.rand
     }
 
     init {
-        story.loadFromString(currentProblem.story)
+        story.load(currentProblem.story)
+        if (editor.length() == 0) {
+            editor.load(helloWorld)
+        }
         editor.requestFocusInWindow()
     }
 }
+
+const val helloWorld = """/*
+F1 = moveForward();
+F2 = turnLeft();
+F3 = turnAround();
+F4 = turnRight();
+F5 = pickBeeper();
+F6 = dropBeeper();
+*/
+
+void karelsFirstProgram()
+{
+    // your code here
+    
+}
+"""

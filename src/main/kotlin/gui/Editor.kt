@@ -2,12 +2,10 @@ package gui
 
 import common.Stack
 import common.push
-import freditor.Autosaver
+import freditor.Freditor
 import freditor.FreditorUI
-import freditor.JavaIndenter
 import syntax.lexer.keywords
 import vm.builtinCommands
-
 import java.awt.*
 import java.awt.event.KeyEvent
 import java.awt.geom.Line2D
@@ -15,43 +13,8 @@ import javax.swing.JOptionPane
 
 private val NAME = Regex("""[A-Z_a-z][0-9A-Z_a-z]*""")
 
-class Editor : FreditorUI(Flexer, JavaIndenter.instance, 60, 1) {
-    val autosaver: Autosaver = newAutosaver("karel")
-
+class Editor(freditor: Freditor) : FreditorUI(freditor, 60, 1) {
     init {
-        autosaver.loadOrDefault(
-            """/*
-F1 = moveForward();
-F2 = turnLeft();
-F3 = turnAround();
-F4 = turnRight();
-F5 = pickBeeper();
-F6 = dropBeeper();
-*/
-
-void karelsFirstProgram()
-{
-    // your code here
-    
-}
-"""
-        )
-        listenToKeyboard()
-    }
-
-    fun insertCommand(command: String) {
-        if (lineBeforeSelection.all(Char::isWhitespace)) {
-            insert(command)
-        } else {
-            simulateEnter()
-            insert(command)
-            // remove the commit between simulateEnter and insertString,
-            // effectively committing both changes as a single commit
-            uncommit()
-        }
-    }
-
-    private fun listenToKeyboard() {
         onKeyPressed { event ->
             when (event.keyCode) {
                 KeyEvent.VK_F1 -> insertCommand("moveForward();")
@@ -75,6 +38,18 @@ void karelsFirstProgram()
                     renameCommand()
                 }
             }
+        }
+    }
+
+    private fun insertCommand(command: String) {
+        if (lineBeforeSelection.all(Char::isWhitespace)) {
+            insert(command)
+        } else {
+            simulateEnter()
+            insert(command)
+            // Remove the commit between simulateEnter and insertString,
+            // effectively committing both changes as a single commit
+            uncommit()
         }
     }
 

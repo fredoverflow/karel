@@ -1,11 +1,12 @@
 package gui
 
 import java.awt.Component
-import java.awt.event.*
-
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.BoxLayout
 import javax.swing.JComponent
-import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
@@ -41,12 +42,4 @@ fun JComponent.onKeyPressed(handler: (KeyEvent) -> Unit) {
 
 fun JComponent.setEmptyBorder(size: Int) {
     border = EmptyBorder(size, size, size, size)
-}
-
-fun JFrame.onWindowClosing(handler: () -> Unit) {
-    addWindowListener(object : WindowAdapter() {
-        override fun windowClosing(event: WindowEvent) {
-            handler()
-        }
-    })
 }

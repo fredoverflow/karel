@@ -1,19 +1,18 @@
 package gui
 
+import freditor.Freditor
 import freditor.FreditorUI
 import freditor.JavaIndenter
-import freditor.LineNumbers
+import freditor.TabbedEditors
 import logic.Problem
 import logic.World
-
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.util.concurrent.atomic.AtomicReference
-
 import javax.swing.Box
 import javax.swing.JFrame
 
-open class MainDesign(val atomicWorld: AtomicReference<World>) : JFrame() {
+abstract class MainDesign(val atomicWorld: AtomicReference<World>) : JFrame() {
 
     val controlPanel = ControlPanel(Problem.problems)
 
@@ -25,17 +24,19 @@ open class MainDesign(val atomicWorld: AtomicReference<World>) : JFrame() {
         setEmptyBorder(16)
     }
 
-    val editor = Editor()
-    val editorWithLineNumbers = HorizontalBoxPanel(LineNumbers(editor), editor).apply {
-        editor.setComponentToRepaint(this)
-    }
+    protected abstract fun createEditor(freditor: Freditor): Editor
+
+    val tabbedEditors = TabbedEditors("karel", Flexer, JavaIndenter.instance, ::createEditor)
+
+    val editor
+        get() = tabbedEditors.selectedEditor as Editor
 
     val virtualMachinePanel = VirtualMachinePanel()
 
     init {
-        title = editor.autosaver.pathname
+        title = editor.file.parent.toString()
         add(left, BorderLayout.WEST)
-        add(editorWithLineNumbers, BorderLayout.CENTER)
+        add(tabbedEditors.tabs, BorderLayout.CENTER)
         add(virtualMachinePanel, BorderLayout.EAST)
         pack()
         isVisible = true
