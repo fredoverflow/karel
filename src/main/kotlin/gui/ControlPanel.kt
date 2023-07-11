@@ -26,7 +26,10 @@ class ControlPanel(problems: List<Problem>) : VerticalBoxPanel() {
     }
 
     val startStopReset = JButton("start").sansSerif()
-    val check = JButton("\uD83D\uDC1C").sansSerif()
+
+    val check = JButton("\uD83D\uDC1C").sansSerif().apply {
+        toolTipText = problems[0].checkAfter.toolTipText
+    }
 
     val firstRow = HorizontalBoxPanel(randomize, goal, problemPicker, startStopReset, check)
 

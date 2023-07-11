@@ -18,7 +18,8 @@ class VirtualMachine(
     private val program: List<Instruction>,
     private val atomicWorld: AtomicReference<World>,
     private val callbacks: Callbacks,
-    private val onMoveOrBeeper: (World) -> Unit = {}
+    private val onBeeper: (World) -> Unit = {},
+    private val onMove: (World) -> Unit = {},
 ) {
 
     interface Callbacks {
@@ -26,6 +27,9 @@ class VirtualMachine(
         fun onReturn() {}
         fun onInfiniteLoop() {}
     }
+
+    val world: World
+        get() = atomicWorld.get()
 
     var pc: Int = ENTRY_POINT
         private set(value) {
@@ -145,12 +149,12 @@ class VirtualMachine(
         when (bytecode) {
             RETURN -> executeReturn()
 
-            MOVE_FORWARD -> onMoveOrBeeper(atomicWorld.updateAndGet(World::moveForward))
+            MOVE_FORWARD -> onMove(atomicWorld.updateAndGet(World::moveForward))
             TURN_LEFT -> atomicWorld.updateAndGet(World::turnLeft)
             TURN_AROUND -> atomicWorld.updateAndGet(World::turnAround)
             TURN_RIGHT -> atomicWorld.updateAndGet(World::turnRight)
-            PICK_BEEPER -> onMoveOrBeeper(atomicWorld.updateAndGet(World::pickBeeper))
-            DROP_BEEPER -> onMoveOrBeeper(atomicWorld.updateAndGet(World::dropBeeper))
+            PICK_BEEPER -> onBeeper(atomicWorld.updateAndGet(World::pickBeeper))
+            DROP_BEEPER -> onBeeper(atomicWorld.updateAndGet(World::dropBeeper))
 
             ON_BEEPER -> push(atomicWorld.get().onBeeper())
             BEEPER_AHEAD -> push(atomicWorld.get().beeperAhead())

@@ -13,6 +13,7 @@ class Problem(
     val name: String,
     val story: String,
     val goal: String,
+    val checkAfter: CheckAfter,
     val binaryLines: Int,
     val numWorlds: BigInteger,
     val createWorld: (id: Int) -> World
@@ -77,6 +78,7 @@ class Problem(
             "karelsFirstProgram",
             "Click the GOAL button (top left)\nand watch Karel go. Drag slider\nto adjust animation speed.\nCan you program Karel to perform\nthe same steps? Test with START!",
             "\u0001\u0005\u0001\u0002\u0001\u0004\u0001\u0006\u0001\u0000",
+            CheckAfter.BEEPER_MOVE,
             0,
             ONE,
         ) {
@@ -90,6 +92,7 @@ class Problem(
             "obtainArtifact",
             "Karel auditions for the new Indy\nmovie. To demonstrate talent,\nKarel re-enacts the classic scene\nwhere Indy saves some valuable\nartifact from an ancient temple.",
             "\u0004\ua106\u0005\ua106\u0006\u0000\u0001\u0002\u0001\u0001\u0001\u0002\u0001\u0000",
+            CheckAfter.BEEPER,
             0,
             ONE,
         ) {
@@ -103,6 +106,7 @@ class Problem(
             "defuseOneBomb",
             "Karel the demolition expert\ndefuses a bomb at the other end\nof the room and returns filled\nwith pride and self-confidence.\nHave you learned repeat (n) yet?",
             "\ua106\u0005\u0003\ua106\u0003\u0000\u8009\u0001\u9107\u0000",
+            CheckAfter.BEEPER_MOVE,
             0,
             ONE,
         ) {
@@ -116,6 +120,7 @@ class Problem(
             "defuseTwoBombs",
             "One bomb is no problem for Karel.\nLet's spice up the challenge!\nShouldn't this be rather simple,\ngiven that Karel already knows\nhow to defuse one single bomb?",
             "\ua102\u0002\ua108\u0005\u0003\ua108\u0003\u0000\u8009\u0001\u9109\u0000",
+            CheckAfter.BEEPER_MOVE,
             0,
             ONE,
         ) {
@@ -129,6 +134,7 @@ class Problem(
             "practiceHomeRun",
             "Karel's heart burns for baseball,\nbut merely watching does not cut\nit anymore. Tonight, let's sneak\ninto the stadium and perform our\nfirst home run. Adrenaline rush!",
             "\u8004\u8009\u0001\u9102\u0005\u0002\u9101\u0000",
+            CheckAfter.BEEPER_MOVE,
             0,
             ONE,
         ) {
@@ -142,6 +148,7 @@ class Problem(
             "climbTheStairs",
             "The elevator seems to be\nout of service as of late...\nBut Karel is still pumped from\nthat home run and full of energy!",
             "\u0001\u8006\u0002\u0001\u0004\u0001\u9102\u0000",
+            CheckAfter.BEEPER_MOVE,
             0,
             ONE,
         ) {
@@ -155,6 +162,7 @@ class Problem(
             "fillTheHoles",
             "Karel considers a career in den-\ndistry. The local dental school\nhas Open House day. Coincidence?\nKarel gets to fill 4 carious\nteeth with dental amalgam. Ouch!",
             "\u8004\u0001\u0004\u0001\u0006\u0003\u0001\u0004\u0001\u9101\u0000",
+            CheckAfter.BEEPER_MOVE,
             0,
             ONE,
         ) {
@@ -168,6 +176,7 @@ class Problem(
             "saveTheFlower",
             "During a vacation in the alps,\nKarel discovers a rare flower\nwhich has trouble blooming\nat such low altitude...\nIt's a long way to the top!",
             "\u0001\u0005\u8004\u0002\u0001\u0001\u0004\u0001\u9103\u0006\u8004\u0001\u0004\u0001\u0001\u0002\u910b\u0000",
+            CheckAfter.BEEPER_MOVE,
             0,
             ONE,
         ) {
@@ -181,6 +190,7 @@ class Problem(
             "mowTheLawn",
             "Karel promised Granger to help in\nthe garden. Granger has already\npulled up the weeds, so Karel\ncan focus on mowing the lawn.",
             "\u8002\ua106\u0004\u0001\u0004\u9101\ua10a\u0002\u0001\u0002\u8006\u0001\u0005\u910b\u0001\u0000",
+            CheckAfter.BEEPER,
             0,
             ONE,
         ) {
@@ -194,6 +204,7 @@ class Problem(
             "harvestTheField",
             "Granger is an agricult -- erm...\nfarmer. After mowing the lawn,\nKarel can't reject the desperate\nplea for help on the farm.\nThe wheat is already overripe!",
             "\ua105\u0004\u0001\u0004\u0001\ua10a\u0001\u0002\u0001\u0002\u8003\u0005\u0004\u0001\u0002\u0001\u910b\u0005\u0000",
+            CheckAfter.BEEPER,
             0,
             ONE,
         ) {
@@ -207,6 +218,7 @@ class Problem(
             "repairTheStreet",
             "Click the DICE button. Notice\nsomething? Not all streets are\ncreated equal! Have you learned\nabout the if/else statement yet?\nF7..F11 are Karel's conditions.",
             "\u8009\ua104\u0001\u9101\u000b\uc10c\u0004\u0001\u0006\u0003\u0001\u0004\u0000",
+            CheckAfter.BEEPER_MOVE,
             0,
             TWO.pow(10),
         ) { id ->
@@ -229,6 +241,7 @@ class Problem(
             "cleanTheRoom",
             "Granger is paying Karel a surprise\nvisit. But Karel's apartment\nis *really* out of shape :(\nThe chaos is almost overwhelming.\nCan Karel clean up in time?",
             "\u8004\ua106\u0004\u0001\u0004\u9101\ua10a\u0002\u0001\u0002\u8009\ua10e\u0001\u910b\u0007\uc111\u0005\u0000",
+            CheckAfter.BEEPER_MOVE,
             0,
             TWO.pow(100),
         ) {
@@ -244,6 +257,7 @@ class Problem(
             "tileTheFloor",
             "During a routine visit to the\nhardware store, Karel can't\nresist buying some flagstones.\nThey seem to be a perfect fit\nfor the luxurious bathroom!",
             "\u8064\u0006\u000a\u000c\u0008\u000e\uc108\u0002\u0001\u9101\u0000",
+            CheckAfter.BEEPER,
             0,
             ONE,
         ) {
@@ -255,6 +269,7 @@ class Problem(
             "stealOlympicFire",
             "Karel is mad with olympic fever\nand somehow comes to believe\nit would be a good idea to\nsteal the olympic fire O_o\nLet's hope nobody will notice...",
             "\u0001\u8006\u0002\u0001\u0004\u0001\u9102\u0005\u0001\u0004\u8006\u0001\u910b\u0002\u0001\u0000",
+            CheckAfter.BEEPER_MOVE,
             0,
             ONE,
         ) {
@@ -268,6 +283,7 @@ class Problem(
             "removeTheTiles",
             "The flagstones were supposed to\nbe a surprise for Karel's new\nsweetheart, Taylor. Too bad green\nis not Taylor's favourite color.\nOh well, back to square one...",
             "\u8064\u0005\u0008\ud105\u0002\u0001\u9101\u0000",
+            CheckAfter.BEEPER,
             0,
             ONE,
         ) {
@@ -281,6 +297,7 @@ class Problem(
             "walkTheLabyrinth",
             "Click DICE several times.\nNote how the generated labyrinths\nare rather simple? They contain\nneither crossroads nor dead ends.\nExactly one path to the beeper!",
             "\u8063\u000a\ud108\u0009\uc107\u0002\ub108\u0004\u0001\u9101\u0000",
+            CheckAfter.FINISH,
             0,
             UNKNOWN,
         ) {
@@ -292,6 +309,7 @@ class Problem(
             "hangTheLampions",
             "Karel was assembled 10 years ago!\nTo celebrate this anniversary,\nKarel bought 10 lampions. Now all\nthat's left to do is hang them\nfrom the (irregular) ceiling.",
             "\u8009\ua104\u0001\u9101\u0002\u0005\ua10d\u0006\u0003\ua10d\u0002\u0000\u0001\u000a\ud10c\u0000",
+            CheckAfter.BEEPER_MOVE,
             0,
             3.toBigInteger().pow(10),
         ) { id ->
@@ -310,6 +328,7 @@ class Problem(
             "followTheSeeds",
             "Karel had insomnia and decided\nto take a walk in the forest.\nFortunately, Karel was smart\nenough to leave a trail of seeds\nto find the way back...",
             "\u0008\uc109\u0008\uc107\u0001\u0005\ub102\u0002\ub100\u0000",
+            CheckAfter.BEEPER_MOVE,
             0,
             ONE,
         ) {
@@ -322,6 +341,7 @@ class Problem(
             "cleanTheTunnels",
             "Karel the coal miner discovers\nten tunnels of varying lengths\nfilled with valuable coal.\n(Does your solution work for\ntunnels of length 0 and 10?)",
             "\u8009\ua104\u0001\u9101\u0007\uc113\u0002\u0005\u0008\uc10d\u0001\u0005\ub108\u0003\u000a\uc112\u0001\ub10e\u0002\u0000",
+            CheckAfter.BEEPER,
             0,
             11.toBigInteger().pow(10),
         ) {
@@ -333,6 +353,7 @@ class Problem(
             "increment",
             "Do you know binary numbers?\nen.wikipedia.org/wiki/Binary_number\nde.wikipedia.org/wiki/Dualsystem\nKarel wants to add 1 to a byte.\nThis is almost trivial in binary.",
             "\u0007\uc105\u0005\u0001\ub100\u0006\u0000",
+            CheckAfter.FINISH,
             0b1,
             TWO.pow(8),
         ) { id ->
@@ -344,6 +365,7 @@ class Problem(
             "decrement",
             "Karel wants to subtract 1 from\na byte. Notice any similarity\nto increment? (What happens if\nKarel decrements the byte zero?\nYou can click in Karel's world!)",
             "\u0007\ud107\u0006\u000a\uc107\u0001\ub100\u0005\u0000",
+            CheckAfter.FINISH,
             0b1,
             TWO.pow(8),
         ) { id ->
@@ -355,6 +377,7 @@ class Problem(
             "addSlow",
             "Welcome to the slowest adding\nmachine in the world! Karel just\ndecrements the first byte\nand increments the second byte\nuntil the first byte is zero.",
             "\ua114\u000a\uc11c\u0003\ua11e\u0004\u0001\u0004\u0007\uc10d\u0005\u0001\ub108\u0006\u0003\ua11e\u0002\u0001\u0002\ub100\u0007\ud11b\u0006\u000a\uc11b\u0001\ub114\u0005\u0000\u0001\u000a\ud11d\u0000",
+            CheckAfter.FINISH,
             0b11,
             TWO.pow(16),
         ) { id ->
@@ -366,6 +389,7 @@ class Problem(
             "saveTheFlowers",
             "Karel climbs Mt. Everest. On the\nway up, Karel collects 4 flowers\nthat do not get enough sunlight\non the west side of the mountain.\nEast is where the sun comes up!",
             "\u8004\ua110\u0005\u9101\ua110\u8004\u0006\u0001\u0004\u000a\uc10d\u0001\ub109\u0002\u9106\u0000\u0002\u000b\ud115\u0001\ub111\u0004\u0001\u0000",
+            CheckAfter.BEEPER_MOVE,
             0,
             3920.toBigInteger(),
         ) { id ->
@@ -417,6 +441,7 @@ class Problem(
             "findTeddyBear",
             "In the middle of the night, Karel\nawakens from a terrible dream.\nThe teddy bear will provide\ncomfort. It should lay somewhere\nnear the edge of the bed...",
             "\u0007\ud108\u000a\uc106\u0001\ub100\u0002\ub100\u0000",
+            CheckAfter.FINISH,
             0,
             16000.toBigInteger(),
         ) { id ->
@@ -441,6 +466,7 @@ class Problem(
             "jumpTheHurdles",
             "Karel signs up for the Olympics\nand is allowed to participate\nin the hurdle runs. After jumping\nall the hurdles, Karel receives a\nspecial medal made of copper!",
             "\u0007\ud114\u000a\uc106\u0001\ub100\u0002\u000b\ud10b\u0001\ub107\u0004\u0001\u0004\u000a\uc112\u0001\ub10e\u0002\ub100\u0000",
+            CheckAfter.BEEPER_MOVE,
             0,
             1111100000.toBigInteger(),
         ) {
@@ -460,6 +486,7 @@ class Problem(
             "solveTheMaze",
             "Study the random mazes carefully.\nThey contain both crossroads and\ndead ends, but no loops. Maintain\ncontact with Karel's left wall\nand you should find the beeper!",
             "\u0007\ud10f\u0009\uc106\u0002\ub10d\u000a\ud10d\u000b\uc10c\u0004\ub10d\u0003\u0001\ub100\u0000",
+            CheckAfter.FINISH,
             0,
             UNKNOWN,
         ) {
@@ -494,6 +521,7 @@ class Problem(
             "quantizeBits",
             "Karel the hacker is eavesdropping\non an analog communications line\nand writes down 10 bits encoded\nas 0..5 (0) or 6..10 (1). Convert\nto always 0 (0) or always 10 (1).",
             "\u8009\ua104\u0001\u9101\u0007\uc124\u0002\u8005\u0001\u9108\u0007\uc11a\u0008\uc110\u0001\ub10c\u000a\uc115\u0001\u0006\ub110\u0003\u0001\u000a\ud116\ub123\u0003\u0008\ud11f\u0001\ub11b\u0001\u0005\u0008\ud11f\u0002\u0000",
+            CheckAfter.BEEPER,
             0,
             11.toBigInteger().pow(10),
         ) {
@@ -505,6 +533,7 @@ class Problem(
             "addFast",
             "Karel adds two bytes from the\n1st and 2nd row and stores the\nsum in the 4th row. The 3rd row\nis reserved for the carry bits.\n(Does \"carry the 1\" ring a bell?)",
             "\u8008\u0007\u0001\u0007\u0001\u0007\u0001\u0004\uc115\uc11c\uc10c\u0006\u0001\u0004\u0001\u0006\u0001\u0001\u0003\u9101\u0000\ud11c\uc118\u0006\u0001\u0004\u0001\ub110\ud10c\ub117",
+            CheckAfter.BEEPER,
             0b1011,
             TWO.pow(16),
         ) { id ->
@@ -516,6 +545,7 @@ class Problem(
             "partyAgain",
             "Karel is preparing the next big\nparty. Unfortunately, the floor\nis so soaked from the last party\nthat care must be taken not to\nbreak through into the cellar!",
             "\u8009\ua104\u0001\u9101\u0002\u0005\ua109\u0002\u0000\u000a\ud10e\u0006\u0003\u0000\u0001\ua109\u0001\u0000",
+            CheckAfter.BEEPER_MOVE,
             0,
             3.toBigInteger().pow(10),
         ) { id ->
@@ -534,6 +564,7 @@ class Problem(
             "fetchTheStars",
             "Karel arranges a romantic date\nwith Taylor on a frozen lake to\n\"fetch the stars from the sky\",\nwhich is German for \"goes to\nthe ends of the world and back\".",
             "\u8009\ua104\u0001\u9101\u0002\ua109\u0006\u0002\u0000\u000a\ud10e\u0005\u0003\u0000\u0001\ua109\u0001\u0000",
+            CheckAfter.BEEPER_MOVE,
             0,
             3.toBigInteger().pow(10),
         ) { id ->
@@ -554,6 +585,7 @@ class Problem(
             "secureTheCave",
             "Karel the cave explorer earns a\nliving as a tourist guide. For\nsafety measures, Karel breaks all\nstalactites from the ceiling and\nre-erects them as stalagmites.",
             "\u8009\ua104\u0001\u9101\u0002\ua109\ua10e\u0004\u0000\u0001\u000a\ud109\u0003\u0000\u0007\uc109\u0005\u0001\ua10e\u0006\u0001\u0000",
+            CheckAfter.BEEPER,
             0,
             9.toBigInteger().pow(10),
         ) {
@@ -575,6 +607,7 @@ class Problem(
             "layAndRemoveTiles",
             "Karel tries a different set of\nflagstones. But again, Taylor\nis not enamored with the result.\nHence Karel immediately removes\nthe flagstones, in reverse order.",
             "\u0007\uc104\u0003\u0000\u0006\u000a\u0008\u000c\u000d\uc10e\u0001\ua100\u0001\ub113\u0002\u0001\ua100\u0001\u0004\u0005\u0000",
+            CheckAfter.BEEPER,
             0,
             ONE,
         ) {
@@ -586,6 +619,7 @@ class Problem(
             "findShelters",
             "Karel is part of an expedition to\nthe north pole. The first task is\nfinding storm-proof shelters.\nMark Karel's path with beepers,\nbut leave the shelters empty!",
             "\u8004\u000a\u0008\u000c\u000d\uc112\u0001\u0009\u000a\u000b\u000e\u000e\uc10f\u0006\ua100\u0003\u0001\u0003\u0002\u9101\u0000",
+            CheckAfter.FINISH,
             0,
             UNKNOWN,
         ) {
@@ -606,6 +640,7 @@ class Problem(
             "addSmart",
             "Karel adds two bytes from the\n1st and 2nd row and stores the\nsum in the 3rd row. Dropping and\nchecking carry bits is no longer\nnecessary. What a smart robot!",
             "\u000b\uc123\u0007\u0008\u000e\ud108\ua120\ub100\u0007\u0008\u000d\uc10e\ua120\ub110\ua124\ub100\u000b\uc123\u0007\u0008\u000e\ud118\ua124\ub100\u0007\u0008\u000d\uc11e\ua124\ub110\ua120\ub110\u0004\u0001\u0002\u0000\u0001\u0001\u0006\u0004\u0001\u0004\u0001\u0001\u0003\u0000",
+            CheckAfter.BEEPER,
             0b111,
             TWO.pow(16),
         ) { id ->
@@ -617,6 +652,7 @@ class Problem(
             "computeFibonacci",
             "Given 2 Fibonacci numbers,\nKarel computes the next 8.\n\nen.wikipedia.org/wiki/Fibonacci_number\nde.wikipedia.org/wiki/Fibonacci-Folge",
             "\u8008\ua10b\u0001\u0002\u000a\uc108\u0001\ub104\u0004\u9101\u0000\u000b\uc12e\u0007\u0008\u000e\ud113\ua12b\ub10b\u0007\u0008\u000d\uc119\ua12b\ub11b\ua12f\ub10b\u000b\uc12e\u0007\u0008\u000e\ud123\ua12f\ub10b\u0007\u0008\u000d\uc129\ua12f\ub11b\ua12b\ub11b\u0004\u0001\u0002\u0000\u0001\u0001\u0006\u0004\u0001\u0004\u0001\u0001\u0003\u0000",
+            CheckAfter.BEEPER,
             0b1111111111,
             5.toBigInteger(),
         ) { id ->

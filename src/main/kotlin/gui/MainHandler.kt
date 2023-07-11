@@ -30,6 +30,7 @@ class MainHandler : MainFlow() {
         controlPanel.problemPicker.addActionListener {
             controlPanel.startStopReset.text = "start"
             controlPanel.randomize.isEnabled = currentProblem.isRandom
+            controlPanel.check.toolTipText = currentProblem.checkAfter.toolTipText
 
             initialWorld = currentProblem.randomWorld()
             atomicWorld.set(initialWorld)

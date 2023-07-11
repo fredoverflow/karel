@@ -2,10 +2,7 @@ package gui
 
 import common.Diagnostic
 import common.Stack
-import logic.KarelError
-import logic.Problem
-import logic.UNKNOWN
-import logic.World
+import logic.*
 import syntax.lexer.Lexer
 import syntax.parser.Parser
 import syntax.parser.program
@@ -125,7 +122,7 @@ abstract class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.
         val goalWorldIterator = goalWorlds(goalInstructions).iterator()
 
         atomicWorld.set(initialWorld)
-        virtualMachine = VirtualMachine(instructions, atomicWorld, ignoreCallAndReturn) { world ->
+        createVirtualMachine(instructions) { world ->
             if (!goalWorldIterator.hasNext()) {
                 throw Diagnostic(virtualMachine.currentInstruction.position, "overshoots goal")
             }
@@ -137,6 +134,11 @@ abstract class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.
         try {
             virtualMachine.stepReturn()
         } catch (_: Stack.Exhausted) {
+            if (currentProblem.checkAfter === CheckAfter.FINISH) {
+                if (!goalWorldIterator.next().equalsIgnoringDirection(virtualMachine.world)) {
+                    throw Diagnostic(virtualMachine.currentInstruction.position, "fails goal")
+                }
+            }
         } catch (error: KarelError) {
             throw Diagnostic(virtualMachine.currentInstruction.position, error.message!!)
         }
@@ -145,13 +147,29 @@ abstract class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.
         }
     }
 
+    private fun createVirtualMachine(instructions: List<Instruction>, callback: (World) -> Unit) {
+        virtualMachine = when (currentProblem.checkAfter) {
+            CheckAfter.BEEPER_MOVE ->
+                VirtualMachine(instructions, atomicWorld, ignoreCallAndReturn, callback, callback)
+
+            CheckAfter.BEEPER ->
+                VirtualMachine(instructions, atomicWorld, ignoreCallAndReturn, callback)
+
+            CheckAfter.FINISH ->
+                VirtualMachine(instructions, atomicWorld, ignoreCallAndReturn)
+        }
+    }
+
     private fun goalWorlds(goalInstructions: List<Instruction>): List<World> {
         val goalWorlds = ArrayList<World>()
         atomicWorld.set(initialWorld)
-        virtualMachine = VirtualMachine(goalInstructions, atomicWorld, ignoreCallAndReturn, goalWorlds::add)
+        createVirtualMachine(goalInstructions, goalWorlds::add)
         try {
             virtualMachine.stepReturn()
         } catch (_: Stack.Exhausted) {
+            if (currentProblem.checkAfter === CheckAfter.FINISH) {
+                goalWorlds.add(virtualMachine.world)
+            }
         }
         return goalWorlds
     }
