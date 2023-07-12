@@ -63,9 +63,11 @@ abstract class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.
 
     private fun check(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
         controlPanel.checkStarted()
+        worldPanel.isEnabled = false
 
         fun cleanup() {
             controlPanel.checkFinished(currentProblem.isRandom)
+            worldPanel.isEnabled = true
 
             virtualMachinePanel.clearStack()
             editor.clearStack()

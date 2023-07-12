@@ -179,6 +179,8 @@ class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
 
     private fun listenToMouse() {
         onMouseClicked { event ->
+            if (!isEnabled) return@onMouseClicked
+
             if (SwingUtilities.isLeftMouseButton(event)) {
                 toggleBeeper(event)
             } else if (SwingUtilities.isRightMouseButton(event)) {
