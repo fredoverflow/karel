@@ -72,14 +72,14 @@ abstract class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.
             update()
         }
 
-        val ids = currentProblem.randomWorldIds().iterator()
+        val worlds = currentProblem.randomWorlds().iterator()
         var worldCounter = 0
-        initialWorld = currentProblem.createWorld(ids.next())
+        initialWorld = worlds.next()
         val start = System.currentTimeMillis()
         var lastRepaint = start
 
         fun reportSuccess() {
-            if (!ids.hasNext()) {
+            if (!worlds.hasNext()) {
                 showDiagnostic("checked all ${currentProblem.numWorlds} possible worlds")
             } else if (currentProblem.numWorlds == UNKNOWN) {
                 showDiagnostic("checked $worldCounter random worlds")
@@ -95,12 +95,12 @@ abstract class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.
                     checkOneWorld(instructions, goalInstructions)
                     ++worldCounter
                     now = System.currentTimeMillis()
-                    if (!ids.hasNext() || now - start >= 2000) {
+                    if (!worlds.hasNext() || now - start >= 2000) {
                         cleanup()
                         reportSuccess()
                         return
                     }
-                    initialWorld = currentProblem.createWorld(ids.next())
+                    initialWorld = worlds.next()
                 } while (now - lastRepaint < 100)
                 lastRepaint = now
 

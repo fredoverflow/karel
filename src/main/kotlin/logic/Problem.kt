@@ -27,12 +27,12 @@ class Problem(
         return createWorld(Random.nextInt().ushr(1))
     }
 
-    fun randomWorldIds(): Sequence<Int> = when (numWorlds) {
-        ONE -> sequenceOf(0)
+    fun randomWorlds(): Sequence<World> = when (numWorlds) {
+        ONE -> sequenceOf(createWorld(0))
 
-        in SHUFFLE -> (0 until numWorlds.toInt()).asSequence().shuffled()
+        in SHUFFLE -> (0 until numWorlds.toInt()).asSequence().shuffled().map(createWorld)
 
-        else -> generateSequence { 0 }
+        else -> generateSequence { createWorld(0) }
     }
 
     companion object {
