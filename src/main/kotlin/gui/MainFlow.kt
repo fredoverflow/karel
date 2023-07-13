@@ -13,6 +13,9 @@ import java.awt.EventQueue
 import java.util.concurrent.atomic.AtomicReference
 import javax.swing.Timer
 
+const val CHECK_TOTAL_NS = 2_000_000_000L
+const val CHECK_REPAINT_NS = 100_000_000L
+
 abstract class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.randomWorld())),
     VirtualMachine.Callbacks {
 
@@ -74,50 +77,45 @@ abstract class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.
             update()
         }
 
+        val start = System.nanoTime()
+        var nextRepaint = CHECK_REPAINT_NS
+
         val worlds = currentProblem.randomWorlds().iterator()
         var worldCounter = 0
-        initialWorld = worlds.next()
-        val start = System.currentTimeMillis()
-        var lastRepaint = start
 
-        fun reportSuccess() {
-            if (!worlds.hasNext()) {
-                showDiagnostic("checked all ${currentProblem.numWorlds} possible worlds")
-            } else if (currentProblem.numWorlds == UNKNOWN) {
-                showDiagnostic("checked $worldCounter random worlds")
-            } else {
-                showDiagnostic("checked $worldCounter random worlds\nfrom ${currentProblem.numWorlds} possible worlds")
-            }
-        }
-
-        fun checkFor100ms() {
+        fun checkBetweenRepaints() {
             try {
-                var now: Long
-                do {
+                while (worlds.hasNext()) {
+                    initialWorld = worlds.next()
                     checkOneWorld(instructions, goalInstructions)
                     ++worldCounter
-                    now = System.currentTimeMillis()
-                    if (!worlds.hasNext() || now - start >= 2000) {
+
+                    val elapsed = System.nanoTime() - start
+                    if (elapsed >= CHECK_TOTAL_NS) {
                         cleanup()
-                        reportSuccess()
+                        if (currentProblem.numWorlds == UNKNOWN) {
+                            showDiagnostic("checked $worldCounter random worlds")
+                        } else {
+                            showDiagnostic("checked $worldCounter random worlds\nfrom ${currentProblem.numWorlds} possible worlds")
+                        }
+                        return
+                    } else if (elapsed >= nextRepaint) {
+                        atomicWorld.set(initialWorld)
+                        worldPanel.repaint()
+                        nextRepaint += CHECK_REPAINT_NS
+                        EventQueue.invokeLater(::checkBetweenRepaints)
                         return
                     }
-                    initialWorld = worlds.next()
-                } while (now - lastRepaint < 100)
-                lastRepaint = now
-
-                atomicWorld.set(initialWorld)
-                worldPanel.repaint()
-                EventQueue.invokeLater(::checkFor100ms)
+                }
+                cleanup()
+                showDiagnostic("checked all ${currentProblem.numWorlds} possible worlds")
             } catch (diagnostic: Diagnostic) {
                 cleanup()
                 showDiagnostic(diagnostic)
             }
         }
 
-        atomicWorld.set(initialWorld)
-        worldPanel.repaint()
-        EventQueue.invokeLater(::checkFor100ms)
+        checkBetweenRepaints()
     }
 
     private fun checkOneWorld(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
