@@ -40,6 +40,16 @@ class VirtualMachine(
     val currentInstruction: Instruction
         get() = program[pc]
 
+    private val returnInstructionPositions = IntArray(program.size).apply {
+        for (index in lastIndex downTo ENTRY_POINT) {
+            if (program[index].bytecode == RETURN) {
+                this[index] = program[index].position
+            } else {
+                this[index] = this[index + 1]
+            }
+        }
+    }
+
     var stack: Stack<StackValue> = Stack.Nil
         private set
 
@@ -132,8 +142,7 @@ class VirtualMachine(
     }
 
     private fun Instruction.executeCall() {
-        val returnInstruction = program.asSequence().drop(target).find { it.bytecode == RETURN }
-        callbacks.onCall(position, returnInstruction!!.position)
+        callbacks.onCall(position, returnInstructionPositions[target])
         push(ReturnAddress(pc))
         ++callDepth
         pc = target
