@@ -32,10 +32,7 @@ class VirtualMachine(
         get() = atomicWorld.get()
 
     var pc: Int = ENTRY_POINT
-        private set(value) {
-            if (field !in ENTRY_POINT..program.size) throw IllegalArgumentException("$value")
-            field = value
-        }
+        private set
 
     val currentInstruction: Instruction
         get() = program[pc]
