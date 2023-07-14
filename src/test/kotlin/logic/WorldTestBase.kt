@@ -17,7 +17,7 @@ open class WorldTestBase : VirtualMachine.Callbacks {
         val atomicWorld = AtomicReference(initialWorld)
         val virtualMachine = VirtualMachine(instructions, atomicWorld, this)
         try {
-            virtualMachine.stepReturn()
+            virtualMachine.executeGoalProgram()
         } catch (_: Stack.Exhausted) {
         }
         world = atomicWorld.get()

@@ -102,6 +102,22 @@ class VirtualMachine(
         }
     }
 
+    fun executeUserProgram() {
+        val start = System.nanoTime()
+        while (System.nanoTime() - start < TIMEOUT) {
+            repeat(1000) {
+                executeOneInstruction()
+            }
+        }
+        callbacks.onInfiniteLoop()
+    }
+
+    fun executeGoalProgram() {
+        while (true) {
+            executeOneInstruction()
+        }
+    }
+
     private fun executeOneInstruction() {
         with(currentInstruction) {
             when (category) {

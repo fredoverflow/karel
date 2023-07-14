@@ -132,7 +132,7 @@ abstract class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.
         }
 
         try {
-            virtualMachine.stepReturn()
+            virtualMachine.executeUserProgram()
         } catch (_: Stack.Exhausted) {
             if (currentProblem.checkAfter === CheckAfter.FINISH) {
                 if (!goalWorldIterator.next().equalsIgnoringDirection(virtualMachine.world)) {
@@ -165,7 +165,7 @@ abstract class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.
         atomicWorld.set(initialWorld)
         createVirtualMachine(goalInstructions, goalWorlds::add)
         try {
-            virtualMachine.stepReturn()
+            virtualMachine.executeGoalProgram()
         } catch (_: Stack.Exhausted) {
             if (currentProblem.checkAfter === CheckAfter.FINISH) {
                 goalWorlds.add(virtualMachine.world)
