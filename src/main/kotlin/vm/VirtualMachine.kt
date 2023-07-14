@@ -117,16 +117,16 @@ class VirtualMachine(
 
     private fun executeOneInstruction() {
         with(currentInstruction) {
-            when (category) {
-                NORM -> executeBasicInstruction(bytecode)
+            when (category shr 12) {
+                NORM shr 12 -> executeBasicInstruction(bytecode)
 
-                PUSH -> executePush()
-                LOOP -> executeLoop()
-                CALL -> executeCall()
+                PUSH shr 12 -> executePush()
+                LOOP shr 12 -> executeLoop()
+                CALL shr 12 -> executeCall()
 
-                JUMP -> pc = target
-                ELSE -> pc = if (pop() === Bool.FALSE) target else pc + 1
-                THEN -> pc = if (pop() === Bool.TRUE) target else pc + 1
+                JUMP shr 12 -> pc = target
+                ELSE shr 12 -> pc = if (pop() === Bool.FALSE) target else pc + 1
+                THEN shr 12 -> pc = if (pop() === Bool.TRUE) target else pc + 1
 
                 else -> throw IllegalBytecode(bytecode)
             }
