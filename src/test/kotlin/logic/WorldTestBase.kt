@@ -5,8 +5,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import vm.VirtualMachine
 
-import java.util.concurrent.atomic.AtomicReference
-
 open class WorldTestBase : VirtualMachine.Callbacks {
     protected var initialWorld: World = Problem.emptyWorld
     protected var world: World = Problem.emptyWorld
@@ -14,13 +12,13 @@ open class WorldTestBase : VirtualMachine.Callbacks {
     protected fun executeGoal(problem: Problem) {
         val instructions = vm.createGoalInstructions(problem.goal)
         initialWorld = problem.randomWorld()
-        val atomicWorld = AtomicReference(initialWorld)
-        val virtualMachine = VirtualMachine(instructions, atomicWorld, this)
+        val worldRef = WorldRef(initialWorld)
+        val virtualMachine = VirtualMachine(instructions, worldRef, this)
         try {
             virtualMachine.executeGoalProgram()
         } catch (_: Stack.Exhausted) {
         }
-        world = atomicWorld.get()
+        world = worldRef.world
     }
 
     override fun onInfiniteLoop() {

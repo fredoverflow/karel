@@ -3,13 +3,13 @@ package gui
 import freditor.Fronts
 import logic.Problem
 import logic.World
+import logic.WorldRef
 
 import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Toolkit
 import java.awt.event.MouseEvent
 import java.awt.image.BufferedImage
-import java.util.concurrent.atomic.AtomicReference
 
 import javax.imageio.ImageIO
 import javax.swing.JPanel
@@ -67,7 +67,7 @@ private fun BufferedImage.rotatedCounterclockwise(): BufferedImage {
     return rotated
 }
 
-class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
+class WorldPanel(private val worldRef: WorldRef) : JPanel() {
 
     private var folder: String = Toolkit.getDefaultToolkit().screenSize.height.let { screenHeight ->
         if (screenHeight < 1000) FOLDER_40 else FOLDER_64
@@ -117,7 +117,7 @@ class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
     }
 
     override fun paintComponent(graphics: Graphics) {
-        val world = atomicWorld.get()
+        val world = worldRef.world
 
         graphics.drawWallsAndBeepers(world)
         graphics.drawKarel(world)
@@ -193,7 +193,7 @@ class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
     private fun toggleBeeper(event: MouseEvent) {
         val x = event.x / tileSize
         val y = event.y / tileSize
-        atomicWorld.updateAndGet { it.toggleBeeper(x, y) }
+        worldRef.updateAndGet { it.toggleBeeper(x, y) }
     }
 
     private fun switchTileSize() {
