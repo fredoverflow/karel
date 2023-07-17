@@ -1,202 +1,189 @@
 package logic
 
-// The state of the world is stored in just two 64-bit longs:
-//
-//       56       48       40       32       24       16        8        0
-// .....cdd ...cyyyy ...cxxxx ....bbbb bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb   hi
-// bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb   lo
-//
-// c : carry
-// d : direction
-// y : y position
-// x : x position
-// b : beepers
+/*
+  0 ······················
+ 22 ··=·=·=·=·=·=·=·=·=·=·
+ 44 ·|·|·|·|·|·|·|·|·|·|·|
+ 66 ··=·=·=·=·=·=·=·=·=·=·
+ 88 ·|·|·|·|·|·|·|·|·|·|·|
+110 ··=·=·=·=·=·=·=·=·=·=·
+132 ·|·|·|·|·|·|·|·|·|·|·|
+154 ··=·=·=·=·=·=·=·=·=·=·
+176 ·|·|·|·|·|·|·|·|·|·|·|
+198 ··=·=·=·=·=·=·=·=·=·=·
+220 ·|·|·|·|·|·|·|·|·|·|·|
+242 ··=·=·=·=·=·=·=·=·=·=·
+264 ·|·|·|·|·|·|·|·|·|·|·|
+286 ··=·=·=·=·=·=·=·=·=·=·
+308 ·|·|·|·|·|·|·|·|·|·|·|
+330 ··=·=·=·=·=·=·=·=·=·=·
+352 ·|·|·|·|·|·|·|·|·|·|·|
+374 ··=·=·=·=·=·=·=·=·=·=·
+396 ·|·|·|·|·|·|·|·|·|·|·|
+418 ··=·=·=·=·=·=·=·=·=·=·
+440 ·|·|·|·|·|·|·|·|·|·|·|
+462 ··=·=·=·=·=·=·=·=·=·=·
+484 ······················
+*/
 
-private const val X_SHIFT = 40
-private const val Y_SHIFT = 48
-private const val D_SHIFT = 56
+const val GRID_WIDTH = 22
+const val GRID_HEIGHT = 23
 
-private const val BEEPERS_HI = 0x0000000fffffffffL
-private const val CLEAR_CARRY = 0x030f0f0fffffffffL
+const val WALL_TOP_LEFT = 23
+const val WALL_TOP_RIGHT = 43
+const val WALL_BOTTOM_LEFT = 463
+const val WALL_BOTTOM_RIGHT = 483
 
-//                              E  N   W  S
-private val deltaX = intArrayOf(1, 0, -1, 0)
-private val deltaY = intArrayOf(0, -1, 0, 1)
-private val deltaXY = longArrayOf(1L.shl(X_SHIFT), 15L.shl(Y_SHIFT), 15L.shl(X_SHIFT), 1L.shl(Y_SHIFT))
+const val CELL_TOP_LEFT = 46
+const val CELL_TOP_RIGHT = 64
+const val CELL_BOTTOM_LEFT = 442
+const val CELL_BOTTOM_RIGHT = 460
 
-data class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan) {
-    val beepersLo: Long
-        get() = lo
+const val EAST: Byte = +1
+const val NORTH: Byte = -22
+const val WEST: Byte = -1
+const val SOUTH: Byte = +22
 
-    val beepersHi: Long
-        get() = hi.and(BEEPERS_HI)
+fun cell(x: Int, y: Int): Int {
+    return CELL_TOP_LEFT + ((y * GRID_WIDTH + x) shl 1)
+}
+
+class World(grid: BooleanArray, x: Int, y: Int) {
+
+    private var grid = grid.clone()
+
+    private var position = cell(x, y)
+
+    private var front = EAST
+    private var left = NORTH
+    private var back = WEST
+    private var right = SOUTH
+
+    operator fun get(position: Int): Boolean {
+        return grid[position]
+    }
 
     val x: Int
-        get() = hi.ushr(X_SHIFT).toInt().and(15)
+        get() = (position ushr 1) % 11 - 1
 
     val y: Int
-        get() = hi.ushr(Y_SHIFT).toInt().and(15)
-
-    fun equalsIgnoringDirection(that: World): Boolean {
-        return this.lo == that.lo && this.hi.shl(8) == that.hi.shl(8)
-    }
+        get() = (position ushr 1) / 11 - 1
 
     val direction: Int
-        get() = hi.ushr(D_SHIFT).toInt()
+        get() = when (front) {
+            EAST -> 0
+            NORTH -> 1
+            WEST -> 2
+            SOUTH -> 3
 
-    fun withBeepers(hi: Long, lo: Long): World {
-        return copy(hi = hi, lo = lo)
-    }
-
-    fun withKarelAt(x: Int, y: Int, direction: Int): World {
-        val coordinates = direction.toLong().shl(D_SHIFT).or(y.toLong().shl(Y_SHIFT)).or(x.toLong().shl(X_SHIFT))
-        return copy(hi = hi.and(BEEPERS_HI).or(coordinates))
-    }
-
-    // BEEPERS
-
-    private fun beepersAt(input: Long, position: Int): Int {
-        return input.ushr(position).toInt().and(1)
-    }
-
-    private fun pickBeeper(input: Long, position: Int): Long {
-        val output = input.and((1L.shl(position)).inv())
-        if (output == input) throw CellIsEmpty()
-        return output
-    }
-
-    private fun dropBeeper(input: Long, position: Int): Long {
-        val output = input.or(1L.shl(position))
-        if (output == input) throw CellIsFull()
-        return output
-    }
-
-    private fun toggleBeeper(input: Long, position: Int): Long {
-        return input.xor(1L.shl(position))
-    }
-
-    fun beeperAt(x: Int, y: Int): Boolean {
-        return beepersAt(x, y) != 0
-    }
-
-    fun beepersAt(x: Int, y: Int): Int {
-        val index = y * 10 + x
-        return if (index >= 64) {
-            beepersAt(hi, index - 64)
-        } else {
-            beepersAt(lo, index)
+            else -> throw AssertionError(String.format("illegal front %08x", front))
         }
+
+    fun moveForward() {
+        if (grid[position + front]) throw BlockedByWall()
+        position += 2 * front
     }
 
-    fun pickBeeper(x: Int, y: Int): World {
-        val index = y * 10 + x
-        return if (index >= 64) {
-            copy(hi = pickBeeper(hi, index - 64))
-        } else {
-            copy(lo = pickBeeper(lo, index))
-        }
+    fun turnLeft() {
+        val temp = front
+        front = left
+        left = back
+        back = right
+        right = temp
     }
 
-    fun dropBeeper(x: Int, y: Int): World {
-        val index = y * 10 + x
-        return if (index >= 64) {
-            copy(hi = dropBeeper(hi, index - 64))
-        } else {
-            copy(lo = dropBeeper(lo, index))
-        }
+    fun turnAround() {
+        var temp = front
+        front = back
+        back = temp
+
+        temp = left
+        left = right
+        right = temp
     }
 
-    fun toggleBeeper(x: Int, y: Int): World {
-        val index = y * 10 + x
-        return if (index >= 64) {
-            copy(hi = toggleBeeper(hi, index - 64))
-        } else {
-            copy(lo = toggleBeeper(lo, index))
-        }
+    fun turnRight() {
+        val temp = front
+        front = right
+        right = back
+        back = left
+        left = temp
     }
 
-    fun fillWithBeepers(): World {
-        return copy(hi = hi.or(BEEPERS_HI), lo = -1)
+    fun pickBeeper() {
+        if (grid[position].not()) throw CellIsEmpty()
+        grid[position] = false
     }
 
-    fun countBeepers(): Int {
-        val a = Integer.bitCount(beepersHi.ushr(32).toInt())
-        val b = Integer.bitCount(hi.toInt())
-        val c = Integer.bitCount(lo.ushr(32).toInt())
-        val d = Integer.bitCount(lo.toInt())
-        return a + b + c + d
-    }
-
-    fun binaryNumber(y: Int = 0): Int {
-        val bit0 = beepersAt(9, y)
-        val bit1 = beepersAt(8, y).shl(1)
-        val bit2 = beepersAt(7, y).shl(2)
-        val bit3 = beepersAt(6, y).shl(3)
-        val bit4 = beepersAt(5, y).shl(4)
-        val bit5 = beepersAt(4, y).shl(5)
-        val bit6 = beepersAt(3, y).shl(6)
-        val bit7 = beepersAt(2, y).shl(7)
-        return bit7.or(bit6).or(bit5).or(bit4).or(bit3).or(bit2).or(bit1).or(bit0)
-    }
-
-    fun countBeepersInColumn(x: Int): Int {
-        return (0..9).sumOf { y -> beepersAt(x, y) }
-    }
-
-    // KAREL
-
-    fun leftIsClear(): Boolean {
-        return floorPlan.isClear(x, y, (direction + 1).and(3))
-    }
-
-    fun frontIsClear(): Boolean {
-        return floorPlan.isClear(x, y, direction)
-    }
-
-    fun rightIsClear(): Boolean {
-        return floorPlan.isClear(x, y, (direction + 3).and(3))
-    }
-
-    fun moveForward(): World {
-        if (!frontIsClear()) throw BlockedByWall()
-        return copy(hi = (hi + deltaXY[direction]).and(CLEAR_CARRY))
-    }
-
-    fun turn(delta: Int): World {
-        return copy(hi = (hi + (delta.toLong().shl(D_SHIFT))).and(CLEAR_CARRY))
-    }
-
-    fun turnLeft(): World {
-        return turn(1)
-    }
-
-    fun turnAround(): World {
-        return turn(2)
-    }
-
-    fun turnRight(): World {
-        return turn(3)
+    fun dropBeeper() {
+        if (grid[position]) throw CellIsFull()
+        grid[position] = true
     }
 
     fun onBeeper(): Boolean {
-        return beeperAt(x, y)
+        return grid[position]
     }
 
     fun beeperAhead(): Boolean {
-        val x = this.x + deltaX[direction]
-        val y = this.y + deltaY[direction]
-        return isInsideWorld(x, y) && beeperAt(x, y)
+        return grid[position + 2 * front]
     }
 
-    fun isInsideWorld(x: Int, y: Int): Boolean {
-        return (0 <= x && x < Problem.WIDTH) && (0 <= y && y < Problem.HEIGHT)
+    fun leftIsClear(): Boolean {
+        return grid[position + left].not()
     }
 
-    fun pickBeeper(): World {
-        return pickBeeper(x, y)
+    fun frontIsClear(): Boolean {
+        return grid[position + front].not()
     }
 
-    fun dropBeeper(): World {
-        return dropBeeper(x, y)
+    fun rightIsClear(): Boolean {
+        return grid[position + right].not()
     }
+}
+
+fun emptyGrid(): BooleanArray {
+    return BooleanArray(GRID_WIDTH * GRID_HEIGHT)
+}
+
+private val PLOT_WALLS = """([>^<v])(\d+)""".toRegex()
+
+fun BooleanArray.plotWalls(origin: Int, program: String): BooleanArray {
+    var position = origin
+    for (matchResult in PLOT_WALLS.findAll(program)) {
+        val (direction, count) = matchResult.destructured
+        val wall = when (direction) {
+            ">" -> EAST
+            "^" -> NORTH
+            "<" -> WEST
+            "v" -> SOUTH
+
+            else -> throw AssertionError("illegal direction $direction")
+        }
+        repeat(count.toInt()) {
+            position += wall
+            this[position] = true
+            position += wall
+        }
+    }
+    return this
+}
+
+fun BooleanArray.dropBeeper(x: Int, y: Int): BooleanArray {
+    this[cell(x, y)] = true
+    return this
+}
+
+fun BooleanArray.dropBeepers(vararg xy: Int): BooleanArray {
+    for (i in xy.indices step 2) {
+        dropBeeper(xy[i], xy[i + 1])
+    }
+    return this
+}
+
+fun freeRoamingGrid(): BooleanArray {
+    return emptyGrid().plotWalls(WALL_TOP_LEFT, ">10 v10 <10 ^10")
+}
+
+fun main() {
+    freeRoamingGrid().map { if (it) 1 else 0 }.chunked(22).forEach(::println)
 }
