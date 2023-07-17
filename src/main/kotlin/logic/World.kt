@@ -63,6 +63,10 @@ class World(grid: BooleanArray, x: Int, y: Int) {
         return grid[position]
     }
 
+    operator fun get(x: Int, y: Int): Boolean {
+        return grid[cell(x, y)]
+    }
+
     val x: Int
         get() = (position ushr 1) % 11 - 1
 
@@ -118,6 +122,11 @@ class World(grid: BooleanArray, x: Int, y: Int) {
     fun dropBeeper() {
         if (grid[position]) throw CellIsFull()
         grid[position] = true
+    }
+
+    fun toggleBeeper(x: Int, y: Int) {
+        val position = cell(x, y)
+        grid[position] = grid[position].not()
     }
 
     fun onBeeper(): Boolean {

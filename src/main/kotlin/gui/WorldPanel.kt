@@ -1,15 +1,13 @@
 package gui
 
 import freditor.Fronts
-import logic.Problem
-import logic.World
+import logic.*
 
 import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Toolkit
 import java.awt.event.MouseEvent
 import java.awt.image.BufferedImage
-import java.util.concurrent.atomic.AtomicReference
 
 import javax.imageio.ImageIO
 import javax.swing.JPanel
@@ -26,64 +24,71 @@ private fun loadTile(folder: String, name: String): BufferedImage {
 
 private fun BufferedImage.scaled(scale: Int): BufferedImage {
     require(scale >= 2) { "scale $scale too small" }
-    require(width == height) { "$width * $height is not a square" }
 
-    val srcSize = width
-    val dstSize = srcSize * scale
-    val src = IntArray(srcSize * srcSize)
-    val dst = IntArray(dstSize * dstSize)
-    getRGB(0, 0, srcSize, srcSize, src, 0, srcSize)
+    val srcWidth = width
+    val srcHeight = height
+    val src = IntArray(srcWidth * srcHeight)
+    getRGB(0, 0, srcWidth, srcHeight, src, 0, srcWidth)
+
+    val dstWidth = srcWidth * scale
+    val dstHeight = srcHeight * scale
+    val dst = IntArray(dstWidth * dstHeight)
 
     var j = 0
-    for (y in 0 until dstSize) {
-        val i = (y / scale) * srcSize
-        for (x in 0 until dstSize) {
+    for (y in 0 until dstHeight) {
+        val i = (y / scale) * srcHeight
+        for (x in 0 until dstWidth) {
             dst[j++] = src[i + (x / scale)]
         }
     }
-    val scaled = BufferedImage(dstSize, dstSize, BufferedImage.TYPE_INT_ARGB)
-    scaled.setRGB(0, 0, dstSize, dstSize, dst, 0, dstSize)
+    val scaled = BufferedImage(dstWidth, dstHeight, BufferedImage.TYPE_INT_ARGB)
+    scaled.setRGB(0, 0, dstWidth, dstHeight, dst, 0, dstWidth)
     return scaled
 }
 
 private fun BufferedImage.rotatedCounterclockwise(): BufferedImage {
-    require(width == height) { "$width * $height is not a square" }
 
-    val tileSize = width
-    val src = IntArray(tileSize * tileSize)
-    val dst = IntArray(tileSize * tileSize)
-    getRGB(0, 0, tileSize, tileSize, src, 0, tileSize)
+    val srcWidth = width
+    val srcHeight = height
+    val src = IntArray(srcWidth * srcHeight)
+    val dst = IntArray(srcHeight * srcWidth)
+    getRGB(0, 0, srcWidth, srcHeight, src, 0, srcWidth)
 
     var j = 0
-    for (y in 0 until tileSize) {
-        var i = tileSize - 1 - y
-        for (x in 0 until tileSize) {
+    for (x in srcWidth - 1 downTo 0) {
+        var i = x
+        for (y in 0 until srcHeight) {
             dst[j++] = src[i]
-            i += tileSize
+            i += srcWidth
         }
     }
-    val rotated = BufferedImage(tileSize, tileSize, BufferedImage.TYPE_INT_ARGB)
-    rotated.setRGB(0, 0, tileSize, tileSize, dst, 0, tileSize)
+    val rotated = BufferedImage(srcHeight, srcWidth, BufferedImage.TYPE_INT_ARGB)
+    rotated.setRGB(0, 0, srcHeight, srcWidth, dst, 0, srcHeight)
     return rotated
 }
 
-class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
+class WorldPanel(private val world: World) : JPanel() {
 
     private var folder: String = Toolkit.getDefaultToolkit().screenSize.height.let { screenHeight ->
         if (screenHeight < 1000) FOLDER_40 else FOLDER_64
     }
     private var tileSize = 1 // smallest working dummy value before loadTiles() runs
-    private var beeper = BufferedImage(tileSize, tileSize, BufferedImage.TYPE_INT_ARGB)
+    private var fullWall = 1
+    private var halfWall = 1
+    private var empty = BufferedImage(tileSize, tileSize, BufferedImage.TYPE_INT_ARGB)
+    private var beeper = empty
     private var karels = emptyArray<BufferedImage>()
-    private var walls = emptyArray<BufferedImage>()
+    private var horizontal = empty
+    private var vertical = empty
 
     private fun loadTiles() {
+        empty = loadTile(folder, "empty")
         beeper = loadTile(folder, "beeper")
-        tileSize = beeper.width
         loadKarels()
         loadWalls()
+        tileSize = beeper.width + fullWall
 
-        val panelSize = Dimension(tileSize * Problem.WIDTH, tileSize * Problem.HEIGHT)
+        val panelSize = Dimension(10 * tileSize + fullWall, 10 * tileSize + fullWall)
         minimumSize = panelSize
         preferredSize = panelSize
         maximumSize = panelSize
@@ -99,64 +104,60 @@ class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
     }
 
     private fun loadWalls() {
-        walls = Array(16) { loadTile(folder, "cross") }
-
-        val east = loadTile(folder, "wall")
-        val north = east.rotatedCounterclockwise()
-        val west = north.rotatedCounterclockwise()
-        val south = west.rotatedCounterclockwise()
-
-        intArrayOf(1, 3, 5, 7, 9, 11, 13, 15).forEach { drawWall(it, east) }
-        intArrayOf(2, 3, 6, 7, 10, 11, 14, 15).forEach { drawWall(it, north) }
-        intArrayOf(4, 5, 6, 7, 12, 13, 14, 15).forEach { drawWall(it, west) }
-        intArrayOf(8, 9, 10, 11, 12, 13, 14, 15).forEach { drawWall(it, south) }
-    }
-
-    private fun drawWall(index: Int, wall: BufferedImage) {
-        walls[index].graphics.drawImage(wall, 0, 0, null)
+        vertical = loadTile(folder, "wall")
+        horizontal = vertical.rotatedCounterclockwise()
+        fullWall = vertical.width
+        halfWall = fullWall shr 1
     }
 
     override fun paintComponent(graphics: Graphics) {
-        val world = atomicWorld.get()
+        val world = world
 
-        graphics.drawWallsAndBeepers(world)
-        graphics.drawKarel(world)
+        graphics.drawWalls(world)
+        graphics.drawBeepersAndKarel(world)
         graphics.drawNumbers(world)
 
         // see https://stackoverflow.com/questions/19480076
         Toolkit.getDefaultToolkit().sync()
     }
 
-    private fun Graphics.drawWallsAndBeepers(world: World) {
-        for (y in 0 until Problem.HEIGHT) {
-            for (x in 0 until Problem.WIDTH) {
-                drawTile(x, y, walls[world.floorPlan.wallsAt(x, y)])
-                if (world.beeperAt(x, y)) {
-                    drawTile(x, y, beeper)
+    private fun Graphics.drawWalls(world: World) {
+        for (y in 0..10) {
+            var wall = WALL_TOP_LEFT + 2 * SOUTH * y
+            for (x in 0..10) {
+                if (world[wall + EAST]) {
+                    drawImage(horizontal, x * tileSize + halfWall, y * tileSize, null)
+                }
+                if (world[wall + SOUTH]) {
+                    drawImage(vertical, x * tileSize, y * tileSize + halfWall, null)
                 }
             }
+            wall += 2 * EAST
         }
     }
 
-    private fun Graphics.drawKarel(world: World) {
-        drawTile(world.x, world.y, karels[world.direction])
-    }
-
-    private fun Graphics.drawTile(x: Int, y: Int, tile: BufferedImage) {
-        drawImage(tile, x * tileSize, y * tileSize, null)
+    private fun Graphics.drawBeepersAndKarel(world: World) {
+        for (y in 0 until 10) {
+            var cell = CELL_TOP_LEFT + 2 * SOUTH * y
+            for (x in 0 until 10) {
+                drawImage(if (world[cell]) beeper else empty, x * tileSize + fullWall, y * tileSize + fullWall, null)
+            }
+            cell += 2 * EAST
+        }
+        drawImage(karels[world.direction], world.x * tileSize + fullWall, world.y * tileSize + fullWall, null)
     }
 
     var binaryLines = 0
 
     private fun Graphics.drawNumbers(world: World) {
-        val shift = if (world.beeperAt(0, 9)) 24 else 0
+        val shift = if (world[CELL_BOTTOM_LEFT]) 24 else 0
         var y = 0
         var lines = binaryLines
         while (lines != 0) {
             var totalValue = 0
             var beeperValue = 1
             for (x in 9 downTo 2) {
-                if (world.beeperAt(x, y)) {
+                if (world[x, y]) {
                     drawNumber(x, y, beeperValue, 0x000000)
                     totalValue += beeperValue
                 }
@@ -174,7 +175,7 @@ class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
         val str = "%3d".format(value)
         val width = str.length * Fronts.front.width
         val leftPad = (tileSize - width).shr(1)
-        Fronts.front.drawString(this, x * tileSize + leftPad, y * tileSize, str, color)
+        Fronts.front.drawString(this, x * tileSize + fullWall + leftPad, y * tileSize + fullWall, str, color)
     }
 
     private fun listenToMouse() {
@@ -191,9 +192,9 @@ class WorldPanel(private val atomicWorld: AtomicReference<World>) : JPanel() {
     }
 
     private fun toggleBeeper(event: MouseEvent) {
-        val x = event.x / tileSize
-        val y = event.y / tileSize
-        atomicWorld.updateAndGet { it.toggleBeeper(x, y) }
+        val x = (event.x - halfWall) / tileSize
+        val y = (event.y - halfWall) / tileSize
+        world.toggleBeeper(x, y)
     }
 
     private fun switchTileSize() {
