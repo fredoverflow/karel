@@ -5,8 +5,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import vm.VirtualMachine
 
-import java.util.concurrent.atomic.AtomicReference
-
 open class WorldTestBase : VirtualMachine.Callbacks {
     protected var initialWorld: World = Problem.emptyWorld
     protected var world: World = Problem.emptyWorld
@@ -14,13 +12,12 @@ open class WorldTestBase : VirtualMachine.Callbacks {
     protected fun executeGoal(problem: Problem) {
         val instructions = vm.createGoalInstructions(problem.goal)
         initialWorld = problem.randomWorld()
-        val atomicWorld = AtomicReference(initialWorld)
-        val virtualMachine = VirtualMachine(instructions, atomicWorld, this)
+        world = initialWorld.copy()
+        val virtualMachine = VirtualMachine(instructions, world, this)
         try {
             virtualMachine.executeGoalProgram()
         } catch (_: Stack.Exhausted) {
         }
-        world = atomicWorld.get()
     }
 
     override fun onInfiniteLoop() {
@@ -34,9 +31,8 @@ open class WorldTestBase : VirtualMachine.Callbacks {
     }
 
     protected fun assertSoleBeeperAt(x: Int, y: Int) {
-        val expected = Problem.emptyWorld.dropBeeper(x, y)
-        assertEquals(expected.beepersHi, world.beepersHi)
-        assertEquals(expected.beepersLo, world.beepersLo)
+        assert(world[x, y])
+        assertEquals(1, world.countBeepers())
     }
 
     protected fun assertSoleBeeperAtKarel() {
@@ -44,8 +40,7 @@ open class WorldTestBase : VirtualMachine.Callbacks {
     }
 
     protected fun assertNoBeepers() {
-        assertEquals(0, world.beepersHi)
-        assertEquals(0, world.beepersLo)
+        assertEquals(0, world.countBeepers())
     }
 
     protected fun assertNumberOfBeepers(expected: Int) {
@@ -56,8 +51,8 @@ open class WorldTestBase : VirtualMachine.Callbacks {
     protected fun assertAllBeepersTouch(walls: Int) {
         for (y in 0 until Problem.HEIGHT) {
             for (x in 0 until Problem.WIDTH) {
-                if (world.beeperAt(x, y)) {
-                    assertEquals(walls, world.floorPlan.wallsAt(x, y).and(walls))
+                if (world[x, y]) {
+                    TODO() // assertEquals(walls, world.floorPlan.wallsAt(x, y).and(walls))
                 }
             }
         }
@@ -66,8 +61,8 @@ open class WorldTestBase : VirtualMachine.Callbacks {
     protected fun assertNoBeepersTouch(walls: Int) {
         for (y in 0 until Problem.HEIGHT) {
             for (x in 0 until Problem.WIDTH) {
-                if (world.beeperAt(x, y)) {
-                    assertEquals(FloorPlan.WALL_NONE, world.floorPlan.wallsAt(x, y).and(walls))
+                if (world[x, y]) {
+                    TODO() // assertEquals(FloorPlan.WALL_NONE, world.floorPlan.wallsAt(x, y).and(walls))
                 }
             }
         }

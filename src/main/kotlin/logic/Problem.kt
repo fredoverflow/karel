@@ -44,33 +44,41 @@ class Problem(
         const val WEST = 2
         const val SOUTH = 3
 
-        val emptyWorld: World = FloorPlan.empty.world()
-
-        private fun pillars(): World {
-            var world = emptyWorld
+        private fun pillars(): Grid {
+            val grid = fencedGrid()
 
             for (x in 0..9) {
                 for (y in Random.nextInt(11)..9) {
-                    world = world.dropBeeper(x, y)
+                    grid.dropBeeper(x, y)
                 }
             }
-            return world
+            return grid
         }
 
-        private fun randomByte(rng: WorldEntropy): World {
-            var world = FloorPlan.binary.world()
+        private fun randomByte(rng: WorldEntropy): Grid {
+            val grid = binaryGrid()
 
-            world = world.withBeepers(0, rng.nextInt(256).shl(2).toLong())
+            for (x in 2..9) {
+                if (rng.nextBoolean()) {
+                    grid[CELL_TOP_LEFT + 2*x] = true
+                }
+            }
 
-            return world.withKarelAt(9, 0, WEST)
+            return grid
         }
 
         private fun randomBytes(rng: WorldEntropy, direction: Int): World {
-            var world = FloorPlan.binary.world()
+            val grid = binaryGrid()
 
-            world = world.withBeepers(0, (rng.nextInt(256).shl(2) + rng.nextInt(256).shl(12)).toLong())
+            for (y in 0..1) {
+                for (x in 2..9) {
+                    if (rng.nextBoolean()) {
+                        grid[CELL_TOP_LEFT + 2*x + 2*SOUTH*y] = true
+                    }
+                }
+            }
 
-            return world.withKarelAt(9, 0, direction)
+            return grid
         }
 
         val karelsFirstProgram = Problem(

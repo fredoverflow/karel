@@ -3,7 +3,6 @@ package vm
 import common.Stack
 import common.push
 import logic.World
-import java.util.concurrent.atomic.AtomicReference
 
 // If "step over" or "step return" do not finish within 1 second,
 // we assume the code contains an infinite loop.
@@ -16,7 +15,7 @@ const val ENTRY_POINT = 256
 
 class VirtualMachine(
     private val program: List<Instruction>,
-    private val atomicWorld: AtomicReference<World>,
+    private val world: World,
     private val callbacks: Callbacks,
     private val onBeeper: (World) -> Unit = {},
     private val onMove: (World) -> Unit = {},
@@ -27,9 +26,6 @@ class VirtualMachine(
         fun onReturn() {}
         fun onInfiniteLoop() {}
     }
-
-    val world: World
-        get() = atomicWorld.get()
 
     var pc: Int = ENTRY_POINT
         private set
@@ -171,18 +167,18 @@ class VirtualMachine(
         when (bytecode) {
             RETURN -> executeReturn()
 
-            MOVE_FORWARD -> onMove(atomicWorld.updateAndGet(World::moveForward))
-            TURN_LEFT -> atomicWorld.updateAndGet(World::turnLeft)
-            TURN_AROUND -> atomicWorld.updateAndGet(World::turnAround)
-            TURN_RIGHT -> atomicWorld.updateAndGet(World::turnRight)
-            PICK_BEEPER -> onBeeper(atomicWorld.updateAndGet(World::pickBeeper))
-            DROP_BEEPER -> onBeeper(atomicWorld.updateAndGet(World::dropBeeper))
+            MOVE_FORWARD -> world.moveForward() // TODO prior notice
+            TURN_LEFT -> world.turnLeft()
+            TURN_AROUND -> world.turnAround()
+            TURN_RIGHT -> world.turnRight()
+            PICK_BEEPER -> world.pickBeeper() // TODO prior notice
+            DROP_BEEPER -> world.dropBeeper() // TODO prior notice
 
-            ON_BEEPER -> push(atomicWorld.get().onBeeper())
-            BEEPER_AHEAD -> push(atomicWorld.get().beeperAhead())
-            LEFT_IS_CLEAR -> push(atomicWorld.get().leftIsClear())
-            FRONT_IS_CLEAR -> push(atomicWorld.get().frontIsClear())
-            RIGHT_IS_CLEAR -> push(atomicWorld.get().rightIsClear())
+            ON_BEEPER -> push(world.onBeeper())
+            BEEPER_AHEAD -> push(world.beeperAhead())
+            LEFT_IS_CLEAR -> push(world.leftIsClear())
+            FRONT_IS_CLEAR -> push(world.frontIsClear())
+            RIGHT_IS_CLEAR -> push(world.rightIsClear())
 
             NOT -> push(pop() === Bool.FALSE)
             AND -> push((pop() === Bool.TRUE) and (pop() === Bool.TRUE))

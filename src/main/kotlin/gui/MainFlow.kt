@@ -16,7 +16,7 @@ import javax.swing.Timer
 const val CHECK_TOTAL_NS = 2_000_000_000L
 const val CHECK_REPAINT_NS = 100_000_000L
 
-abstract class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.randomWorld())),
+abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()),
     VirtualMachine.Callbacks {
 
     val currentProblem: Problem
@@ -27,7 +27,7 @@ abstract class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.
         return if (logarithm < 0) logarithm else 1.shl(logarithm)
     }
 
-    var initialWorld: World = atomicWorld.get()
+    var initialWorld: World = world.copy()
 
     lateinit var virtualMachine: VirtualMachine
 
@@ -54,7 +54,7 @@ abstract class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.
 
                 val goalInstructions = vm.createGoalInstructions(goal)
 
-                check(instructions, goalInstructions)
+                TODO() // check(instructions, goalInstructions)
             } else {
                 editor.setCursorTo(editor.length())
                 showDiagnostic("void ${currentProblem.name}() not found")
@@ -63,7 +63,7 @@ abstract class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.
             showDiagnostic(diagnostic)
         }
     }
-
+/*
     private fun check(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
         controlPanel.checkStarted()
         worldPanel.isEnabled = false
@@ -100,7 +100,7 @@ abstract class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.
                         }
                         return
                     } else if (elapsed >= nextRepaint) {
-                        atomicWorld.set(initialWorld)
+                        world = initialWorld.copy()
                         worldPanel.repaint()
                         nextRepaint += CHECK_REPAINT_NS
                         EventQueue.invokeLater(::checkBetweenRepaints)
@@ -121,7 +121,7 @@ abstract class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.
     private fun checkOneWorld(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
         val goalWorldIterator = goalWorlds(goalInstructions).iterator()
 
-        atomicWorld.set(initialWorld)
+        world = initialWorld.copy()
         createVirtualMachine(instructions) { world ->
             if (!goalWorldIterator.hasNext()) {
                 throw Diagnostic(virtualMachine.currentInstruction.position, "overshoots goal")
@@ -150,19 +150,19 @@ abstract class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.
     private fun createVirtualMachine(instructions: List<Instruction>, callback: (World) -> Unit) {
         virtualMachine = when (currentProblem.checkAfter) {
             CheckAfter.BEEPER_MOVE ->
-                VirtualMachine(instructions, atomicWorld, ignoreCallAndReturn, callback, callback)
+                VirtualMachine(instructions, world, ignoreCallAndReturn, callback, callback)
 
             CheckAfter.BEEPER ->
-                VirtualMachine(instructions, atomicWorld, ignoreCallAndReturn, callback)
+                VirtualMachine(instructions, world, ignoreCallAndReturn, callback)
 
             CheckAfter.FINISH ->
-                VirtualMachine(instructions, atomicWorld, ignoreCallAndReturn)
+                VirtualMachine(instructions, world, ignoreCallAndReturn)
         }
     }
 
     private fun goalWorlds(goalInstructions: List<Instruction>): List<World> {
         val goalWorlds = ArrayList<World>()
-        atomicWorld.set(initialWorld)
+        world = initialWorld.copy()
         createVirtualMachine(goalInstructions, goalWorlds::add)
         try {
             virtualMachine.executeGoalProgram()
@@ -179,7 +179,7 @@ abstract class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.
             throw Diagnostic(virtualMachine.currentInstruction.position, "infinite loop detected")
         }
     }
-
+*/
     fun parseAndExecute() {
         editor.indent()
         editor.saveWithBackup()
@@ -204,7 +204,7 @@ abstract class MainFlow : MainDesign(AtomicReference(Problem.karelsFirstProgram.
     fun start(instructions: List<Instruction>) {
         tabbedEditors.tabs.isEnabled = false
         virtualMachinePanel.setProgram(instructions)
-        virtualMachine = VirtualMachine(instructions, atomicWorld, this)
+        virtualMachine = VirtualMachine(instructions, world, this)
         controlPanel.executionStarted()
         update()
         if (delay() >= 0) {

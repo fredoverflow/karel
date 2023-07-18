@@ -7,16 +7,15 @@ import freditor.TabbedEditors
 import logic.Problem
 import logic.World
 import java.awt.BorderLayout
-import java.util.concurrent.atomic.AtomicReference
 import javax.swing.Box
 import javax.swing.JFrame
 import javax.swing.border.EmptyBorder
 
-abstract class MainDesign(val atomicWorld: AtomicReference<World>) : JFrame() {
+abstract class MainDesign(var world: World) : JFrame() {
 
     val controlPanel = ControlPanel(Problem.problems)
 
-    val worldPanel = WorldPanel(atomicWorld)
+    val worldPanel = WorldPanel(world)
 
     val story = FreditorUI(Flexer, JavaIndenter.instance, 33, 5)
 
