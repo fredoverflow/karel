@@ -52,45 +52,6 @@ fun cell(x: Int, y: Int): Int {
     return CELL_TOP_LEFT + ((y * GRID_WIDTH + x) shl 1)
 }
 
-fun newGrid(): Grid {
-    return Grid(GRID_WIDTH * GRID_HEIGHT)
+fun wall(x: Int, y: Int): Int {
+    return WALL_TOP_LEFT + ((y * GRID_WIDTH + x) shl 1)
 }
-
-private val PLOT_WALLS = """([>^<v])(\d+)""".toRegex()
-
-fun Grid.plotWalls(origin: Int, program: String): Grid {
-    var position = origin
-    for (matchResult in PLOT_WALLS.findAll(program)) {
-        val (direction, count) = matchResult.destructured
-        val wall = when (direction) {
-            ">" -> EAST
-            "^" -> NORTH
-            "<" -> WEST
-            "v" -> SOUTH
-
-            else -> throw AssertionError("illegal direction $direction")
-        }
-        repeat(count.toInt()) {
-            position += wall
-            this[position] = true
-            position += wall
-        }
-    }
-    return this
-}
-
-fun Grid.dropBeeper(x: Int, y: Int): Grid {
-    this[cell(x, y)] = true
-    return this
-}
-
-fun Grid.dropBeepers(vararg xy: Int): Grid {
-    for (i in xy.indices step 2) {
-        dropBeeper(xy[i], xy[i + 1])
-    }
-    return this
-}
-
-val fencedGrid: () -> Grid = newGrid().plotWalls(WALL_TOP_LEFT, ">10 v10 <10 ^10")::clone
-
-val binaryGrid: () -> Grid = newGrid().plotWalls(WALL_TOP_RIGHT, "v10 <9 ^10 >9")::clone
