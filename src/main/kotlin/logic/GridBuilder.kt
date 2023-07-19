@@ -3,7 +3,7 @@ package logic
 val fenced = GridBuilder().east(10).north(10).west(10).south(10)::copy
 val binary = GridBuilder().spawn(1, 0).east(10).north(10).west(10).south(10)::copy
 
-class GridBuilder(private val grid: Grid = Grid(GRID_WIDTH * GRID_HEIGHT)) {
+class GridBuilder(val grid: Grid = Grid(GRID_WIDTH * GRID_HEIGHT)) {
 
     fun copy(): GridBuilder = GridBuilder(grid.clone())
 
@@ -52,6 +52,24 @@ class GridBuilder(private val grid: Grid = Grid(GRID_WIDTH * GRID_HEIGHT)) {
 
     fun drop(x: Int, y: Int): GridBuilder {
         grid[cell(x, y)] = true
+        return this
+    }
+
+    inline fun drop(x1: Int, y1: Int, x2: Int, y2: Int, shouldDrop: (Int, Int) -> Boolean): GridBuilder {
+        for (y in y1..y2) {
+            for (x in x1..x2) {
+                grid[cell(x, y)] = shouldDrop(x, y)
+            }
+        }
+        return this
+    }
+
+    inline fun drop(x1: Int, y1: Int, x2: Int, y2: Int, shouldDrop: () -> Boolean): GridBuilder {
+        for (y in y1..y2) {
+            for (x in x1..x2) {
+                grid[cell(x, y)] = shouldDrop()
+            }
+        }
         return this
     }
 

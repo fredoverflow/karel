@@ -56,29 +56,17 @@ class Problem(
         }
 
         private fun randomByte(rng: WorldEntropy): World {
-            val builder = binary()
-
-            for (x in 2..9) {
-                if (rng.nextBoolean()) {
-                    builder.drop(x, 0)
-                }
-            }
-
-            return builder.world().spawn(9, 0).west()
+            return binary()
+                .drop(2, 0, 9, 0, rng::nextBoolean)
+                .world()
+                .spawn(9, 0).west()
         }
 
         private fun randomBytes(rng: WorldEntropy): World {
-            val builder = binary()
-
-            for (y in 0..1) {
-                for (x in 2..9) {
-                    if (rng.nextBoolean()) {
-                        builder.drop(x, y)
-                    }
-                }
-            }
-
-            return builder.world().spawn(9, 0)
+            return binary()
+                .drop(2, 0, 9, 1, rng::nextBoolean)
+                .world()
+                .spawn(9, 0)
         }
 
         val karelsFirstProgram = Problem(
@@ -225,13 +213,10 @@ class Problem(
             0,
             ONE,
         ) {
-            val builder = fenced()
-            for (y in 2..7) {
-                for (x in 2..7) {
-                    builder.drop(x, y)
-                }
-            }
-            builder.world().spawn(1, 7)
+            fenced()
+                .drop(2, 2, 7, 7) { -> true }
+                .world()
+                .spawn(1, 7)
         }
 
         val harvestTheField = Problem(
@@ -287,15 +272,9 @@ class Problem(
             0,
             TWO.pow(100),
         ) {
-            val builder = fenced()
-            for (y in 0..9) {
-                for (x in 0..9) {
-                    if (Random.nextBoolean()) {
-                        builder.drop(x, y)
-                    }
-                }
-            }
-            builder.world()
+            fenced()
+                .drop(0, 0, 9, 9, Random::nextBoolean)
+                .world()
         }
 
         val tileTheFloor = Problem(
@@ -341,13 +320,9 @@ class Problem(
             0,
             ONE,
         ) {
-            val builder = fenced()
-            for (y in 0..9) {
-                for (x in 0..9) {
-                    builder.drop(x, y)
-                }
-            }
-            builder.world()
+            fenced()
+                .drop(0, 0, 9, 9) { -> true }
+                .world()
         }
 
         val walkTheLabyrinth = Problem(
