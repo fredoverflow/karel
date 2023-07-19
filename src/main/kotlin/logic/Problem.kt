@@ -52,7 +52,7 @@ class Problem(
                     builder.drop(x, y)
                 }
             }
-            return builder.toWorld().spawn(0, 9).east()
+            return builder.world().spawn(0, 9).east()
         }
 
         private fun randomByte(rng: WorldEntropy): World {
@@ -64,7 +64,7 @@ class Problem(
                 }
             }
 
-            return builder.toWorld().spawn(9, 0).west()
+            return builder.world().spawn(9, 0).west()
         }
 
         private fun randomBytes(rng: WorldEntropy): World {
@@ -78,7 +78,7 @@ class Problem(
                 }
             }
 
-            return builder.toWorld().spawn(9, 0)
+            return builder.world().spawn(9, 0)
         }
 
         val karelsFirstProgram = Problem(
@@ -90,10 +90,10 @@ class Problem(
             0,
             ONE,
         ) {
-            WorldBuilder()
+            GridBuilder()
                 .east(3).north(1).east(2).north(1).west(5).south(2)
                 .drop(1, 9)
-                .toWorld()
+                .world()
         }
 
         val obtainArtifact = Problem(
@@ -108,7 +108,7 @@ class Problem(
             fenced()
                 .spawn(5, 5).south(1)
                 .drop(6, 5)
-                .toWorld()
+                .world()
                 .spawn(3, 5)
         }
 
@@ -123,7 +123,7 @@ class Problem(
         ) {
             fenced()
                 .drop(9, 9)
-                .toWorld()
+                .world()
         }
 
         val defuseTwoBombs = Problem(
@@ -137,7 +137,7 @@ class Problem(
         ) {
             fenced()
                 .drop(0, 0).drop(9, 9)
-                .toWorld()
+                .world()
         }
 
         val practiceHomeRun = Problem(
@@ -151,7 +151,7 @@ class Problem(
         ) {
             fenced()
                 .drop(0, 0).drop(9, 0).drop(0, 9).drop(9, 9)
-                .toWorld()
+                .world()
         }
 
         val climbTheStairs = Problem(
@@ -163,7 +163,7 @@ class Problem(
             0,
             ONE,
         ) {
-            WorldBuilder().east(2)
+            GridBuilder().east(2)
                 .north(1).east(1)
                 .north(1).east(1)
                 .north(1).east(1)
@@ -172,7 +172,7 @@ class Problem(
                 .north(1).east(1)
                 .south(6).east(2)
                 .north(10).west(10).south(10)
-                .toWorld()
+                .world()
         }
 
         val fillTheHoles = Problem(
@@ -184,13 +184,13 @@ class Problem(
             0,
             ONE,
         ) {
-            WorldBuilder().spawn(0, 8).east(1).south(1).east(1)
+            GridBuilder().spawn(0, 8).east(1).south(1).east(1)
                 .south(1).east(1).north(1).east(1)
                 .south(1).east(1).north(1).east(1)
                 .south(1).east(1).north(1).east(1)
                 .south(1).east(1).north(1).east(1)
                 .north(9).west(10).south(8)
-                .toWorld()
+                .world()
                 .spawn(1, 9)
         }
 
@@ -203,7 +203,7 @@ class Problem(
             0,
             ONE,
         ) {
-            WorldBuilder().east(2)
+            GridBuilder().east(2)
                 .north(2).east(1)
                 .north(2).east(1)
                 .north(2).east(1)
@@ -213,7 +213,7 @@ class Problem(
                 .south(2).east(1)
                 .south(2).east(1)
                 .north(10).west(10).south(10)
-                .toWorld()
+                .world()
         }
 
         val mowTheLawn = Problem(
@@ -231,7 +231,7 @@ class Problem(
                     builder.drop(x, y)
                 }
             }
-            builder.toWorld().spawn(1, 7)
+            builder.world().spawn(1, 7)
         }
 
         val harvestTheField = Problem(
@@ -251,7 +251,7 @@ class Problem(
                 .drop(3, 5).drop(5, 5).drop(7, 5)
                 .drop(4, 6).drop(6, 6)
                 .drop(5, 7)
-                .toWorld()
+                .world()
                 .spawn(5, 7).north()
         }
 
@@ -265,7 +265,7 @@ class Problem(
             TWO.pow(10),
         ) { id ->
             val rng = WorldEntropy(id)
-            val builder = WorldBuilder().spawn(0, 9)
+            val builder = GridBuilder().spawn(0, 9)
             for (x in 0..9) {
                 if (rng.nextBoolean()) {
                     builder.east(1)
@@ -274,7 +274,7 @@ class Problem(
                 }
             }
             builder.north(9).west(10).south(9)
-                .toWorld()
+                .world()
                 .spawn(0, 8)
         }
 
@@ -295,7 +295,7 @@ class Problem(
                     }
                 }
             }
-            builder.toWorld()
+            builder.world()
         }
 
         val tileTheFloor = Problem(
@@ -307,7 +307,7 @@ class Problem(
             0,
             ONE,
         ) {
-            fenced().toWorld()
+            fenced().world()
         }
 
         val stealOlympicFire = Problem(
@@ -319,7 +319,7 @@ class Problem(
             0,
             ONE,
         ) {
-            WorldBuilder().east(2)
+            GridBuilder().east(2)
                 .north(1).east(1)
                 .north(1).east(1)
                 .north(1).east(1)
@@ -329,7 +329,7 @@ class Problem(
                 .south(6).east(2)
                 .north(10).west(10).south(10)
                 .drop(7, 3)
-                .toWorld()
+                .world()
         }
 
         val removeTheTiles = Problem(
@@ -347,7 +347,7 @@ class Problem(
                     builder.drop(x, y)
                 }
             }
-            builder.toWorld()
+            builder.world()
         }
 
         val walkTheLabyrinth = Problem(
