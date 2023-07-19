@@ -52,7 +52,7 @@ class Problem(
                     builder.drop(x, y)
                 }
             }
-            return builder.world().spawn(0, 9).east()
+            return builder.world()
         }
 
         private fun randomByte(rng: WorldEntropy): World {
@@ -347,13 +347,14 @@ class Problem(
             3.toBigInteger().pow(10),
         ) { id ->
             val rng = WorldEntropy(id)
-            val builder = FloorPlan.empty.builder()
+            val builder = fenced()
 
             for (x in 0..9) {
-                builder.buildHorizontalWall(x, 1 + rng.nextInt(3))
+                builder.spawn(x, 1 + rng.nextInt(3)).east(1)
             }
-            val world = builder.world().withBeepers(1023L.shl(90 - 64), 0L)
-            world.withKarelAt(0, 9, EAST)
+            builder
+                .drop(0, 9, 9, 9) { -> true }
+                .world()
         }
 
         val followTheSeeds = Problem(
@@ -365,8 +366,15 @@ class Problem(
             0,
             ONE,
         ) {
-            val world = emptyWorld.withBeepers(0xffc017f50L, 0x55d5555157d405ffL)
-            world.withKarelAt(5, 4, WEST)
+            val world = fenced().world().spawn(5, 4).west()
+            for (n in arrayOf(1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9)) {
+                repeat(n) {
+                    world.moveForward()
+                    world.dropBeeper()
+                }
+                world.turnLeft()
+            }
+            world.spawn(5, 4).west()
         }
 
         val cleanTheTunnels = Problem(
@@ -378,7 +386,7 @@ class Problem(
             0,
             11.toBigInteger().pow(10),
         ) {
-            pillars().withKarelAt(0, 9, EAST)
+            pillars()
         }
 
         val increment = Problem(
@@ -414,7 +422,7 @@ class Problem(
             0b11,
             TWO.pow(16),
         ) { id ->
-            randomBytes(WorldEntropy(id), WEST)
+            randomBytes(WorldEntropy(id)).west()
         }
 
         val saveTheFlowers = Problem(
@@ -427,46 +435,27 @@ class Problem(
             3920.toBigInteger(),
         ) { id ->
             val rng = WorldEntropy(id)
-            val builder = FloorPlan.empty.builder()
+            val ups =
+                "11115111241113311142111511121411223112321124111313113221133111412114211151112114121231213212141122131222212231123121232112411131131312213131132121322113311141121412114211151112111421123211322114121213212222123121312213212141122113221222213122212222212231123112231212321124111311133112231131312123122131311321123212132211331114111241121412114211151111"
+            val up = rng.nextInt(ups.length / 5) * 5
+            val downs =
+                "11161125113411431152121512241233124212511314132313321341141314221431151215212115212421332142215122142223223222412313232223312412242125113114312331323141321332223231331233213411411341224131421242214311511251215211"
+            val down = rng.nextInt(downs.length / 4) * 4
 
-            val upPermutations =
-                "5432643265326542654374327532754275437632764276437652765376548432853285428543863286428643865286538654873287428743875287538754876287638764876594329532954295439632964296439652965396549732974297439752975397549762976397649765983298429843985298539854986298639864986598729873987498759876"
-            val up = rng.nextInt(upPermutations.length / 4) * 4
-            val y1 = upPermutations[up] - '0'
-            val y2 = upPermutations[up + 1] - '0'
-            val y3 = upPermutations[up + 2] - '0'
-            val y4 = upPermutations[up + 3] - '0'
-
-            for (y in y1 until 10) builder.buildVerticalWall(1, y)
-            builder.buildHorizontalWall(1, y1)
-            for (y in y2 until y1) builder.buildVerticalWall(2, y)
-            builder.buildHorizontalWall(2, y2)
-            for (y in y3 until y2) builder.buildVerticalWall(3, y)
-            builder.buildHorizontalWall(3, y3)
-            for (y in y4 until y3) builder.buildVerticalWall(4, y)
-            builder.buildHorizontalWall(4, y4)
-            for (y in 1 until y4) builder.buildVerticalWall(5, y)
-
-            builder.buildHorizontalWall(5, 1)
-
-            val downPermutations =
-                "234235236237238239245246247248249256257258259267268269278279289345346347348349356357358359367368369378379389456457458459467468469478479489567568569578579589678679689789"
-            val down = rng.nextInt(downPermutations.length / 3) * 3
-            val y5 = downPermutations[down] - '0'
-            val y6 = downPermutations[down + 1] - '0'
-            val y7 = downPermutations[down + 2] - '0'
-
-            for (y in 1 until y5) builder.buildVerticalWall(6, y)
-            builder.buildHorizontalWall(6, y5)
-            for (y in y5 until y6) builder.buildVerticalWall(7, y)
-            builder.buildHorizontalWall(7, y6)
-            for (y in y6 until y7) builder.buildVerticalWall(8, y)
-            builder.buildHorizontalWall(8, y7)
-            for (y in y7 until 10) builder.buildVerticalWall(9, y)
-
-            val world =
-                builder.world().dropBeeper(1, y1 - 1).dropBeeper(2, y2 - 1).dropBeeper(3, y3 - 1).dropBeeper(4, y4 - 1)
-            world.withKarelAt(0, 9, EAST)
+            GridBuilder().east(1)
+                .north(ups[up + 0] - '0').east(1).drop()
+                .north(ups[up + 1] - '0').east(1).drop()
+                .north(ups[up + 2] - '0').east(1).drop()
+                .north(ups[up + 3] - '0').east(1).drop()
+                .north(ups[up + 4] - '0').east(1).drop()
+                .south(downs[down + 0] - '0').east(1)
+                .south(downs[down + 1] - '0').east(1)
+                .south(downs[down + 2] - '0').east(1)
+                .south(downs[down + 3] - '0').east(1)
+                .north(10)
+                .west(10)
+                .south(10)
+                .world()
         }
 
         val findTeddyBear = Problem(
@@ -479,19 +468,23 @@ class Problem(
             16000.toBigInteger(),
         ) { id ->
             val rng = WorldEntropy(id)
-            var world = emptyWorld
+            val builder = fenced()
 
             val xy = rng.nextInt(10)
             when (rng.nextInt(4)) {
-                EAST -> world = world.dropBeeper(9, xy)
-                WEST -> world = world.dropBeeper(0, xy)
-                NORTH -> world = world.dropBeeper(xy, 0)
-                SOUTH -> world = world.dropBeeper(xy, 9)
+                EAST -> builder.drop(9, xy)
+                WEST -> builder.drop(0, xy)
+                NORTH -> builder.drop(xy, 0)
+                SOUTH -> builder.drop(xy, 9)
             }
             val x = rng.nextInt(10)
             val y = rng.nextInt(10)
             val dir = rng.nextInt(4)
-            world.withKarelAt(x, y, dir)
+            builder.world().spawn(x, y).apply {
+                repeat(dir) {
+                    turnLeft()
+                }
+            }
         }
 
         val jumpTheHurdles = Problem(
@@ -504,14 +497,12 @@ class Problem(
             1111100000.toBigInteger(),
         ) {
             val xBeeper = 5 + Random.nextInt(5)
-            val builder = FloorPlan.empty.builder()
+            val builder = fenced()
 
             for (x in 1..xBeeper) {
-                for (y in 0 until Random.nextInt(10)) {
-                    builder.buildVerticalWall(x, 9 - y)
-                }
+                builder.spawn(x, 10).north(Random.nextInt(10))
             }
-            builder.world().dropBeeper(xBeeper, 9).withKarelAt(0, 9, EAST)
+            builder.drop(xBeeper, 9).world()
         }
 
         val solveTheMaze = Problem(
@@ -523,30 +514,7 @@ class Problem(
             0,
             UNKNOWN,
         ) {
-            val builder = FloorPlan.maze.builder()
-            var world = builder.world().fillWithBeepers()
-
-            fun generateMaze() {
-                val angle = Random.nextInt(4)
-                world = world.pickBeeper().turn(angle)
-                repeat(4) {
-                    if (world.beeperAhead()) {
-                        builder.tearDownWall(world.x, world.y, world.direction)
-                        world = world.moveForward()
-                        generateMaze()
-                        world = world.turnAround()
-                        builder.tearDownWall(world.x, world.y, world.direction)
-                        world = world.moveForward().turnAround()
-                    }
-                    world = world.turnLeft()
-                }
-                world = world.turn(-angle)
-            }
-
-            generateMaze()
-            val x = Random.nextInt(10)
-            val y = Random.nextInt(10)
-            world.dropBeeper(x, y).withKarelAt(0, 0, EAST)
+            TODO()
         }
 
         val quantizeBits = Problem(
@@ -558,7 +526,7 @@ class Problem(
             0,
             11.toBigInteger().pow(10),
         ) {
-            pillars().withKarelAt(0, 9, EAST)
+            pillars()
         }
 
         val addFast = Problem(
@@ -570,7 +538,7 @@ class Problem(
             0b1011,
             TWO.pow(16),
         ) { id ->
-            randomBytes(WorldEntropy(id), SOUTH)
+            randomBytes(WorldEntropy(id)).south()
         }
 
         val partyAgain = Problem(

@@ -8,7 +8,7 @@ class GridBuilder(val grid: Grid = Grid(GRID_WIDTH * GRID_HEIGHT)) {
     fun copy(): GridBuilder = GridBuilder(grid.clone())
 
     private var position = WALL_BOTTOM_LEFT
-    private var cellDistance = EAST + NORTH
+    private var cellDistance = NORTH + WEST
 
     fun spawn(x: Int, y: Int): GridBuilder {
         position = wall(x, y)
