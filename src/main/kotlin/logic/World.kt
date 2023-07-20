@@ -7,45 +7,19 @@ class World private constructor(
 ) {
     constructor(grid: Grid) : this(grid, CELL_BOTTOM_LEFT, EAST, NORTH, WEST, SOUTH)
 
+    constructor(grid: Grid, x: Int, y: Int) : this(grid, cell(x, y), EAST, NORTH, WEST, SOUTH)
+
+    constructor(grid: Grid, x: Int, y: Int, direction: Int) : this(
+        grid,
+        cell(x, y),
+        delta(direction),
+        delta(direction + 1),
+        delta(direction + 2),
+        delta(direction + 3)
+    )
+
     fun copy(): World {
         return World(grid.clone(), position, front, left, back, right)
-    }
-
-    fun spawn(x: Int, y: Int): World {
-        position = cell(x, y)
-        return this
-    }
-
-    fun east(): World {
-        front = EAST
-        left = NORTH
-        back = WEST
-        right = SOUTH
-        return this
-    }
-
-    fun north(): World {
-        front = NORTH
-        left = WEST
-        back = SOUTH
-        right = EAST
-        return this
-    }
-
-    fun west(): World {
-        front = WEST
-        left = SOUTH
-        back = EAST
-        right = NORTH
-        return this
-    }
-
-    fun south(): World {
-        front = SOUTH
-        left = EAST
-        back = NORTH
-        right = WEST
-        return this
     }
 
     operator fun get(position: Int): Boolean {

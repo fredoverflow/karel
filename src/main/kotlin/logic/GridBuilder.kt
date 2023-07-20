@@ -76,5 +76,9 @@ class GridBuilder(val grid: Grid = Grid(GRID_WIDTH * GRID_HEIGHT)) {
         return this
     }
 
-    fun world(): World = World(grid)
+    fun world() = World(grid)
+
+    fun world(x: Int, y: Int) = World(grid, x, y)
+
+    fun world(x: Int, y: Int, direction: Int) = World(grid, x, y, direction)
 }

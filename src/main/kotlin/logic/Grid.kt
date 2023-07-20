@@ -55,3 +55,12 @@ fun cell(x: Int, y: Int): Int {
 fun wall(x: Int, y: Int): Int {
     return WALL_TOP_LEFT + ((y * GRID_WIDTH + x) shl 1)
 }
+
+fun delta(direction: Int): Byte = when (direction and 3) {
+    0 -> EAST
+    1 -> NORTH
+    2 -> WEST
+    3 -> SOUTH
+
+    else -> error(direction)
+}
