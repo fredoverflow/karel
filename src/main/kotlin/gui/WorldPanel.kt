@@ -3,6 +3,7 @@ package gui
 import freditor.Fronts
 import logic.*
 
+import java.awt.Color
 import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Toolkit
@@ -67,7 +68,7 @@ private fun BufferedImage.rotatedCounterclockwise(): BufferedImage {
     return rotated
 }
 
-class WorldPanel(private val world: World) : JPanel() {
+class WorldPanel(var world: World) : JPanel() {
 
     private var folder: String = Toolkit.getDefaultToolkit().screenSize.height.let { screenHeight ->
         if (screenHeight < 1000) FOLDER_40 else FOLDER_64
@@ -111,6 +112,9 @@ class WorldPanel(private val world: World) : JPanel() {
     }
 
     override fun paintComponent(graphics: Graphics) {
+        graphics.color = Color.WHITE
+        graphics.fillRect(0, 0, width, height)
+
         val world = world
 
         graphics.drawWalls(world)
@@ -131,18 +135,19 @@ class WorldPanel(private val world: World) : JPanel() {
                 if (world[wall + SOUTH]) {
                     drawImage(vertical, x * tileSize, y * tileSize + halfWall, null)
                 }
+                wall += 2 * EAST
             }
-            wall += 2 * EAST
         }
     }
 
     private fun Graphics.drawBeepersAndKarel(world: World) {
+        var cell = CELL_TOP_LEFT
         for (y in 0 until 10) {
-            var cell = CELL_TOP_LEFT + 2 * SOUTH * y
             for (x in 0 until 10) {
                 drawImage(if (world[cell]) beeper else empty, x * tileSize + fullWall, y * tileSize + fullWall, null)
+                cell += CELL_NEXT_COLUMN
             }
-            cell += 2 * EAST
+            cell += CELL_NEXT_ROW
         }
         drawImage(karels[world.direction], world.x * tileSize + fullWall, world.y * tileSize + fullWall, null)
     }

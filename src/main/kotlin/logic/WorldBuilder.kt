@@ -3,7 +3,7 @@ package logic
 val fenced = WorldBuilder()
     .east(10).north(10).west(10).south(10)::copy
 
-val binary = WorldBuilder().spawn(1, 0)
+val binary = WorldBuilder().spawn(1, 10)
     .east(9).north(10).west(9).south(10)::copy
 
 class WorldBuilder(val grid: Grid = Grid(GRID_WIDTH * GRID_HEIGHT)) {

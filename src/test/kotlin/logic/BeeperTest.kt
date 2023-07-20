@@ -6,43 +6,52 @@ import org.junit.Test
 class BeeperTest {
     @Test
     fun dropOneBeeper() {
-        val beforeDrop = Problem.emptyWorld
-        val afterDrop = beforeDrop.dropBeeper(1, 2)
+        val world = fenced().placeKarel()
+        assertFalse(world.onBeeper())
 
-        assertFalse(beforeDrop.beeperAt(1, 2))
-        assertTrue(afterDrop.beeperAt(1, 2))
+        world.dropBeeper()
+        assertTrue(world.onBeeper())
     }
 
     @Test
     fun dropAnotherBeeper() {
-        val one = Problem.emptyWorld.dropBeeper(1, 2)
+        val world = fenced().placeKarel()
+        world.dropBeeper()
+
         assertThrows(CellIsFull::class.java) {
-            one.dropBeeper(1, 2)
+            world.dropBeeper()
         }
     }
 
     @Test
     fun dropFourCornerBeepers() {
-        val beforeDrop = Problem.emptyWorld
-        val afterDrop = beforeDrop.dropBeeper(0, 0).dropBeeper(9, 0).dropBeeper(0, 9).dropBeeper(9, 9)
+        val world = fenced()
+            .drop(0, 0)
+            .drop(9, 0)
+            .drop(0, 9)
+            .drop(9, 9)
+            .placeKarel()
 
-        assertEquals(0, beforeDrop.countBeepers())
-        assertEquals(4, afterDrop.countBeepers())
+        assertEquals(4, world.countBeepers())
     }
 
     @Test
     fun pickOneBeeper() {
-        val beforePick = World(0, 1, FloorPlan.empty)
-        val afterPick = beforePick.pickBeeper(0, 0)
+        val world = fenced()
+            .drop(0, 0)
+            .placeKarel(0, 0)
 
-        assertTrue(beforePick.beeperAt(0, 0))
-        assertFalse(afterPick.beeperAt(0, 0))
+        assertTrue(world.onBeeper())
+        world.pickBeeper()
+        assertFalse(world.onBeeper())
     }
 
     @Test
     fun pickImaginaryBeeper() {
         assertThrows(CellIsEmpty::class.java) {
-            Problem.emptyWorld.pickBeeper(0, 0)
+            fenced()
+                .placeKarel()
+                .pickBeeper()
         }
     }
 }

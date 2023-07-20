@@ -90,9 +90,9 @@ class Problem(
                 .east(3)
                 .north(1)
                 .east(2)
-                .north(1)
+                .north(2)
                 .west(5)
-                .south(2)
+                .south(3)
                 .drop(1, 9)
                 .placeKarel()
         }
@@ -201,7 +201,7 @@ class Problem(
                 .north(9)
                 .west(10)
                 .south(8)
-                .placeKarel(1, 9)
+                .placeKarel(1, 8)
         }
 
         val saveTheFlower = Problem(
@@ -215,6 +215,7 @@ class Problem(
         ) {
             WorldBuilder()
                 .east(2)
+                .drop()
                 .north(2).east(1)
                 .north(2).east(1)
                 .north(2).east(1)
@@ -480,7 +481,7 @@ class Problem(
                 .north(ups[up + 1] - '0').east(1).drop()
                 .north(ups[up + 2] - '0').east(1).drop()
                 .north(ups[up + 3] - '0').east(1).drop()
-                .north(ups[up + 4] - '0').east(1).drop()
+                .north(ups[up + 4] - '0').east(1)
                 .south(downs[down + 0] - '0').east(1)
                 .south(downs[down + 1] - '0').east(1)
                 .south(downs[down + 2] - '0').east(1)

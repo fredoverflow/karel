@@ -56,7 +56,9 @@ class Week1Test : WorldTestBase() {
         executeGoal(Problem.fillTheHoles)
         assertKarelAt(9, 8, EAST)
         assertNumberOfBeepers(4)
-        assertAllBeepersTouch(FloorPlan.WALL_ALL - FloorPlan.WALL_NORTH)
+        assertAllBeepersTouch(WEST)
+        assertAllBeepersTouch(SOUTH)
+        assertAllBeepersTouch(EAST)
     }
 
     @Test
@@ -84,10 +86,13 @@ class Week1Test : WorldTestBase() {
     fun repairTheStreet() {
         executeGoal(Problem.repairTheStreet)
         assertKarelAt(9, 8, EAST)
-        for (x in 0..9) {
-            val isSolid = (world.floorPlan.wallsAt(x, 9).and(FloorPlan.WALL_NORTH)) != 0
-            val isRepaired = world.beeperAt(x, 9)
-            assertTrue(isSolid.xor(isRepaired))
+        var cell = CELL_BOTTOM_LEFT
+        val north = delta(NORTH)
+        repeat(10) {
+            val isSolid = world[cell + north]
+            val isRepaired = world[cell]
+            assertTrue(isSolid xor isRepaired)
+            cell += CELL_NEXT_COLUMN
         }
     }
 

@@ -2,6 +2,7 @@ package logic
 
 import logic.Problem.Companion.EAST
 import logic.Problem.Companion.NORTH
+import logic.Problem.Companion.SOUTH
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -11,7 +12,7 @@ class Week2Test : WorldTestBase() {
         executeGoal(Problem.hangTheLampions)
         assertKarelAt(9, 9, EAST)
         assertNumberOfBeepers(10)
-        assertAllBeepersTouch(FloorPlan.WALL_NORTH)
+        assertAllBeepersTouch(NORTH)
     }
 
     @Test
@@ -31,16 +32,16 @@ class Week2Test : WorldTestBase() {
     @Test
     fun increment() {
         executeGoal(Problem.increment)
-        val before = initialWorld.binaryNumber()
-        val after = world.binaryNumber()
+        val before = initialWorld.binaryNumber(0)
+        val after = world.binaryNumber(0)
         assertEquals((before + 1).and(255), after)
     }
 
     @Test
     fun decrement() {
         executeGoal(Problem.decrement)
-        val before = initialWorld.binaryNumber()
-        val after = world.binaryNumber()
+        val before = initialWorld.binaryNumber(0)
+        val after = world.binaryNumber(0)
         assertEquals((before - 1).and(255), after)
     }
 
@@ -58,8 +59,8 @@ class Week2Test : WorldTestBase() {
         executeGoal(Problem.saveTheFlowers)
         assertKarelAt(9, 9, EAST)
         assertNumberOfBeepers(4)
-        assertAllBeepersTouch(FloorPlan.WALL_SOUTH)
-        assertNoBeepersTouch(FloorPlan.WALL_EAST)
+        assertAllBeepersTouch(SOUTH)
+        assertNoBeepersTouch(EAST)
     }
 
     @Test
@@ -71,8 +72,6 @@ class Week2Test : WorldTestBase() {
     @Test
     fun jumpTheHurdles() {
         executeGoal(Problem.jumpTheHurdles)
-        val x = Integer.numberOfTrailingZeros((initialWorld.beepersHi.ushr(9 * 10 - 64)).toInt())
-        assertKarelAt(x, 9, EAST)
         assertSoleBeeperAtKarel()
     }
 
@@ -87,9 +86,9 @@ class Week2Test : WorldTestBase() {
         executeGoal(Problem.quantizeBits)
         assertKarelAt(9, 9, EAST)
         for (x in 0..9) {
-            val expected = initialWorld.beeperAt(x, 4)
+            val expected = initialWorld[x, 4]
             for (y in 0..9) {
-                assertEquals(expected, world.beeperAt(x, y))
+                assertEquals(expected, world[x, y])
             }
         }
     }

@@ -1,13 +1,14 @@
 package logic
 
 import common.Stack
-import org.junit.Assert.assertEquals
-import org.junit.Assert.fail
+import org.junit.Assert.*
 import vm.VirtualMachine
 
+private val requiredInitializer: World = fenced().placeKarel()
+
 open class WorldTestBase : VirtualMachine.Callbacks {
-    protected var initialWorld: World = Problem.emptyWorld
-    protected var world: World = Problem.emptyWorld
+    protected var initialWorld: World = requiredInitializer
+    protected var world: World = requiredInitializer
 
     protected fun executeGoal(problem: Problem) {
         val instructions = vm.createGoalInstructions(problem.goal)
@@ -32,7 +33,7 @@ open class WorldTestBase : VirtualMachine.Callbacks {
 
     protected fun assertSoleBeeperAt(x: Int, y: Int) {
         assert(world[x, y])
-        assertEquals(1, world.countBeepers())
+        assertNumberOfBeepers(1)
     }
 
     protected fun assertSoleBeeperAtKarel() {
@@ -40,7 +41,7 @@ open class WorldTestBase : VirtualMachine.Callbacks {
     }
 
     protected fun assertNoBeepers() {
-        assertEquals(0, world.countBeepers())
+        assertNumberOfBeepers(0)
     }
 
     protected fun assertNumberOfBeepers(expected: Int) {
@@ -48,23 +49,31 @@ open class WorldTestBase : VirtualMachine.Callbacks {
         assertEquals(expected, actual)
     }
 
-    protected fun assertAllBeepersTouch(walls: Int) {
-        for (y in 0 until Problem.HEIGHT) {
-            for (x in 0 until Problem.WIDTH) {
-                if (world[x, y]) {
-                    TODO() // assertEquals(walls, world.floorPlan.wallsAt(x, y).and(walls))
+    protected fun assertAllBeepersTouch(direction: Int) {
+        val delta = delta(direction)
+        var cell = CELL_TOP_LEFT
+        for (y in 0 until 10) {
+            for (x in 0 until 10) {
+                if (world[cell]) {
+                    assertTrue(world[cell + delta])
                 }
+                cell += CELL_NEXT_COLUMN
             }
+            cell += CELL_NEXT_ROW
         }
     }
 
-    protected fun assertNoBeepersTouch(walls: Int) {
-        for (y in 0 until Problem.HEIGHT) {
-            for (x in 0 until Problem.WIDTH) {
-                if (world[x, y]) {
-                    TODO() // assertEquals(FloorPlan.WALL_NONE, world.floorPlan.wallsAt(x, y).and(walls))
+    protected fun assertNoBeepersTouch(direction: Int) {
+        val delta = delta(direction)
+        var cell = CELL_TOP_LEFT
+        for (y in 0 until 10) {
+            for (x in 0 until 10) {
+                if (world[cell]) {
+                    assertFalse(world[cell + delta])
                 }
+                cell += CELL_NEXT_COLUMN
             }
+            cell += CELL_NEXT_ROW
         }
     }
 }
