@@ -1,7 +1,10 @@
 package logic
 
-val fenced = GridBuilder().east(10).north(10).west(10).south(10)::copy
-val binary = GridBuilder().spawn(1, 0).east(10).north(10).west(10).south(10)::copy
+val fenced = GridBuilder()
+    .east(10).north(10).west(10).south(10)::copy
+
+val binary = GridBuilder().spawn(1, 0)
+    .east(9).north(10).west(9).south(10)::copy
 
 class GridBuilder(val grid: Grid = Grid(GRID_WIDTH * GRID_HEIGHT)) {
 

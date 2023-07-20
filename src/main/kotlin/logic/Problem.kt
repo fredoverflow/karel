@@ -36,9 +36,6 @@ class Problem(
     }
 
     companion object {
-        const val HEIGHT = 10
-        const val WIDTH = 10
-
         const val EAST = 0
         const val NORTH = 1
         const val WEST = 2
@@ -52,6 +49,7 @@ class Problem(
                     builder.drop(x, y)
                 }
             }
+
             return builder.world()
         }
 
@@ -59,7 +57,8 @@ class Problem(
             return binary()
                 .drop(2, 0, 9, 0, rng::nextBoolean)
                 .world()
-                .spawn(9, 0).west()
+                .spawn(9, 0)
+                .west()
         }
 
         private fun randomBytes(rng: WorldEntropy): World {
@@ -67,6 +66,19 @@ class Problem(
                 .drop(2, 0, 9, 1, rng::nextBoolean)
                 .world()
                 .spawn(9, 0)
+        }
+
+        private fun party(rng: WorldEntropy, y: Int): World {
+            val builder = fenced()
+
+            for (x in 0..9) {
+                builder.spawn(x, 1 + rng.nextInt(3)).east(1)
+            }
+
+            return builder
+                .drop(0, y, 9, y) { -> true }
+                .world()
+                .spawn(0, y)
         }
 
         val karelsFirstProgram = Problem(
@@ -79,7 +91,12 @@ class Problem(
             ONE,
         ) {
             GridBuilder()
-                .east(3).north(1).east(2).north(1).west(5).south(2)
+                .east(3)
+                .north(1)
+                .east(2)
+                .north(1)
+                .west(5)
+                .south(2)
                 .drop(1, 9)
                 .world()
         }
@@ -94,7 +111,8 @@ class Problem(
             ONE,
         ) {
             fenced()
-                .spawn(5, 5).south(1)
+                .spawn(5, 5)
+                .south(1)
                 .drop(6, 5)
                 .world()
                 .spawn(3, 5)
@@ -124,7 +142,8 @@ class Problem(
             ONE,
         ) {
             fenced()
-                .drop(0, 0).drop(9, 9)
+                .drop(0, 0)
+                .drop(9, 9)
                 .world()
         }
 
@@ -138,7 +157,10 @@ class Problem(
             ONE,
         ) {
             fenced()
-                .drop(0, 0).drop(9, 0).drop(0, 9).drop(9, 9)
+                .drop(0, 0)
+                .drop(9, 0)
+                .drop(0, 9)
+                .drop(9, 9)
                 .world()
         }
 
@@ -151,7 +173,8 @@ class Problem(
             0,
             ONE,
         ) {
-            GridBuilder().east(2)
+            GridBuilder()
+                .east(2)
                 .north(1).east(1)
                 .north(1).east(1)
                 .north(1).east(1)
@@ -159,7 +182,9 @@ class Problem(
                 .north(1).east(1)
                 .north(1).east(1)
                 .south(6).east(2)
-                .north(10).west(10).south(10)
+                .north(10)
+                .west(10)
+                .south(10)
                 .world()
         }
 
@@ -172,12 +197,15 @@ class Problem(
             0,
             ONE,
         ) {
-            GridBuilder().spawn(0, 8).east(1).south(1).east(1)
+            GridBuilder().spawn(0, 8)
+                .east(1).south(1).east(1)
                 .south(1).east(1).north(1).east(1)
                 .south(1).east(1).north(1).east(1)
                 .south(1).east(1).north(1).east(1)
                 .south(1).east(1).north(1).east(1)
-                .north(9).west(10).south(8)
+                .north(9)
+                .west(10)
+                .south(8)
                 .world()
                 .spawn(1, 9)
         }
@@ -191,7 +219,8 @@ class Problem(
             0,
             ONE,
         ) {
-            GridBuilder().east(2)
+            GridBuilder()
+                .east(2)
                 .north(2).east(1)
                 .north(2).east(1)
                 .north(2).east(1)
@@ -200,7 +229,9 @@ class Problem(
                 .south(2).east(1)
                 .south(2).east(1)
                 .south(2).east(1)
-                .north(10).west(10).south(10)
+                .north(10)
+                .west(10)
+                .south(10)
                 .world()
         }
 
@@ -237,7 +268,8 @@ class Problem(
                 .drop(4, 6).drop(6, 6)
                 .drop(5, 7)
                 .world()
-                .spawn(5, 7).north()
+                .spawn(5, 7)
+                .north()
         }
 
         val repairTheStreet = Problem(
@@ -251,6 +283,7 @@ class Problem(
         ) { id ->
             val rng = WorldEntropy(id)
             val builder = GridBuilder().spawn(0, 9)
+
             for (x in 0..9) {
                 if (rng.nextBoolean()) {
                     builder.east(1)
@@ -258,7 +291,11 @@ class Problem(
                     builder.south(1).east(1).north(1)
                 }
             }
-            builder.north(9).west(10).south(9)
+
+            builder
+                .north(9)
+                .west(10)
+                .south(9)
                 .world()
                 .spawn(0, 8)
         }
@@ -286,7 +323,8 @@ class Problem(
             0,
             ONE,
         ) {
-            fenced().world()
+            fenced()
+                .world()
         }
 
         val stealOlympicFire = Problem(
@@ -298,7 +336,8 @@ class Problem(
             0,
             ONE,
         ) {
-            GridBuilder().east(2)
+            GridBuilder()
+                .east(2)
                 .north(1).east(1)
                 .north(1).east(1)
                 .north(1).east(1)
@@ -306,7 +345,9 @@ class Problem(
                 .north(1).east(1)
                 .north(1).east(1)
                 .south(6).east(2)
-                .north(10).west(10).south(10)
+                .north(10)
+                .west(10)
+                .south(10)
                 .drop(7, 3)
                 .world()
         }
@@ -346,15 +387,7 @@ class Problem(
             0,
             3.toBigInteger().pow(10),
         ) { id ->
-            val rng = WorldEntropy(id)
-            val builder = fenced()
-
-            for (x in 0..9) {
-                builder.spawn(x, 1 + rng.nextInt(3)).east(1)
-            }
-            builder
-                .drop(0, 9, 9, 9) { -> true }
-                .world()
+            party(WorldEntropy(id), 9)
         }
 
         val followTheSeeds = Problem(
@@ -367,6 +400,7 @@ class Problem(
             ONE,
         ) {
             val world = fenced().world().spawn(5, 4).west()
+
             for (n in arrayOf(1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9)) {
                 repeat(n) {
                     world.moveForward()
@@ -374,7 +408,10 @@ class Problem(
                 }
                 world.turnLeft()
             }
-            world.spawn(5, 4).west()
+
+            world
+                .spawn(5, 4)
+                .west()
         }
 
         val cleanTheTunnels = Problem(
@@ -422,7 +459,8 @@ class Problem(
             0b11,
             TWO.pow(16),
         ) { id ->
-            randomBytes(WorldEntropy(id)).west()
+            randomBytes(WorldEntropy(id))
+                .west()
         }
 
         val saveTheFlowers = Problem(
@@ -442,7 +480,8 @@ class Problem(
                 "11161125113411431152121512241233124212511314132313321341141314221431151215212115212421332142215122142223223222412313232223312412242125113114312331323141321332223231331233213411411341224131421242214311511251215211"
             val down = rng.nextInt(downs.length / 4) * 4
 
-            GridBuilder().east(1)
+            GridBuilder()
+                .east(1)
                 .north(ups[up + 0] - '0').east(1).drop()
                 .north(ups[up + 1] - '0').east(1).drop()
                 .north(ups[up + 2] - '0').east(1).drop()
@@ -480,11 +519,15 @@ class Problem(
             val x = rng.nextInt(10)
             val y = rng.nextInt(10)
             val dir = rng.nextInt(4)
-            builder.world().spawn(x, y).apply {
-                repeat(dir) {
-                    turnLeft()
+
+            builder
+                .world()
+                .spawn(x, y)
+                .apply {
+                    repeat(dir) {
+                        turnLeft()
+                    }
                 }
-            }
         }
 
         val jumpTheHurdles = Problem(
@@ -502,7 +545,10 @@ class Problem(
             for (x in 1..xBeeper) {
                 builder.spawn(x, 10).north(Random.nextInt(10))
             }
-            builder.drop(xBeeper, 9).world()
+
+            builder
+                .drop(xBeeper, 9)
+                .world()
         }
 
         val solveTheMaze = Problem(
@@ -538,7 +584,8 @@ class Problem(
             0b1011,
             TWO.pow(16),
         ) { id ->
-            randomBytes(WorldEntropy(id)).south()
+            randomBytes(WorldEntropy(id))
+                .south()
         }
 
         val partyAgain = Problem(
@@ -550,14 +597,7 @@ class Problem(
             0,
             3.toBigInteger().pow(10),
         ) { id ->
-            val rng = WorldEntropy(id)
-            val builder = FloorPlan.trap.builder()
-
-            for (x in 0..9) {
-                builder.buildHorizontalWall(x, 1 + rng.nextInt(3))
-            }
-            val world = builder.world().withBeepers(1023L.shl(80 - 64), 0L)
-            world.withKarelAt(0, 8, EAST)
+            party(WorldEntropy(id), 8)
         }
 
         val fetchTheStars = Problem(
@@ -570,15 +610,16 @@ class Problem(
             3.toBigInteger().pow(10),
         ) { id ->
             val rng = WorldEntropy(id)
-            val builder = FloorPlan.trap.builder()
-            var world = builder.world()
+            val builder = fenced().cellSouthWest()
 
             for (x in 0..9) {
                 val y = 1 + rng.nextInt(3)
-                builder.buildHorizontalWall(x, y)
-                world = world.dropBeeper(x, y)
+                builder.spawn(x, y).east(1).drop()
             }
-            world.withKarelAt(0, 8, EAST)
+
+            builder
+                .world()
+                .spawn(0, 8)
         }
 
         val secureTheCave = Problem(
@@ -590,17 +631,19 @@ class Problem(
             0,
             9.toBigInteger().pow(10),
         ) {
-            val builder = FloorPlan.empty.builder()
-            var world = builder.world()
+            val builder = fenced().cellSouthEast()
 
             for (x in 0..9) {
                 val y = 1 + Random.nextInt(3)
-                builder.buildHorizontalWall(x, y)
-                for (a in y..y + Random.nextInt(3)) {
-                    world = world.dropBeeper(x, a)
+                val n = 1 + Random.nextInt(3)
+                builder.spawn(x, y).east(1)
+                repeat(n) {
+                    builder.spawn(x, y + it).drop()
                 }
             }
-            world.withKarelAt(0, 9, EAST)
+
+            builder
+                .world()
         }
 
         val layAndRemoveTiles = Problem(
@@ -612,7 +655,8 @@ class Problem(
             0,
             ONE,
         ) {
-            emptyWorld.withKarelAt(0, 9, EAST)
+            fenced()
+                .world()
         }
 
         val findShelters = Problem(
@@ -624,16 +668,24 @@ class Problem(
             0,
             UNKNOWN,
         ) {
-            val builder = FloorPlan.empty.builder()
+            val builder = fenced()
 
             repeat(25) {
-                builder.buildHorizontalWall(Random.nextInt(10), 1 + Random.nextInt(9))
-                builder.buildVerticalWall(1 + Random.nextInt(9), Random.nextInt(10))
+                builder.spawn(Random.nextInt(10), 1 + Random.nextInt(9)).east(1)
+                builder.spawn(1 + Random.nextInt(9), Random.nextInt(10)).south(1)
             }
             val x = Random.nextInt(10)
             val y = Random.nextInt(10)
             val dir = Random.nextInt(4)
-            builder.world().withKarelAt(x, y, dir)
+
+            builder
+                .world()
+                .spawn(x, y)
+                .apply {
+                    repeat(dir) {
+                        turnLeft()
+                    }
+                }
         }
 
         val addSmart = Problem(
@@ -645,7 +697,8 @@ class Problem(
             0b111,
             TWO.pow(16),
         ) { id ->
-            randomBytes(WorldEntropy(id), SOUTH)
+            randomBytes(WorldEntropy(id))
+                .south()
         }
 
         val computeFibonacci = Problem(
@@ -657,16 +710,21 @@ class Problem(
             0b1111111111,
             5.toBigInteger(),
         ) { id ->
-            val world = FloorPlan.binary.world().withKarelAt(9, 0, SOUTH)
+            val builder = binary()
+
             when (id % 5) {
-                0 -> world.dropBeeper(9, 1) // 0 1
-                1 -> world.dropBeeper(9, 0).dropBeeper(9, 1) // 1 1
-                2 -> world.dropBeeper(9, 0).dropBeeper(8, 1) // 1 2
-                3 -> world.dropBeeper(8, 0).dropBeeper(8, 1).dropBeeper(9, 1) // 2 3
-                4 -> world.dropBeeper(8, 0).dropBeeper(9, 0).dropBeeper(7, 1).dropBeeper(9, 1) // 3 5
+                0 -> builder.drop(9, 1) // 0 1
+                1 -> builder.drop(9, 0).drop(9, 1) // 1 1
+                2 -> builder.drop(9, 0).drop(8, 1) // 1 2
+                3 -> builder.drop(8, 0).drop(8, 1).drop(9, 1) // 2 3
+                4 -> builder.drop(8, 0).drop(9, 0).drop(7, 1).drop(9, 1) // 3 5
 
                 else -> error(id)
             }
+            builder
+                .world()
+                .spawn(9, 0)
+                .south()
         }
 
         val problems: List<Problem> = listOf(
