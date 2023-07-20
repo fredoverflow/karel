@@ -1,23 +1,10 @@
 package logic
 
-class World private constructor(
+class World(
     private var grid: Grid,
     private var position: Int,
     private var front: Byte, private var left: Byte, private var back: Byte, private var right: Byte
 ) {
-    constructor(grid: Grid) : this(grid, CELL_BOTTOM_LEFT, EAST, NORTH, WEST, SOUTH)
-
-    constructor(grid: Grid, x: Int, y: Int) : this(grid, cell(x, y), EAST, NORTH, WEST, SOUTH)
-
-    constructor(grid: Grid, x: Int, y: Int, direction: Int) : this(
-        grid,
-        cell(x, y),
-        delta(direction),
-        delta(direction + 1),
-        delta(direction + 2),
-        delta(direction + 3)
-    )
-
     fun copy(): World {
         return World(grid.clone(), position, front, left, back, right)
     }
