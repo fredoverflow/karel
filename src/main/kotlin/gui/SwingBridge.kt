@@ -10,18 +10,14 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
-open class HorizontalBoxPanel(vararg components: Component) : JPanel() {
-    init {
-        layout = BoxLayout(this, BoxLayout.X_AXIS)
-        components.forEach { add(it) }
-    }
+fun horizontalBoxPanel(vararg components: Component) = JPanel().apply {
+    layout = BoxLayout(this, BoxLayout.X_AXIS)
+    components.forEach(::add)
 }
 
-open class VerticalBoxPanel(vararg components: Component) : JPanel() {
-    init {
-        layout = BoxLayout(this, BoxLayout.Y_AXIS)
-        components.forEach { add(it) }
-    }
+fun verticalBoxPanel(vararg components: Component) = JPanel().apply {
+    layout = BoxLayout(this, BoxLayout.Y_AXIS)
+    components.forEach(::add)
 }
 
 fun JComponent.onMouseClicked(handler: (MouseEvent) -> Unit) {

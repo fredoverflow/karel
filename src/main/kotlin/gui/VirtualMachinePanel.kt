@@ -3,16 +3,18 @@ package gui
 import common.Stack
 import vm.Instruction
 import vm.StackValue
-
 import javax.swing.Box
+import javax.swing.BoxLayout
+import javax.swing.JPanel
 
-class VirtualMachinePanel : HorizontalBoxPanel() {
+class VirtualMachinePanel : JPanel() {
 
     private val stackTable = StackTable()
     private val bytecodeTable = BytecodeTable()
 
     init {
-        add(VerticalBoxPanel(Box.createVerticalGlue(), stackTable))
+        layout = BoxLayout(this, BoxLayout.X_AXIS)
+        add(verticalBoxPanel(Box.createVerticalGlue(), stackTable))
         add(bytecodeTable)
         isVisible = false
     }

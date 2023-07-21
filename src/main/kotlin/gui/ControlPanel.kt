@@ -2,18 +2,14 @@ package gui
 
 import freditor.Fronts
 import logic.Problem
-
-import javax.swing.JButton
-import javax.swing.JComboBox
-import javax.swing.JComponent
-import javax.swing.JSlider
+import javax.swing.*
 
 fun <T : JComponent> T.sansSerif(): T {
     this.font = Fronts.sansSerif
     return this
 }
 
-class ControlPanel(problems: List<Problem>) : VerticalBoxPanel() {
+class ControlPanel(problems: List<Problem>) : JPanel() {
 
     val randomize = JButton("\uD83C\uDFB2").sansSerif().apply {
         isEnabled = false
@@ -31,7 +27,7 @@ class ControlPanel(problems: List<Problem>) : VerticalBoxPanel() {
         toolTipText = problems[0].checkAfter.toolTipText
     }
 
-    val firstRow = HorizontalBoxPanel(randomize, goal, problemPicker, startStopReset, check)
+    val firstRow = horizontalBoxPanel(randomize, goal, problemPicker, startStopReset, check)
 
     val stepInto = JButton("step into (F12)").sansSerif()
     val stepOver = JButton("step over").sansSerif()
@@ -43,7 +39,7 @@ class ControlPanel(problems: List<Problem>) : VerticalBoxPanel() {
         stepReturn.isEnabled = enabled
     }
 
-    val secondRow = HorizontalBoxPanel(stepInto, stepOver, stepReturn).apply {
+    val secondRow = horizontalBoxPanel(stepInto, stepOver, stepReturn).apply {
         setEmptyBorder(16)
     }
 
@@ -54,6 +50,7 @@ class ControlPanel(problems: List<Problem>) : VerticalBoxPanel() {
     }
 
     init {
+        layout = BoxLayout(this, BoxLayout.Y_AXIS)
         setEnabledStepButtons(false)
         add(firstRow)
         add(secondRow)
