@@ -35,10 +35,10 @@ abstract class MainDesign(val atomicWorld: AtomicReference<World>) : JFrame() {
 
     init {
         title = editor.file.parent.toString()
-        add(left, BorderLayout.WEST)
-        add(tabbedEditors.tabs, BorderLayout.CENTER)
-        add(virtualMachinePanel, BorderLayout.EAST)
-        pack()
+        super.add(left, BorderLayout.WEST)
+        super.add(tabbedEditors.tabs, BorderLayout.CENTER)
+        super.add(virtualMachinePanel, BorderLayout.EAST)
+        super.pack()
         isVisible = true
     }
 }
