@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent
 import javax.swing.BoxLayout
 import javax.swing.JComponent
 import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 
 fun horizontalBoxPanel(vararg components: Component) = JPanel().apply {
     layout = BoxLayout(this, BoxLayout.X_AXIS)
@@ -34,8 +33,4 @@ fun JComponent.onKeyPressed(handler: (KeyEvent) -> Unit) {
             handler(event)
         }
     })
-}
-
-fun JComponent.setEmptyBorder(size: Int) {
-    border = EmptyBorder(size, size, size, size)
 }

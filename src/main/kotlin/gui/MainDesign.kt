@@ -7,10 +7,10 @@ import freditor.TabbedEditors
 import logic.Problem
 import logic.World
 import java.awt.BorderLayout
-import java.awt.Dimension
 import java.util.concurrent.atomic.AtomicReference
 import javax.swing.Box
 import javax.swing.JFrame
+import javax.swing.border.EmptyBorder
 
 abstract class MainDesign(val atomicWorld: AtomicReference<World>) : JFrame() {
 
@@ -19,10 +19,6 @@ abstract class MainDesign(val atomicWorld: AtomicReference<World>) : JFrame() {
     val worldPanel = WorldPanel(atomicWorld)
 
     val story = FreditorUI(Flexer, JavaIndenter.instance, 33, 5)
-
-    val left = verticalBoxPanel(controlPanel, worldPanel, Box.createRigidArea(Dimension(0, 16)), story).apply {
-        setEmptyBorder(16)
-    }
 
     protected abstract fun createEditor(freditor: Freditor): Editor
 
@@ -35,6 +31,14 @@ abstract class MainDesign(val atomicWorld: AtomicReference<World>) : JFrame() {
 
     init {
         title = editor.file.parent.toString()
+        val left = verticalBoxPanel(
+            controlPanel,
+            Box.createVerticalStrut(16),
+            worldPanel,
+            Box.createVerticalStrut(16),
+            story,
+        )
+        left.border = EmptyBorder(16, 16, 16, 16)
         super.add(left, BorderLayout.WEST)
         super.add(tabbedEditors.tabs, BorderLayout.CENTER)
         super.add(virtualMachinePanel, BorderLayout.EAST)

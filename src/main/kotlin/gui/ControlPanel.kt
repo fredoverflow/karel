@@ -27,20 +27,14 @@ class ControlPanel(problems: List<Problem>) : JPanel() {
         toolTipText = problems[0].checkAfter.toolTipText
     }
 
-    val firstRow = horizontalBoxPanel(randomize, goal, problemPicker, startStopReset, check)
-
     val stepInto = JButton("step into (F12)").sansSerif()
     val stepOver = JButton("step over").sansSerif()
     val stepReturn = JButton("step return").sansSerif()
 
-    fun setEnabledStepButtons(enabled: Boolean) {
+    private fun setEnabledStepButtons(enabled: Boolean) {
         stepInto.isEnabled = enabled
         stepOver.isEnabled = enabled
         stepReturn.isEnabled = enabled
-    }
-
-    val secondRow = horizontalBoxPanel(stepInto, stepOver, stepReturn).apply {
-        setEmptyBorder(16)
     }
 
     val slider = JSlider(0, 11, 2).sansSerif()
@@ -52,8 +46,10 @@ class ControlPanel(problems: List<Problem>) : JPanel() {
     init {
         layout = BoxLayout(this, BoxLayout.Y_AXIS)
         setEnabledStepButtons(false)
-        add(firstRow)
-        add(secondRow)
+        add(horizontalBoxPanel(randomize, goal, problemPicker, startStopReset, check))
+        add(Box.createVerticalStrut(16))
+        add(horizontalBoxPanel(stepInto, stepOver, stepReturn))
+        add(Box.createVerticalStrut(16))
         add(slider)
     }
 
