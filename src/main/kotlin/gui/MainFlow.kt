@@ -9,8 +9,8 @@ import syntax.parser.program
 import vm.CodeGenerator
 import vm.Instruction
 import vm.VirtualMachine
+import vm.PositionConsumer
 import java.awt.EventQueue
-import java.util.concurrent.atomic.AtomicReference
 import javax.swing.Timer
 
 const val CHECK_TOTAL_NS = 2_000_000_000L
@@ -27,7 +27,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()),
         return if (logarithm < 0) logarithm else 1.shl(logarithm)
     }
 
-    var initialWorld: World = world.copy()
+    var initialWorld: World = worldPanel.world.copy()
 
     lateinit var virtualMachine: VirtualMachine
 
@@ -54,7 +54,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()),
 
                 val goalInstructions = vm.createGoalInstructions(goal)
 
-                TODO() // check(instructions, goalInstructions)
+                check(instructions, goalInstructions)
             } else {
                 editor.setCursorTo(editor.length())
                 showDiagnostic("void ${currentProblem.name}() not found")
@@ -63,7 +63,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()),
             showDiagnostic(diagnostic)
         }
     }
-/*
+
     private fun check(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
         controlPanel.checkStarted()
         worldPanel.isEnabled = false
@@ -100,7 +100,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()),
                         }
                         return
                     } else if (elapsed >= nextRepaint) {
-                        world = initialWorld.copy()
+                        worldPanel.world = initialWorld.copy()
                         worldPanel.repaint()
                         nextRepaint += CHECK_REPAINT_NS
                         EventQueue.invokeLater(::checkBetweenRepaints)
@@ -119,14 +119,14 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()),
     }
 
     private fun checkOneWorld(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
-        val goalWorldIterator = goalWorlds(goalInstructions).iterator()
+        val goalPositionsIterator = goalPositionsOrWorld(goalInstructions).iterator()
 
-        world = initialWorld.copy()
-        createVirtualMachine(instructions) { world ->
-            if (!goalWorldIterator.hasNext()) {
+        worldPanel.world = initialWorld.copy()
+        createVirtualMachine(instructions) { position ->
+            if (!goalPositionsIterator.hasNext()) {
                 throw Diagnostic(virtualMachine.currentInstruction.position, "overshoots goal")
             }
-            if (!goalWorldIterator.next().equalsIgnoringDirection(world)) {
+            if (goalPositionsIterator.next() != position) {
                 throw Diagnostic(virtualMachine.currentInstruction.position, "deviates from goal")
             }
         }
@@ -135,34 +135,35 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()),
             virtualMachine.executeUserProgram()
         } catch (_: Stack.Exhausted) {
             if (currentProblem.checkAfter === CheckAfter.FINISH) {
-                if (!goalWorldIterator.next().equalsIgnoringDirection(virtualMachine.world)) {
+                val goalWorld = goalPositionsIterator.next() as World
+                if (!goalWorld.positionAndGridEquals(virtualMachine.world)) {
                     throw Diagnostic(virtualMachine.currentInstruction.position, "fails goal")
                 }
             }
         } catch (error: KarelError) {
             throw Diagnostic(virtualMachine.currentInstruction.position, error.message!!)
         }
-        if (goalWorldIterator.hasNext()) {
+        if (goalPositionsIterator.hasNext()) {
             throw Diagnostic(virtualMachine.currentInstruction.position, "falls short of goal")
         }
     }
 
-    private fun createVirtualMachine(instructions: List<Instruction>, callback: (World) -> Unit) {
+    private fun createVirtualMachine(instructions: List<Instruction>, callback: PositionConsumer) {
         virtualMachine = when (currentProblem.checkAfter) {
             CheckAfter.BEEPER_MOVE ->
-                VirtualMachine(instructions, world, ignoreCallAndReturn, callback, callback)
+                VirtualMachine(instructions, worldPanel.world, ignoreCallAndReturn, callback, callback)
 
             CheckAfter.BEEPER ->
-                VirtualMachine(instructions, world, ignoreCallAndReturn, callback)
+                VirtualMachine(instructions, worldPanel.world, ignoreCallAndReturn, callback)
 
             CheckAfter.FINISH ->
-                VirtualMachine(instructions, world, ignoreCallAndReturn)
+                VirtualMachine(instructions, worldPanel.world, ignoreCallAndReturn)
         }
     }
 
-    private fun goalWorlds(goalInstructions: List<Instruction>): List<World> {
-        val goalWorlds = ArrayList<World>()
-        world = initialWorld.copy()
+    private fun goalPositionsOrWorld(goalInstructions: List<Instruction>): List<Any> {
+        val goalWorlds = ArrayList<Any>()
+        worldPanel.world = initialWorld.copy()
         createVirtualMachine(goalInstructions, goalWorlds::add)
         try {
             virtualMachine.executeGoalProgram()
@@ -179,7 +180,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()),
             throw Diagnostic(virtualMachine.currentInstruction.position, "infinite loop detected")
         }
     }
-*/
+
     fun parseAndExecute() {
         editor.indent()
         editor.saveWithBackup()
@@ -204,7 +205,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()),
     fun start(instructions: List<Instruction>) {
         tabbedEditors.tabs.isEnabled = false
         virtualMachinePanel.setProgram(instructions)
-        virtualMachine = VirtualMachine(instructions, world, this)
+        virtualMachine = VirtualMachine(instructions, worldPanel.world, this)
         controlPanel.executionStarted()
         update()
         if (delay() >= 0) {

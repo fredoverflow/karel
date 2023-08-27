@@ -11,6 +11,14 @@ class World(
         return World(grid.clone(), position, front, left, back, right)
     }
 
+    fun gridEquals(that: World): Boolean {
+        return this.grid.contentEquals(that.grid)
+    }
+
+    fun positionAndGridEquals(that: World): Boolean {
+        return this.position == that.position && this.grid.contentEquals(that.grid)
+    }
+
     operator fun get(position: Int): Boolean {
         return grid[position]
     }
@@ -18,6 +26,9 @@ class World(
     operator fun get(x: Int, y: Int): Boolean {
         return grid[cell(x, y)]
     }
+
+    val pos: Int
+        get() = position
 
     val x: Int
         get() = ((position % SOUTH) ushr 1) - 1

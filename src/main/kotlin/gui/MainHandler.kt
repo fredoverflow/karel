@@ -10,16 +10,14 @@ class MainHandler : MainFlow() {
     init {
         controlPanel.randomize.addActionListener {
             initialWorld = currentProblem.randomWorld()
-            world = initialWorld.copy()
-            worldPanel.world = world
+            worldPanel.world = initialWorld.copy()
             worldPanel.repaint()
 
             editor.requestFocusInWindow()
         }
 
         controlPanel.goal.addActionListener {
-            world = initialWorld.copy()
-            worldPanel.world = world
+            worldPanel.world = initialWorld.copy()
             worldPanel.repaint()
 
             executeGoal(currentProblem.goal)
@@ -35,8 +33,7 @@ class MainHandler : MainFlow() {
             controlPanel.check.toolTipText = currentProblem.checkAfter.toolTipText
 
             initialWorld = currentProblem.randomWorld()
-            world = initialWorld.copy()
-            worldPanel.world = world
+            worldPanel.world = initialWorld.copy()
             worldPanel.binaryLines = currentProblem.binaryLines
             worldPanel.repaint()
 
@@ -61,8 +58,7 @@ class MainHandler : MainFlow() {
 
                 "reset" -> {
                     controlPanel.startStopReset.text = "start"
-                    world = initialWorld.copy()
-                    worldPanel.world = world
+                    worldPanel.world = initialWorld.copy()
                     worldPanel.repaint()
                 }
             }

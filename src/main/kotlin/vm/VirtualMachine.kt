@@ -3,6 +3,7 @@ package vm
 import common.Stack
 import common.push
 import logic.World
+import java.util.function.IntConsumer
 
 // If "step over" or "step return" do not finish within 1 second,
 // we assume the code contains an infinite loop.
@@ -13,12 +14,15 @@ const val TIMEOUT = 1_000_000_000L
 // from truth values and loop counters on the stack.
 const val ENTRY_POINT = 256
 
+typealias PositionConsumer = IntConsumer
+val ignorePosition = PositionConsumer { }
+
 class VirtualMachine(
     private val program: List<Instruction>,
-    private val world: World,
+    val world: World,
     private val callbacks: Callbacks,
-    private val onBeeper: (World) -> Unit = {},
-    private val onMove: (World) -> Unit = {},
+    private val onBeeper: PositionConsumer = ignorePosition,
+    private val onMove: PositionConsumer = ignorePosition,
 ) {
 
     interface Callbacks {
@@ -167,12 +171,21 @@ class VirtualMachine(
         when (bytecode) {
             RETURN -> executeReturn()
 
-            MOVE_FORWARD -> world.moveForward() // TODO prior notice
+            MOVE_FORWARD -> {
+                world.moveForward()
+                onMove.accept(world.pos)
+            }
             TURN_LEFT -> world.turnLeft()
             TURN_AROUND -> world.turnAround()
             TURN_RIGHT -> world.turnRight()
-            PICK_BEEPER -> world.pickBeeper() // TODO prior notice
-            DROP_BEEPER -> world.dropBeeper() // TODO prior notice
+            PICK_BEEPER -> {
+                world.pickBeeper()
+                onBeeper.accept(world.pos.inv())
+            }
+            DROP_BEEPER -> {
+                world.dropBeeper()
+                onBeeper.accept(world.pos.inv())
+            }
 
             ON_BEEPER -> push(world.onBeeper())
             BEEPER_AHEAD -> push(world.beeperAhead())

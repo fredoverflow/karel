@@ -1,5 +1,5 @@
 package logic
-
+/*
 import logic.Problem.Companion.EAST
 import logic.Problem.Companion.NORTH
 import logic.Problem.Companion.SOUTH
@@ -268,3 +268,4 @@ class LabyrinthGenerator {
         labyrinth[position] = unchartedNeighbours
     }
 }
+*/

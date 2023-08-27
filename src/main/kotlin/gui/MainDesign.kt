@@ -11,7 +11,7 @@ import javax.swing.Box
 import javax.swing.JFrame
 import javax.swing.border.EmptyBorder
 
-abstract class MainDesign(var world: World) : JFrame() {
+abstract class MainDesign(world: World) : JFrame() {
 
     val controlPanel = ControlPanel(Problem.problems)
 

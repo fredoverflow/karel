@@ -59,10 +59,13 @@ class WorldBuilder(val grid: Grid = Grid(GRID_WIDTH * GRID_HEIGHT)) {
     }
 
     inline fun drop(x1: Int, y1: Int, x2: Int, y2: Int, shouldDrop: () -> Boolean): WorldBuilder {
+        var cell = CELL_TOP_LEFT
         for (y in y1..y2) {
             for (x in x1..x2) {
-                grid[cell(x, y)] = shouldDrop()
+                grid[cell] = shouldDrop()
+                cell += CELL_NEXT_COLUMN
             }
+            cell += CELL_NEXT_ROW
         }
         return this
     }
