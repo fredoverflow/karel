@@ -1,6 +1,7 @@
 package gui
 
 import common.Diagnostic
+import common.IntArrayBuffer
 import common.Stack
 import logic.*
 import syntax.lexer.Lexer
@@ -119,14 +120,14 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()),
     }
 
     private fun checkOneWorld(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
-        val goalPositionsIterator = goalPositionsOrWorld(goalInstructions).iterator()
-
+        val goalPositions = goalPositions(goalInstructions)
+        val goalWorld = worldPanel.world
         worldPanel.world = initialWorld.copy()
         createVirtualMachine(instructions) { position ->
-            if (!goalPositionsIterator.hasNext()) {
+            if (!goalPositions.hasNext()) {
                 throw Diagnostic(virtualMachine.currentInstruction.position, "overshoots goal")
             }
-            if (goalPositionsIterator.next() != position) {
+            if (goalPositions.next() != position) {
                 throw Diagnostic(virtualMachine.currentInstruction.position, "deviates from goal")
             }
         }
@@ -135,7 +136,6 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()),
             virtualMachine.executeUserProgram()
         } catch (_: Stack.Exhausted) {
             if (currentProblem.checkAfter === CheckAfter.FINISH) {
-                val goalWorld = goalPositionsIterator.next() as World
                 if (!goalWorld.positionAndGridEquals(virtualMachine.world)) {
                     throw Diagnostic(virtualMachine.currentInstruction.position, "fails goal")
                 }
@@ -143,36 +143,33 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()),
         } catch (error: KarelError) {
             throw Diagnostic(virtualMachine.currentInstruction.position, error.message!!)
         }
-        if (goalPositionsIterator.hasNext()) {
+        if (goalPositions.hasNext()) {
             throw Diagnostic(virtualMachine.currentInstruction.position, "falls short of goal")
         }
     }
 
-    private fun createVirtualMachine(instructions: List<Instruction>, callback: PositionConsumer) {
+    private fun createVirtualMachine(instructions: List<Instruction>, consumer: PositionConsumer) {
         virtualMachine = when (currentProblem.checkAfter) {
             CheckAfter.BEEPER_MOVE ->
-                VirtualMachine(instructions, worldPanel.world, ignoreCallAndReturn, callback, callback)
+                VirtualMachine(instructions, worldPanel.world, ignoreCallAndReturn, consumer, consumer)
 
             CheckAfter.BEEPER ->
-                VirtualMachine(instructions, worldPanel.world, ignoreCallAndReturn, callback)
+                VirtualMachine(instructions, worldPanel.world, ignoreCallAndReturn, consumer)
 
             CheckAfter.FINISH ->
                 VirtualMachine(instructions, worldPanel.world, ignoreCallAndReturn)
         }
     }
 
-    private fun goalPositionsOrWorld(goalInstructions: List<Instruction>): List<Any> {
-        val goalWorlds = ArrayList<Any>()
+    private fun goalPositions(goalInstructions: List<Instruction>): IntArrayBuffer {
+        val goalPositions = IntArrayBuffer(1000)
         worldPanel.world = initialWorld.copy()
-        createVirtualMachine(goalInstructions, goalWorlds::add)
+        createVirtualMachine(goalInstructions, goalPositions)
         try {
             virtualMachine.executeGoalProgram()
         } catch (_: Stack.Exhausted) {
-            if (currentProblem.checkAfter === CheckAfter.FINISH) {
-                goalWorlds.add(virtualMachine.world)
-            }
         }
-        return goalWorlds
+        return goalPositions
     }
 
     private val ignoreCallAndReturn = object : VirtualMachine.Callbacks {
