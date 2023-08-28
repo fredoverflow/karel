@@ -8,6 +8,7 @@ import logic.WorldRef
 import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Toolkit
+import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.image.BufferedImage
 
@@ -116,8 +117,14 @@ class WorldPanel(private val worldRef: WorldRef) : JPanel() {
         walls[index].graphics.drawImage(wall, 0, 0, null)
     }
 
+    var antWorld: World? = null
+    var showAntWorld: Boolean = false
+
     override fun paintComponent(graphics: Graphics) {
-        val world = worldRef.world
+        var world = antWorld
+        if (world == null || !showAntWorld) {
+            world = worldRef.world
+        }
 
         graphics.drawWallsAndBeepers(world)
         graphics.drawKarel(world)
@@ -178,16 +185,36 @@ class WorldPanel(private val worldRef: WorldRef) : JPanel() {
     }
 
     private fun listenToMouse() {
-        onMouseClicked { event ->
-            if (!isEnabled) return@onMouseClicked
+        addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(event: MouseEvent) {
+                if (!isEnabled) return
 
-            if (SwingUtilities.isLeftMouseButton(event)) {
-                toggleBeeper(event)
-            } else if (SwingUtilities.isRightMouseButton(event)) {
-                switchTileSize()
+                if (SwingUtilities.isLeftMouseButton(event)) {
+                    if (antWorld == null) {
+                        toggleBeeper(event)
+                    } else {
+                        showAntWorld = !showAntWorld
+                    }
+                } else if (SwingUtilities.isRightMouseButton(event)) {
+                    switchTileSize()
+                }
+                repaint()
             }
-            repaint()
-        }
+
+            override fun mouseEntered(event: MouseEvent) {
+                showAntWorld = true
+                if (antWorld != null) {
+                    repaint()
+                }
+            }
+
+            override fun mouseExited(event: MouseEvent) {
+                showAntWorld = false
+                if (antWorld != null) {
+                    repaint()
+                }
+            }
+        })
     }
 
     private fun toggleBeeper(event: MouseEvent) {

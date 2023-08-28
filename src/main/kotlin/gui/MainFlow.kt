@@ -15,6 +15,8 @@ import javax.swing.Timer
 const val CHECK_TOTAL_NS = 2_000_000_000L
 const val CHECK_REPAINT_NS = 100_000_000L
 
+const val COMPARE = "mouse enter/exit (or click) world to compare"
+
 abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomWorld())),
     VirtualMachine.Callbacks {
 
@@ -93,9 +95,9 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
                     if (elapsed >= CHECK_TOTAL_NS) {
                         cleanup()
                         if (currentProblem.numWorlds == UNKNOWN) {
-                            showDiagnostic("checked $worldCounter random worlds")
+                            showDiagnostic("OK: checked $worldCounter random worlds")
                         } else {
-                            showDiagnostic("checked $worldCounter random worlds\nfrom ${currentProblem.numWorlds} possible worlds")
+                            showDiagnostic("OK: checked $worldCounter random worlds\n    from ${currentProblem.numWorlds} possible worlds")
                         }
                         return
                     } else if (elapsed >= nextRepaint) {
@@ -107,7 +109,7 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
                     }
                 }
                 cleanup()
-                showDiagnostic("checked all ${currentProblem.numWorlds} possible worlds")
+                showDiagnostic("OK: checked all ${currentProblem.numWorlds} possible worlds")
             } catch (diagnostic: Diagnostic) {
                 cleanup()
                 showDiagnostic(diagnostic)
@@ -118,15 +120,19 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
     }
 
     private fun checkOneWorld(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
-        val goalWorldIterator = goalWorlds(goalInstructions).iterator()
+        val goalWorlds = goalWorlds(goalInstructions)
+        val goalWorldIterator = goalWorlds.iterator()
 
         worldRef.world = initialWorld
         createVirtualMachine(instructions) { world ->
             if (!goalWorldIterator.hasNext()) {
-                throw Diagnostic(virtualMachine.currentInstruction.position, "overshoots goal")
+                worldPanel.antWorld = goalWorlds.last()
+                throw Diagnostic(virtualMachine.currentInstruction.position, "overshoots goal\n$COMPARE")
             }
-            if (!goalWorldIterator.next().equalsIgnoringDirection(world)) {
-                throw Diagnostic(virtualMachine.currentInstruction.position, "deviates from goal")
+            val goalWorld = goalWorldIterator.next()
+            if (!goalWorld.equalsIgnoringDirection(world)) {
+                worldPanel.antWorld = goalWorld
+                throw Diagnostic(virtualMachine.currentInstruction.position, "deviates from goal\n$COMPARE")
             }
         }
 
@@ -134,15 +140,18 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
             virtualMachine.executeUserProgram()
         } catch (_: Stack.Exhausted) {
             if (currentProblem.checkAfter === CheckAfter.FINISH) {
-                if (!goalWorldIterator.next().equalsIgnoringDirection(virtualMachine.world)) {
-                    throw Diagnostic(virtualMachine.currentInstruction.position, "fails goal")
+                val goalWorld = goalWorldIterator.next()
+                if (!goalWorld.equalsIgnoringDirection(virtualMachine.world)) {
+                    worldPanel.antWorld = goalWorld
+                    throw Diagnostic(virtualMachine.currentInstruction.position, "fails goal\n$COMPARE")
                 }
             }
         } catch (error: KarelError) {
             throw Diagnostic(virtualMachine.currentInstruction.position, error.message!!)
         }
         if (goalWorldIterator.hasNext()) {
-            throw Diagnostic(virtualMachine.currentInstruction.position, "falls short of goal")
+            worldPanel.antWorld = goalWorldIterator.next()
+            throw Diagnostic(virtualMachine.currentInstruction.position, "falls short of goal\n$COMPARE")
         }
     }
 
@@ -160,7 +169,7 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
     }
 
     private fun goalWorlds(goalInstructions: List<Instruction>): List<World> {
-        val goalWorlds = ArrayList<World>()
+        val goalWorlds = ArrayList<World>(200)
         worldRef.world = initialWorld
         createVirtualMachine(goalInstructions, goalWorlds::add)
         try {
