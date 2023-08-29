@@ -139,32 +139,22 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
         try {
             virtualMachine.executeUserProgram()
         } catch (_: Stack.Exhausted) {
-            if (currentProblem.checkAfter === CheckAfter.FINISH) {
-                val goalWorld = goalWorldIterator.next()
-                if (!goalWorld.equalsIgnoringDirection(virtualMachine.world)) {
-                    worldPanel.antWorld = goalWorld
-                    throw Diagnostic(virtualMachine.currentInstruction.position, "fails goal\n$COMPARE")
-                }
-            }
         } catch (error: KarelError) {
             throw Diagnostic(virtualMachine.currentInstruction.position, error.message!!)
         }
-        if (goalWorldIterator.hasNext()) {
+        if (goalWorldIterator.hasNext() && !goalWorlds.last().equalsIgnoringDirection(virtualMachine.world)) {
             worldPanel.antWorld = goalWorldIterator.next()
             throw Diagnostic(virtualMachine.currentInstruction.position, "falls short of goal\n$COMPARE")
         }
     }
 
     private fun createVirtualMachine(instructions: List<Instruction>, callback: (World) -> Unit) {
-        virtualMachine = when (currentProblem.checkAfter) {
-            CheckAfter.BEEPER_MOVE ->
+        virtualMachine = when (currentProblem.check) {
+            Check.EVERY_PICK_DROP_MOVE ->
                 VirtualMachine(instructions, worldRef, ignoreCallAndReturn, callback, callback)
 
-            CheckAfter.BEEPER ->
+            Check.EVERY_PICK_DROP ->
                 VirtualMachine(instructions, worldRef, ignoreCallAndReturn, callback)
-
-            CheckAfter.FINISH ->
-                VirtualMachine(instructions, worldRef, ignoreCallAndReturn)
         }
     }
 
@@ -175,9 +165,6 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
         try {
             virtualMachine.executeGoalProgram()
         } catch (_: Stack.Exhausted) {
-            if (currentProblem.checkAfter === CheckAfter.FINISH) {
-                goalWorlds.add(virtualMachine.world)
-            }
         }
         return goalWorlds
     }
