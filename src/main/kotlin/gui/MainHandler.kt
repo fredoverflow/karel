@@ -107,6 +107,34 @@ class MainHandler : MainFlow() {
             editor.requestFocusInWindow()
         }
 
+        var previousValue = controlPanel.slider.value
+
+        controlPanel.pause.addActionListener {
+            with(controlPanel.slider) {
+                if (value != minimum) {
+                    if (value != maximum) {
+                        previousValue = value
+                    }
+                    value = minimum
+                } else {
+                    value = previousValue
+                }
+            }
+        }
+
+        controlPanel.fast.addActionListener {
+            with(controlPanel.slider) {
+                if (value != maximum) {
+                    if (value != minimum) {
+                        previousValue = value
+                    }
+                    value = maximum
+                } else {
+                    value = previousValue
+                }
+            }
+        }
+
         defaultCloseOperation = EXIT_ON_CLOSE
         tabbedEditors.saveOnExit(this)
     }

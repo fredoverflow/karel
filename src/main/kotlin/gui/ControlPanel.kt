@@ -37,7 +37,9 @@ class ControlPanel(problems: List<Problem>) : JPanel() {
         stepReturn.isEnabled = enabled
     }
 
+    val pause = JButton("\u23F8").sansSerif()
     val slider = JSlider(0, 11, 2).sansSerif()
+    val fast = JButton("\u23E9").sansSerif()
 
     fun delayLogarithm(): Int {
         return if (slider.value == 0) -1 else slider.maximum - slider.value
@@ -50,7 +52,7 @@ class ControlPanel(problems: List<Problem>) : JPanel() {
         add(Box.createVerticalStrut(16))
         add(horizontalBoxPanel(stepInto, stepOver, stepReturn))
         add(Box.createVerticalStrut(16))
-        add(slider)
+        add(horizontalBoxPanel(pause, slider, fast))
     }
 
     fun executionStarted() {
