@@ -9,6 +9,8 @@ import kotlin.streams.asSequence
 class MainHandler : MainFlow() {
     init {
         controlPanel.randomize.addActionListener {
+            controlPanel.startStopReset.text = "start"
+
             initialWorld = currentProblem.randomWorld()
             worldRef.world = initialWorld
             worldPanel.antWorld = null
@@ -61,6 +63,7 @@ class MainHandler : MainFlow() {
 
                 "reset" -> {
                     controlPanel.startStopReset.text = "start"
+
                     worldRef.world = initialWorld
                     worldPanel.antWorld = null
                     worldPanel.repaint()
