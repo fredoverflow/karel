@@ -1,9 +1,6 @@
 package gui
 
-import freditor.Freditor
-import freditor.FreditorUI
-import freditor.JavaIndenter
-import freditor.TabbedEditors
+import freditor.*
 import logic.Problem
 import logic.WorldRef
 import java.awt.BorderLayout
@@ -29,7 +26,7 @@ abstract class MainDesign(val worldRef: WorldRef) : JFrame() {
     val virtualMachinePanel = VirtualMachinePanel()
 
     init {
-        title = editor.file.parent.toString()
+        title = "karel version ${Release.compilationDate(MainDesign::class.java)} @ ${editor.file.parent}"
         val left = verticalBoxPanel(
             controlPanel,
             Box.createVerticalStrut(16),
