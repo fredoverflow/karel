@@ -88,7 +88,7 @@ class Problem(
         }
 
         val obtainArtifact = Problem(
-            "1.1.1",
+            "1.1.1 \uD83E\uDD20",
             "obtainArtifact",
             "Karel auditions for the new Indy\nmovie. To demonstrate talent,\nKarel re-enacts the classic scene\nwhere Indy saves some valuable\nartifact from an ancient temple.",
             "\u0004\ua106\u0005\ua106\u0006\u0000\u0001\u0002\u0001\u0001\u0001\u0002\u0001\u0000",
@@ -305,7 +305,7 @@ class Problem(
         }
 
         val hangTheLampions = Problem(
-            "2.1.1",
+            "2.1.1 \uD83C\uDFEE",
             "hangTheLampions",
             "Karel was assembled 10 years ago!\nTo celebrate this anniversary,\nKarel bought 10 lampions. Now all\nthat's left to do is hang them\nfrom the (irregular) ceiling.",
             "\u8009\ua104\u0001\u9101\u0002\u0005\u0001\u000a\ud106\u0006\u0003\u0001\u000a\ud10b\u0002\u0000",
@@ -541,7 +541,7 @@ class Problem(
         }
 
         val partyAgain = Problem(
-            "3.1.1",
+            "3.1.1 \uD83C\uDF88",
             "partyAgain",
             "Karel is preparing the next big\nparty. Unfortunately, the floor\nis so soaked from the last party\nthat care must be taken not to\nbreak through into the cellar!",
             "\u8009\ua104\u0001\u9101\u0002\u0005\ua109\u0002\u0000\u000a\ud10e\u0006\u0003\u0000\u0001\ua109\u0001\u0000",
