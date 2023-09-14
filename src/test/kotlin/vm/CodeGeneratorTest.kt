@@ -1,5 +1,6 @@
 package vm
 
+import common.subList
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import syntax.lexer.Lexer
@@ -17,7 +18,7 @@ class CodeGeneratorTest {
 
     private fun assertBytecode(sourceCode: String, vararg bytecodes: Int) {
         val expected = bytecodes.map { bytecode -> "%x".format(bytecode) }
-        val actual = compile(sourceCode).drop(ENTRY_POINT).map { (bytecode) -> "%x".format(bytecode) }
+        val actual = compile(sourceCode).subList(ENTRY_POINT).map { instruction -> "%x".format(instruction.bytecode) }
         assertEquals(expected, actual)
     }
 

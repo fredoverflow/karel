@@ -1,19 +1,21 @@
 package gui
 
+import common.subList
 import freditor.FreditorUI
 import freditor.Indenter
+import vm.ENTRY_POINT
 import vm.Instruction
 
 class BytecodeTable : FreditorUI(BytecodeFlexer, Indenter.instance, 18, 1) {
     fun setProgram(program: List<Instruction>) {
-        val lines = program.asSequence().drop(vm.ENTRY_POINT).withIndex().map { (row, instruction) ->
-            "%3x %4x %s".format(row + vm.ENTRY_POINT, instruction.bytecode, instruction.mnemonic())
-        }
-        load((sequenceOf(" @  CODE MNEMONIC") + lines).joinToString("\n"))
+        load(program.subList(ENTRY_POINT).withIndex()
+            .joinToString(prefix = " @  CODE MNEMONIC\n", separator = "\n") { (row, instruction) ->
+                "%3x %4x %s".format(row + ENTRY_POINT, instruction.bytecode, instruction.mnemonic())
+            })
     }
 
     fun highlightLine(line: Int) {
-        val row = line - vm.ENTRY_POINT + 1
+        val row = line - ENTRY_POINT + 1
         setCursorTo(row, 9)
     }
 }
