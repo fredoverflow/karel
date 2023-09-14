@@ -19,6 +19,7 @@ class ControlPanel(problems: List<Problem>) : JPanel() {
 
     val problemPicker = JComboBox(problems.toTypedArray()).sansSerif().apply {
         maximumSize = minimumSize
+        maximumRowCount = 20
     }
 
     val startStopReset = JButton("start").sansSerif()
