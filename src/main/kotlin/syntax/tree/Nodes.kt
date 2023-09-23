@@ -26,10 +26,6 @@ data class While(val whi1e: Token, val condition: Condition, val body: Block) : 
 
 sealed class Condition : Node()
 
-data class False(val fa1se: Token) : Condition()
-
-data class True(val tru3: Token) : Condition()
-
 data class OnBeeper(val onBeeper: Token) : Condition()
 
 data class BeeperAhead(val beeperAhead: Token) : Condition()

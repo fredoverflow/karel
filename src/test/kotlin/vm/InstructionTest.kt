@@ -26,10 +26,16 @@ class InstructionTest {
     }
 
     @Test
-    fun conditionsNeverPause() {
-        for (bytecode in ON_BEEPER..XOR) {
+    fun goalConditionsNeverPause() {
+        for (bytecode in ON_BEEPER..RIGHT_IS_CLEAR) {
             assertNoPause(bytecode, GOAL)
-            assertNoPause(bytecode, HUMAN)
+        }
+    }
+
+    @Test
+    fun humanConditionsAlwaysPause() {
+        for (bytecode in ON_BEEPER..RIGHT_IS_CLEAR) {
+            assertPause(bytecode, HUMAN)
         }
     }
 
@@ -45,13 +51,13 @@ class InstructionTest {
     }
 
     @Test
-    fun otherHumanInstructionsAlwaysPauseExceptUnconditionalJumps() {
+    fun otherHumanInstructionsAlwaysPauseExceptBranches() {
         assertPause(RETURN, HUMAN)
         assertPause(PUSH, HUMAN)
         assertPause(LOOP, HUMAN)
         assertPause(CALL, HUMAN)
         assertNoPause(JUMP, HUMAN)
-        assertPause(ELSE, HUMAN)
-        assertPause(THEN, HUMAN)
+        assertNoPause(ELSE, HUMAN)
+        assertNoPause(THEN, HUMAN)
     }
 }

@@ -22,12 +22,10 @@ fun Parser.conjunction(): Condition {
     }
 }
 
-val PREDICATES = listOf("false", "true", "onBeeper", "beeperAhead", "leftIsClear", "frontIsClear", "rightIsClear")
+val PREDICATES = listOf("onBeeper", "beeperAhead", "leftIsClear", "frontIsClear", "rightIsClear")
 
 fun Parser.primaryCondition(): Condition = when (current) {
     IDENTIFIER -> when (token.lexeme) {
-        "false" -> False(accept())
-        "true" -> True(accept())
 
         "onBeeper" -> OnBeeper(accept().emptyParens())
         "beeperAhead" -> BeeperAhead(accept().emptyParens())

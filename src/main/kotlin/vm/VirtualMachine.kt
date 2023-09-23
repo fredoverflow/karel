@@ -134,13 +134,7 @@ class VirtualMachine(
     }
 
     private fun Instruction.executePush() {
-        push(
-            when (target) {
-                0 -> Bool.FALSE
-                1 -> Bool.TRUE
-                else -> LoopCounter(target)
-            }
-        )
+        push(LoopCounter(target))
         ++pc
     }
 
@@ -183,11 +177,6 @@ class VirtualMachine(
             LEFT_IS_CLEAR -> push(worldRef.world.leftIsClear())
             FRONT_IS_CLEAR -> push(worldRef.world.frontIsClear())
             RIGHT_IS_CLEAR -> push(worldRef.world.rightIsClear())
-
-            NOT -> push(pop() === Bool.FALSE)
-            AND -> push((pop() === Bool.TRUE) and (pop() === Bool.TRUE))
-            OR -> push((pop() === Bool.TRUE) or (pop() === Bool.TRUE))
-            XOR -> push((pop() === Bool.TRUE) xor (pop() === Bool.TRUE))
 
             else -> throw IllegalBytecode(bytecode)
         }

@@ -2,7 +2,7 @@ package vm
 
 import freditor.persistent.ChampMap
 
-data class Instruction(val bytecode: Int, val position: Int) {
+class Instruction(var bytecode: Int, val position: Int) {
 
     val category: Int
         get() = bytecode.and(0xf000)
@@ -10,16 +10,17 @@ data class Instruction(val bytecode: Int, val position: Int) {
     val target: Int
         get() = bytecode.and(0x0fff)
 
+    var label: Label? = null
+
+    fun resolveLabel() {
+        label?.apply {
+            bytecode = category + address
+            label = null
+        }
+    }
+
     private val compiledFromSource: Boolean
         get() = position > 0
-
-    fun withTarget(newTarget: Int): Instruction {
-        return copy(bytecode = category.or(newTarget))
-    }
-
-    fun mapTarget(f: (Int) -> Int): Instruction {
-        return withTarget(f(target))
-    }
 
     fun shouldPause(): Boolean {
         return when (bytecode) {
@@ -27,9 +28,9 @@ data class Instruction(val bytecode: Int, val position: Int) {
 
             MOVE_FORWARD, TURN_LEFT, TURN_AROUND, TURN_RIGHT, PICK_BEEPER, DROP_BEEPER -> true
 
-            ON_BEEPER, BEEPER_AHEAD, LEFT_IS_CLEAR, FRONT_IS_CLEAR, RIGHT_IS_CLEAR, NOT, AND, OR, XOR -> false
+            ON_BEEPER, BEEPER_AHEAD, LEFT_IS_CLEAR, FRONT_IS_CLEAR, RIGHT_IS_CLEAR -> compiledFromSource
 
-            else -> compiledFromSource && (category != JUMP)
+            else -> compiledFromSource && (category < JUMP)
         }
     }
 
@@ -50,18 +51,8 @@ data class Instruction(val bytecode: Int, val position: Int) {
             FRONT_IS_CLEAR -> "FCLR"
             RIGHT_IS_CLEAR -> "RCLR"
 
-            NOT -> "NOT"
-            AND -> "AND"
-            OR -> "OR"
-            XOR -> "XOR"
-
             else -> when (category) {
-                PUSH -> when (target) {
-                    0 -> "FALSE"
-                    1 -> "TRUE"
-                    else -> "PUSH %03x".format(target)
-                }
-
+                PUSH -> "PUSH %03x".format(target)
                 LOOP -> "LOOP %03x".format(target)
                 CALL -> "CALL %03x".format(target)
 
@@ -90,16 +81,9 @@ const val LEFT_IS_CLEAR = 0x0009
 const val FRONT_IS_CLEAR = 0x000a
 const val RIGHT_IS_CLEAR = 0x000b
 
-const val NOT = 0x000c
-const val AND = 0x000d
-const val OR = 0x000e
-const val XOR = 0x000f
-
 const val NORM = 0x0000
 
 const val PUSH = 0x8000
-const val FALSE = PUSH + 0
-const val TRUE = PUSH + 1
 const val LOOP = 0x9000
 const val CALL = 0xa000
 
@@ -116,7 +100,7 @@ val builtinCommands: ChampMap<String, Int> = ChampMap.of(
     "dropBeeper", DROP_BEEPER,
 )
 
-private val basicGoalInstructions = Array(XOR + 1) { Instruction(it, 0) }
+private val basicGoalInstructions = Array(RIGHT_IS_CLEAR + 1) { Instruction(it, 0) }
 
 fun createInstructionBuffer(): MutableList<Instruction> {
     return MutableList(ENTRY_POINT) { basicGoalInstructions[RETURN] }

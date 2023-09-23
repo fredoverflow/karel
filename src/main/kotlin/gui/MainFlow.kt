@@ -6,7 +6,7 @@ import logic.*
 import syntax.lexer.Lexer
 import syntax.parser.Parser
 import syntax.parser.program
-import vm.CodeGenerator
+import vm.Emitter
 import vm.Instruction
 import vm.VirtualMachine
 import java.awt.EventQueue
@@ -50,7 +50,7 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
             parser.program()
             val main = parser.sema.command(currentProblem.name)
             if (main != null) {
-                val instructions: List<Instruction> = CodeGenerator(parser.sema).generate(main)
+                val instructions: List<Instruction> = Emitter(parser.sema).emit(main)
                 virtualMachinePanel.setProgram(instructions)
 
                 val goalInstructions = vm.createGoalInstructions(goal)
@@ -185,7 +185,7 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
             parser.program()
             val main = parser.sema.command(currentProblem.name)
             if (main != null) {
-                val instructions = CodeGenerator(parser.sema).generate(main)
+                val instructions = Emitter(parser.sema).emit(main)
                 start(instructions)
             } else {
                 editor.setCursorTo(editor.length())

@@ -7,13 +7,13 @@ import syntax.lexer.Lexer
 import syntax.parser.Parser
 import syntax.parser.program
 
-class CodeGeneratorTest {
+class EmitterTest {
     private fun compile(sourceCode: String): List<Instruction> {
         val lexer = Lexer(sourceCode)
         val parser = Parser(lexer)
         val program = parser.program()
         val main = program.commands.first()
-        return CodeGenerator(parser.sema).generate(main)
+        return Emitter(parser.sema).emit(main)
     }
 
     private fun assertBytecode(sourceCode: String, vararg bytecodes: Int) {
@@ -197,43 +197,6 @@ class CodeGeneratorTest {
     }
 
     @Test
-    fun and() {
-        assertBytecode(
-            """
-            void main() {
-                if (!leftIsClear() && !frontIsClear() && !rightIsClear()) {
-                    turnAround();
-                }
-            }
-            """,
-            LEFT_IS_CLEAR, NOT,
-            FRONT_IS_CLEAR, NOT,
-            RIGHT_IS_CLEAR, NOT,
-            AND, AND,
-            ELSE + 0x10a,
-            TURN_AROUND,
-            RETURN,
-        )
-    }
-
-    @Test
-    fun or() {
-        assertBytecode(
-            """
-            void main() {
-                if (!(leftIsClear() || frontIsClear() || rightIsClear())) {
-                    turnAround();
-                }
-            }
-            """,
-            LEFT_IS_CLEAR, FRONT_IS_CLEAR, RIGHT_IS_CLEAR,
-            OR, OR, THEN + 0x107,
-            TURN_AROUND,
-            RETURN,
-        )
-    }
-
-    @Test
     fun elseIf() {
         assertBytecode(
             """
@@ -256,6 +219,110 @@ class CodeGeneratorTest {
             RIGHT_IS_CLEAR, ELSE + 0x10b,
             TURN_RIGHT,
             JUMP + 0x10c,
+            TURN_AROUND,
+            RETURN,
+        )
+    }
+
+    @Test
+    fun obstacle1() {
+        assertBytecode(
+            """
+            void main() {
+                if (!frontIsClear() || beeperAhead()) {
+                    turnLeft();
+                }
+            }
+            """,
+            FRONT_IS_CLEAR, ELSE + 0x104,
+            BEEPER_AHEAD, ELSE + 0x105,
+            TURN_LEFT,
+            RETURN,
+        )
+    }
+
+    @Test
+    fun obstacle2() {
+        assertBytecode(
+            """
+            void main() {
+                if (beeperAhead() || !frontIsClear()) {
+                    turnLeft();
+                }
+            }
+            """,
+            BEEPER_AHEAD, THEN + 0x104,
+            FRONT_IS_CLEAR, THEN + 0x105,
+            TURN_LEFT,
+            RETURN,
+        )
+    }
+
+    @Test
+    fun shot1() {
+        assertBytecode(
+            """
+            void main() {
+                if (!onBeeper() && frontIsClear()) {
+                    moveForward();
+                }
+            }
+            """,
+            ON_BEEPER, THEN + 0x105,
+            FRONT_IS_CLEAR, ELSE + 0x105,
+            MOVE_FORWARD,
+            RETURN,
+        )
+    }
+
+    @Test
+    fun shot2() {
+        assertBytecode(
+            """
+            void main() {
+                if (frontIsClear() && !onBeeper()) {
+                    moveForward();
+                }
+            }
+            """,
+            FRONT_IS_CLEAR, ELSE + 0x105,
+            ON_BEEPER, THEN + 0x105,
+            MOVE_FORWARD,
+            RETURN,
+        )
+    }
+
+    @Test
+    fun deadEnd1() {
+        assertBytecode(
+            """
+            void main() {
+                if (!leftIsClear() && !frontIsClear() && !rightIsClear()) {
+                    turnAround();
+                }
+            }
+            """,
+            LEFT_IS_CLEAR, THEN + 0x107,
+            FRONT_IS_CLEAR, THEN + 0x107,
+            RIGHT_IS_CLEAR, THEN + 0x107,
+            TURN_AROUND,
+            RETURN,
+        )
+    }
+
+    @Test
+    fun deadEnd2() {
+        assertBytecode(
+            """
+            void main() {
+                if (!(leftIsClear() || frontIsClear() || rightIsClear())) {
+                    turnAround();
+                }
+            }
+            """,
+            LEFT_IS_CLEAR, THEN + 0x107,
+            FRONT_IS_CLEAR, THEN + 0x107,
+            RIGHT_IS_CLEAR, THEN + 0x107,
             TURN_AROUND,
             RETURN,
         )
@@ -337,41 +404,28 @@ class CodeGeneratorTest {
     }
 
     @Test
-    fun infiniteLoop() {
+    fun infiniteRecursion2() {
         assertBytecode(
             """
-            void hangTheLampions() {
-                while (true) {
-                    turnLeft();
-                }
-            }
+            void f() { g(); }
+            void g() { f(); }
             """,
-            TRUE,
-            ELSE + 0x104,
-            TURN_LEFT,
-            JUMP + 0x100,
-            RETURN,
+            CALL + 0x102, RETURN,
+            CALL + 0x100, RETURN,
         )
     }
 
     @Test
-    fun disabledViaIf() {
+    fun infiniteRecursion3() {
         assertBytecode(
             """
-            void main() {
-                if (false) {
-                    turnAround();
-                    moveForward();
-                    turnAround();
-                }
-            }
+            void f() { g(); }
+            void g() { h(); }
+            void h() { f(); }
             """,
-            FALSE,
-            ELSE + 0x105,
-            TURN_AROUND,
-            MOVE_FORWARD,
-            TURN_AROUND,
-            RETURN,
+            CALL + 0x102, RETURN,
+            CALL + 0x104, RETURN,
+            CALL + 0x100, RETURN,
         )
     }
 }
