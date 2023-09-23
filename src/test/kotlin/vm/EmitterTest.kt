@@ -13,7 +13,7 @@ class EmitterTest {
         val parser = Parser(lexer)
         val program = parser.program()
         val main = program.commands.first()
-        return Emitter(parser.sema).emit(main)
+        return Emitter(parser.sema, false).emit(main)
     }
 
     private fun assertBytecode(sourceCode: String, vararg bytecodes: Int) {

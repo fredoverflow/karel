@@ -5,7 +5,9 @@ import syntax.lexer.Token
 import syntax.parser.Sema
 import syntax.tree.*
 
-class Emitter(private val sema: Sema) {
+class Emitter(private val sema: Sema, instrument: Boolean) {
+
+    private val instrumentOffset: Int = if (instrument) ON_BEEPER_INSTRUMENT - ON_BEEPER else 0
 
     private val program: MutableList<Instruction> = createInstructionBuffer()
 
@@ -19,7 +21,7 @@ class Emitter(private val sema: Sema) {
     }
 
     private fun emitBranch(predicate: Int, token: Token, branch: Int, label: Label, control: Token) {
-        emitInstruction(predicate, token)
+        emitInstruction(predicate + instrumentOffset, token)
         emitInstruction(branch, control).label = label
     }
 

@@ -45,11 +45,11 @@ class Instruction(var bytecode: Int, val position: Int) {
             PICK_BEEPER -> "PICK"
             DROP_BEEPER -> "DROP"
 
-            ON_BEEPER -> "BEEP"
-            BEEPER_AHEAD -> "HEAD"
-            LEFT_IS_CLEAR -> "LCLR"
-            FRONT_IS_CLEAR -> "FCLR"
-            RIGHT_IS_CLEAR -> "RCLR"
+            ON_BEEPER, ON_BEEPER_INSTRUMENT, ON_BEEPER_FALSE, ON_BEEPER_TRUE -> "BEEP"
+            BEEPER_AHEAD, BEEPER_AHEAD_INSTRUMENT, BEEPER_AHEAD_FALSE, BEEPER_AHEAD_TRUE -> "HEAD"
+            LEFT_IS_CLEAR, LEFT_IS_CLEAR_INSTRUMENT, LEFT_IS_CLEAR_FALSE, LEFT_IS_CLEAR_TRUE -> "LCLR"
+            FRONT_IS_CLEAR, FRONT_IS_CLEAR_INSTRUMENT, FRONT_IS_CLEAR_FALSE, FRONT_IS_CLEAR_TRUE -> "FCLR"
+            RIGHT_IS_CLEAR, RIGHT_IS_CLEAR_INSTRUMENT, RIGHT_IS_CLEAR_FALSE, RIGHT_IS_CLEAR_TRUE -> "RCLR"
 
             else -> when (category) {
                 PUSH -> "PUSH %03x".format(target)
@@ -80,6 +80,24 @@ const val BEEPER_AHEAD = 0x0008
 const val LEFT_IS_CLEAR = 0x0009
 const val FRONT_IS_CLEAR = 0x000a
 const val RIGHT_IS_CLEAR = 0x000b
+
+const val ON_BEEPER_INSTRUMENT = 0x0010
+const val BEEPER_AHEAD_INSTRUMENT = 0x0011
+const val LEFT_IS_CLEAR_INSTRUMENT = 0x0012
+const val FRONT_IS_CLEAR_INSTRUMENT = 0x0013
+const val RIGHT_IS_CLEAR_INSTRUMENT = 0x0014
+
+const val ON_BEEPER_FALSE = 0x0015
+const val BEEPER_AHEAD_FALSE = 0x0016
+const val LEFT_IS_CLEAR_FALSE = 0x0017
+const val FRONT_IS_CLEAR_FALSE = 0x0018
+const val RIGHT_IS_CLEAR_FALSE = 0x0019
+
+const val ON_BEEPER_TRUE = 0x001a
+const val BEEPER_AHEAD_TRUE = 0x001b
+const val LEFT_IS_CLEAR_TRUE = 0x001c
+const val FRONT_IS_CLEAR_TRUE = 0x001d
+const val RIGHT_IS_CLEAR_TRUE = 0x001e
 
 const val NORM = 0x0000
 

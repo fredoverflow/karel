@@ -6,9 +6,7 @@ import logic.*
 import syntax.lexer.Lexer
 import syntax.parser.Parser
 import syntax.parser.program
-import vm.Emitter
-import vm.Instruction
-import vm.VirtualMachine
+import vm.*
 import java.awt.EventQueue
 import javax.swing.Timer
 
@@ -37,7 +35,7 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
     }
 
     fun executeGoal(goal: String) {
-        start(vm.createGoalInstructions(goal))
+        start(createGoalInstructions(goal))
     }
 
     fun checkAgainst(goal: String) {
@@ -50,10 +48,10 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
             parser.program()
             val main = parser.sema.command(currentProblem.name)
             if (main != null) {
-                val instructions: List<Instruction> = Emitter(parser.sema).emit(main)
+                val instructions = Emitter(parser.sema, true).emit(main)
                 virtualMachinePanel.setProgram(instructions)
 
-                val goalInstructions = vm.createGoalInstructions(goal)
+                val goalInstructions = createGoalInstructions(goal)
 
                 check(instructions, goalInstructions)
             } else {
@@ -78,6 +76,20 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
             update()
         }
 
+        fun reportFirstRedundantCondition() {
+            for (instruction in instructions) {
+                when (instruction.bytecode) {
+                    ON_BEEPER_FALSE, BEEPER_AHEAD_FALSE, LEFT_IS_CLEAR_FALSE, FRONT_IS_CLEAR_FALSE, RIGHT_IS_CLEAR_FALSE -> {
+                        throw Diagnostic(instruction.position, "condition was always false")
+                    }
+
+                    ON_BEEPER_TRUE, BEEPER_AHEAD_TRUE, LEFT_IS_CLEAR_TRUE, FRONT_IS_CLEAR_TRUE, RIGHT_IS_CLEAR_TRUE -> {
+                        throw Diagnostic(instruction.position, "condition was always true")
+                    }
+                }
+            }
+        }
+
         val start = System.nanoTime()
         var nextRepaint = CHECK_REPAINT_NS
 
@@ -94,6 +106,7 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
                     val elapsed = System.nanoTime() - start
                     if (elapsed >= CHECK_TOTAL_NS) {
                         cleanup()
+                        reportFirstRedundantCondition()
                         if (currentProblem.numWorlds == UNKNOWN) {
                             showDiagnostic("OK: checked $worldCounter random worlds")
                         } else {
@@ -109,6 +122,7 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
                     }
                 }
                 cleanup()
+                reportFirstRedundantCondition()
                 showDiagnostic("OK: checked all ${currentProblem.numWorlds} possible worlds")
             } catch (diagnostic: Diagnostic) {
                 cleanup()
@@ -185,7 +199,7 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
             parser.program()
             val main = parser.sema.command(currentProblem.name)
             if (main != null) {
-                val instructions = Emitter(parser.sema).emit(main)
+                val instructions = Emitter(parser.sema, false).emit(main)
                 start(instructions)
             } else {
                 editor.setCursorTo(editor.length())

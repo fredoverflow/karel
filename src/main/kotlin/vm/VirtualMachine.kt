@@ -178,6 +178,102 @@ class VirtualMachine(
             FRONT_IS_CLEAR -> push(worldRef.world.frontIsClear())
             RIGHT_IS_CLEAR -> push(worldRef.world.rightIsClear())
 
+            // INSTRUMENT
+
+            ON_BEEPER_INSTRUMENT -> {
+                val status = worldRef.world.onBeeper()
+                push(status)
+                currentInstruction.bytecode = if (status) ON_BEEPER_TRUE else ON_BEEPER_FALSE
+            }
+
+            BEEPER_AHEAD_INSTRUMENT -> {
+                val status = worldRef.world.beeperAhead()
+                push(status)
+                currentInstruction.bytecode = if (status) BEEPER_AHEAD_TRUE else BEEPER_AHEAD_FALSE
+            }
+
+            LEFT_IS_CLEAR_INSTRUMENT -> {
+                val status = worldRef.world.leftIsClear()
+                push(status)
+                currentInstruction.bytecode = if (status) LEFT_IS_CLEAR_TRUE else LEFT_IS_CLEAR_FALSE
+            }
+
+            FRONT_IS_CLEAR_INSTRUMENT -> {
+                val status = worldRef.world.frontIsClear()
+                push(status)
+                currentInstruction.bytecode = if (status) FRONT_IS_CLEAR_TRUE else FRONT_IS_CLEAR_FALSE
+            }
+
+            RIGHT_IS_CLEAR_INSTRUMENT -> {
+                val status = worldRef.world.rightIsClear()
+                push(status)
+                currentInstruction.bytecode = if (status) RIGHT_IS_CLEAR_TRUE else RIGHT_IS_CLEAR_FALSE
+            }
+
+            // FALSE
+
+            ON_BEEPER_FALSE -> {
+                val status = worldRef.world.onBeeper()
+                push(status)
+                if (status) currentInstruction.bytecode = ON_BEEPER
+            }
+
+            BEEPER_AHEAD_FALSE -> {
+                val status = worldRef.world.beeperAhead()
+                push(status)
+                if (status) currentInstruction.bytecode = BEEPER_AHEAD
+            }
+
+            LEFT_IS_CLEAR_FALSE -> {
+                val status = worldRef.world.leftIsClear()
+                push(status)
+                if (status) currentInstruction.bytecode = LEFT_IS_CLEAR
+            }
+
+            FRONT_IS_CLEAR_FALSE -> {
+                val status = worldRef.world.frontIsClear()
+                push(status)
+                if (status) currentInstruction.bytecode = FRONT_IS_CLEAR
+            }
+
+            RIGHT_IS_CLEAR_FALSE -> {
+                val status = worldRef.world.rightIsClear()
+                push(status)
+                if (status) currentInstruction.bytecode = RIGHT_IS_CLEAR
+            }
+
+            // TRUE
+
+            ON_BEEPER_TRUE -> {
+                val status = worldRef.world.onBeeper()
+                push(status)
+                if (!status) currentInstruction.bytecode = ON_BEEPER
+            }
+
+            BEEPER_AHEAD_TRUE -> {
+                val status = worldRef.world.beeperAhead()
+                push(status)
+                if (!status) currentInstruction.bytecode = BEEPER_AHEAD
+            }
+
+            LEFT_IS_CLEAR_TRUE -> {
+                val status = worldRef.world.leftIsClear()
+                push(status)
+                if (!status) currentInstruction.bytecode = LEFT_IS_CLEAR
+            }
+
+            FRONT_IS_CLEAR_TRUE -> {
+                val status = worldRef.world.frontIsClear()
+                push(status)
+                if (!status) currentInstruction.bytecode = FRONT_IS_CLEAR
+            }
+
+            RIGHT_IS_CLEAR_TRUE -> {
+                val status = worldRef.world.rightIsClear()
+                push(status)
+                if (!status) currentInstruction.bytecode = RIGHT_IS_CLEAR
+            }
+
             else -> throw IllegalBytecode(bytecode)
         }
         ++pc
