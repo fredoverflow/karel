@@ -1,7 +1,5 @@
 package gui
 
-import common.Stack
-import common.push
 import freditor.Freditor
 import freditor.FreditorUI
 import syntax.lexer.keywords
@@ -82,7 +80,7 @@ class Editor(freditor: Freditor) : FreditorUI(freditor, 60, 1) {
         replace("""\b$oldName(\s*\(\s*\))""", "$newName$1")
     }
 
-    private var lines: Stack<Line2D.Double> = Stack.Nil
+    private val lines = ArrayList<Line2D.Double>()
 
     private val frontHeight = FreditorUI.frontHeight
     private val frontWidth = FreditorUI.frontWidth
@@ -101,23 +99,23 @@ class Editor(freditor: Freditor) : FreditorUI(freditor, 60, 1) {
     }
 
     private fun pushLine(callerLine: Int, calleeLine: Int) {
-        val x = 0.5 * thickness + lines.size() * frontWidth
+        val x = 0.5 * thickness + lines.size * frontWidth
         val y1 = (callerLine - 0.5) * frontHeight
         val y2 = (calleeLine - 0.5) * frontHeight
 
         val line = Line2D.Double(x, y1, x, y2)
-        lines = lines.push(line)
+        lines.add(line)
     }
 
     fun pop() {
-        if (!lines.isEmpty()) {
-            lines = lines.pop()
+        if (lines.isNotEmpty()) {
+            lines.removeLast()
             repaint()
         }
     }
 
     fun clearStack() {
-        lines = Stack.Nil
+        lines.clear()
         repaint()
     }
 
@@ -131,9 +129,9 @@ class Editor(freditor: Freditor) : FreditorUI(freditor, 60, 1) {
         graphics.stroke = stroke
         graphics.color = color
         graphics.translate(0, -firstVisibleLine() * frontHeight)
-        if (!lines.isEmpty()) {
+        if (lines.isNotEmpty()) {
             lines.forEach(graphics::draw)
-            graphics.draw(lines.top())
+            graphics.draw(lines.last())
         }
     }
 }
