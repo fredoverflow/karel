@@ -19,10 +19,6 @@ class VirtualMachinePanel : JPanel() {
         isVisible = false
     }
 
-    fun clearStack() {
-        stackTable.setStack(Stack.Nil)
-    }
-
     fun setProgram(program: List<Instruction>) {
         bytecodeTable.setProgram(program)
     }

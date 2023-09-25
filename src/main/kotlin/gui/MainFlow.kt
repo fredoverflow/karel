@@ -50,6 +50,7 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
             if (main != null) {
                 val instructions = Emitter(parser.sema, true).emit(main)
                 virtualMachinePanel.setProgram(instructions)
+                virtualMachinePanel.update(ENTRY_POINT, Stack.Nil)
 
                 val goalInstructions = createGoalInstructions(goal)
 
@@ -73,7 +74,6 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
             worldPanel.isEnabled = true
             tabbedEditors.tabs.isEnabled = true
 
-            virtualMachinePanel.clearStack()
             editor.clearStack()
             update()
         }
@@ -226,7 +226,6 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
     fun stop() {
         timer.stop()
         controlPanel.executionFinished(currentProblem.isRandom)
-        virtualMachinePanel.clearStack()
         tabbedEditors.tabs.isEnabled = true
         editor.clearStack()
         editor.requestFocusInWindow()
