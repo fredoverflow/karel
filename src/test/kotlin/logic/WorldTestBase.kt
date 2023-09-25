@@ -1,8 +1,8 @@
 package logic
 
-import common.Stack
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
+import vm.Stack
 import vm.VirtualMachine
 
 open class WorldTestBase : VirtualMachine.Callbacks {
@@ -16,7 +16,7 @@ open class WorldTestBase : VirtualMachine.Callbacks {
         val virtualMachine = VirtualMachine(instructions, worldRef, this)
         try {
             virtualMachine.executeGoalProgram()
-        } catch (_: Stack.Exhausted) {
+        } catch (_: VirtualMachine.Finished) {
         }
         world = worldRef.world
     }

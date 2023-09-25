@@ -1,7 +1,5 @@
 package vm
 
-import common.Stack
-import common.push
 import logic.World
 import logic.WorldRef
 
@@ -47,23 +45,19 @@ class VirtualMachine(
         }
     }
 
-    var stack: Stack<StackValue> = Stack.Nil
+    var stack: Stack? = null
         private set
 
     private var callDepth: Int = 0
 
-    private fun push(x: StackValue) {
-        stack = stack.push(x)
-    }
-
     private fun push(x: Boolean) {
-        stack = stack.push(if (x) Bool.TRUE else Bool.FALSE)
+        stack = Stack.Boolean(if (x) 1 else 0, stack)
     }
 
-    private fun pop(): StackValue {
-        val result = stack.top()
-        stack = stack.pop()
-        return result
+    private fun pop(): Int {
+        val stack = this.stack!!
+        this.stack = stack.tail
+        return stack.head
     }
 
     fun stepInto(virtualMachineVisible: Boolean) {
@@ -125,8 +119,8 @@ class VirtualMachine(
                 CALL shr 12 -> executeCall()
 
                 JUMP shr 12 -> pc = target
-                ELSE shr 12 -> pc = if (pop() === Bool.FALSE) target else pc + 1
-                THEN shr 12 -> pc = if (pop() === Bool.TRUE) target else pc + 1
+                ELSE shr 12 -> pc = if (pop() == 0) target else pc + 1
+                THEN shr 12 -> pc = if (pop() != 0) target else pc + 1
 
                 else -> throw IllegalBytecode(bytecode)
             }
@@ -134,14 +128,14 @@ class VirtualMachine(
     }
 
     private fun Instruction.executePush() {
-        push(LoopCounter(target))
+        stack = Stack.LoopCounter(target, stack)
         ++pc
     }
 
     private fun Instruction.executeLoop() {
-        val remaining = (pop() as LoopCounter).value - 1
+        val remaining = pop() - 1
         if (remaining > 0) {
-            push(LoopCounter(remaining))
+            stack = Stack.LoopCounter(remaining, stack)
             pc = target
         } else {
             ++pc
@@ -150,14 +144,17 @@ class VirtualMachine(
 
     private fun Instruction.executeCall() {
         callbacks.onCall(position, returnInstructionPositions[target])
-        push(ReturnAddress(pc))
+        stack = Stack.ReturnAddress(pc, stack)
         ++callDepth
         pc = target
     }
 
+    object Finished : Exception()
+
     private fun executeReturn() {
+        if (stack == null) throw Finished
         callbacks.onReturn()
-        pc = (pop() as ReturnAddress).value
+        pc = pop()
         --callDepth
     }
 

@@ -1,15 +1,16 @@
 package gui
 
-import common.Stack
 import freditor.Fronts
-import vm.StackValue
+import vm.Stack
+import vm.forEach
+import vm.size
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Graphics
 import javax.swing.JComponent
 
 class StackTable : JComponent() {
-    private var stack: Stack<StackValue> = Stack.Nil
+    private var stack: Stack? = null
 
     init {
         resize(0)
@@ -23,26 +24,36 @@ class StackTable : JComponent() {
         revalidate()
     }
 
-    fun setStack(stack: Stack<StackValue>) {
-        if (stack !== this.stack) {
-            val newSize = stack.size()
-            val oldSize = this.stack.size()
-            this.stack = stack
-            if (newSize != oldSize) {
-                resize(newSize)
+    fun setStack(newStack: Stack?) {
+        if (newStack !== stack) {
+            if (newStack.size != stack.size) {
+                resize(newStack.size)
             }
+            stack = newStack
             repaint()
         }
     }
 
-    override fun paint(g: Graphics) {
-        g.color = Color.WHITE
-        g.fillRect(0, 0, width, height)
+    override fun paint(graphics: Graphics) {
+        graphics.color = Color.WHITE
+        graphics.fillRect(0, 0, width, height)
 
         var y = 0
         val frontHeight = Fronts.front.height
-        stack.forEach { stackValue ->
-            Fronts.front.drawString(g, 0, y, stackValue.toString(), stackValue.color)
+        val frontRight = 4 * Fronts.front.width
+
+        stack.forEach { stack ->
+            when (stack) {
+                is Stack.ReturnAddress -> Fronts.front.drawHexRight(graphics, frontRight, y, stack.head, 0x808080)
+
+                is Stack.LoopCounter -> Fronts.front.drawIntRight(graphics, frontRight, y, stack.head, 0x6400c8)
+
+                is Stack.Boolean -> if (stack.head == 0) {
+                    Fronts.front.drawString(graphics, 0, y, "false", 0xff0000)
+                } else {
+                    Fronts.front.drawString(graphics, 0, y, "true", 0x008000)
+                }
+            }
             y += frontHeight
         }
     }

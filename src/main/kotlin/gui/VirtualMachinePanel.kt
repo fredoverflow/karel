@@ -1,8 +1,7 @@
 package gui
 
-import common.Stack
 import vm.Instruction
-import vm.StackValue
+import vm.Stack
 import javax.swing.Box
 import javax.swing.BoxLayout
 import javax.swing.JPanel
@@ -23,7 +22,7 @@ class VirtualMachinePanel : JPanel() {
         bytecodeTable.setProgram(program)
     }
 
-    fun update(pc: Int, stack: Stack<StackValue>) {
+    fun update(stack: Stack?, pc: Int) {
         stackTable.setStack(stack)
         bytecodeTable.highlightLine(pc)
     }
