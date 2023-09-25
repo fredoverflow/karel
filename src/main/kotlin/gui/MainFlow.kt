@@ -66,10 +66,12 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
     private fun check(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
         controlPanel.checkStarted()
         worldPanel.isEnabled = false
+        tabbedEditors.tabs.isEnabled = false
 
         fun cleanup() {
             controlPanel.checkFinished(currentProblem.isRandom)
             worldPanel.isEnabled = true
+            tabbedEditors.tabs.isEnabled = true
 
             virtualMachinePanel.clearStack()
             editor.clearStack()
