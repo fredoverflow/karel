@@ -14,8 +14,7 @@ const val CHECK_REPAINT_NS = 100_000_000L
 
 const val COMPARE = "mouse enter/exit (or click) world to compare"
 
-abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomWorld())),
-    VirtualMachine.Callbacks {
+abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomWorld())) {
 
     val currentProblem: Problem
         get() = controlPanel.problemPicker.selectedItem as Problem
@@ -164,13 +163,12 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
     }
 
     private fun createVirtualMachine(instructions: List<Instruction>, callback: (World) -> Unit) {
-        virtualMachine = when (currentProblem.check) {
-            Check.EVERY_PICK_DROP_MOVE ->
-                VirtualMachine(instructions, worldRef, ignoreCallAndReturn, callback, callback)
-
-            Check.EVERY_PICK_DROP ->
-                VirtualMachine(instructions, worldRef, ignoreCallAndReturn, callback)
-        }
+        virtualMachine = VirtualMachine(
+            instructions, worldRef,
+            onInfiniteLoop = ::onInfiniteLoop,
+            onPickDrop = callback,
+            onMove = callback.takeIf { Check.EVERY_PICK_DROP_MOVE == currentProblem.check },
+        )
     }
 
     private fun goalWorlds(goalInstructions: List<Instruction>): List<World> {
@@ -182,12 +180,6 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
         } catch (_: VirtualMachine.Finished) {
         }
         return goalWorlds
-    }
-
-    private val ignoreCallAndReturn = object : VirtualMachine.Callbacks {
-        override fun onInfiniteLoop() {
-            throw Diagnostic(virtualMachine.currentInstruction.position, "infinite loop detected")
-        }
     }
 
     fun parseAndExecute() {
@@ -212,9 +204,15 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
     }
 
     fun start(instructions: List<Instruction>) {
+        val compiledFromSource = instructions[ENTRY_POINT].compiledFromSource
         tabbedEditors.tabs.isEnabled = false
         virtualMachinePanel.setProgram(instructions)
-        virtualMachine = VirtualMachine(instructions, worldRef, this)
+        virtualMachine = VirtualMachine(
+            instructions, worldRef,
+            onCall = editor::push.takeIf { compiledFromSource },
+            onReturn = editor::pop.takeIf { compiledFromSource },
+            onInfiniteLoop = ::onInfiniteLoop,
+        )
         controlPanel.executionStarted()
         update()
         if (delay() >= 0) {
@@ -230,16 +228,8 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
         editor.requestFocusInWindow()
     }
 
-    override fun onCall(callerPosition: Int, calleePosition: Int) {
-        editor.push(callerPosition, calleePosition)
-    }
-
-    override fun onReturn() {
-        editor.pop()
-    }
-
-    override fun onInfiniteLoop() {
-        showDiagnostic("infinite loop detected")
+    fun onInfiniteLoop() {
+        throw Diagnostic(virtualMachine.currentInstruction.position, "infinite loop detected")
     }
 
     fun update() {

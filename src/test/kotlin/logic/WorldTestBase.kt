@@ -2,10 +2,9 @@ package logic
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
-import vm.Stack
 import vm.VirtualMachine
 
-open class WorldTestBase : VirtualMachine.Callbacks {
+open class WorldTestBase {
     protected var initialWorld: World = Problem.emptyWorld
     protected var world: World = Problem.emptyWorld
 
@@ -13,16 +12,12 @@ open class WorldTestBase : VirtualMachine.Callbacks {
         val instructions = vm.createGoalInstructions(problem.goal)
         initialWorld = problem.randomWorld()
         val worldRef = WorldRef(initialWorld)
-        val virtualMachine = VirtualMachine(instructions, worldRef, this)
+        val virtualMachine = VirtualMachine(instructions, worldRef, onInfiniteLoop = { fail("infinite loop detected") })
         try {
             virtualMachine.executeGoalProgram()
         } catch (_: VirtualMachine.Finished) {
         }
         world = worldRef.world
-    }
-
-    override fun onInfiniteLoop() {
-        fail("infinite loop detected")
     }
 
     protected fun assertKarelAt(x: Int, y: Int, direction: Int) {

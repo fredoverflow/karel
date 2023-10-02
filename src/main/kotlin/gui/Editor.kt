@@ -3,6 +3,7 @@ package gui
 import freditor.Freditor
 import freditor.FreditorUI
 import syntax.lexer.keywords
+import vm.Instruction
 import vm.builtinCommands
 import java.awt.*
 import java.awt.event.KeyEvent
@@ -89,29 +90,17 @@ class Editor(freditor: Freditor) : FreditorUI(freditor, 60, 1) {
     private val stroke = BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
     private val color = Color(0x40ff0000, true)
 
-    fun push(callerPosition: Int, calleePosition: Int) {
-        if (callerPosition > 0) {
-            val callerLine = lineOfPosition(callerPosition) + 1
-            val calleeLine = lineOfPosition(calleePosition) + 1
-            pushLine(callerLine, calleeLine)
-            repaint()
-        }
-    }
-
-    private fun pushLine(callerLine: Int, calleeLine: Int) {
+    fun push(callInstruction: Instruction, returnInstruction: Instruction) {
         val x = 0.5 * thickness + lines.size * frontWidth
-        val y1 = (callerLine - 0.5) * frontHeight
-        val y2 = (calleeLine - 0.5) * frontHeight
-
-        val line = Line2D.Double(x, y1, x, y2)
-        lines.add(line)
+        val y1 = (lineOfPosition(callInstruction.position) + 0.5) * frontHeight
+        val y2 = (lineOfPosition(returnInstruction.position) + 0.5) * frontHeight
+        lines.add(Line2D.Double(x, y1, x, y2))
+        repaint()
     }
 
     fun pop() {
-        if (lines.isNotEmpty()) {
-            lines.removeLast()
-            repaint()
-        }
+        lines.removeLast()
+        repaint()
     }
 
     fun clearStack() {

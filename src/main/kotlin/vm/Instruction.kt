@@ -19,7 +19,7 @@ class Instruction(var bytecode: Int, val position: Int) {
         }
     }
 
-    private val compiledFromSource: Boolean
+    val compiledFromSource: Boolean
         get() = position > 0
 
     fun shouldPause(): Boolean {

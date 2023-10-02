@@ -15,16 +15,13 @@ const val ENTRY_POINT = 256
 class VirtualMachine(
     private val program: List<Instruction>,
     private val worldRef: WorldRef,
-    private val callbacks: Callbacks,
-    private val onBeeper: (World) -> Unit = {},
-    private val onMove: (World) -> Unit = {},
+    // callbacks
+    private val onCall: ((Instruction, Instruction) -> Unit)? = null,
+    private val onReturn: (() -> Unit)? = null,
+    private val onInfiniteLoop: (() -> Unit)? = null,
+    private val onPickDrop: ((World) -> Unit)? = null,
+    private val onMove: ((World) -> Unit)? = null,
 ) {
-
-    interface Callbacks {
-        fun onCall(callerPosition: Int, calleePosition: Int) {}
-        fun onReturn() {}
-        fun onInfiniteLoop() {}
-    }
 
     val world: World
         get() = worldRef.world
@@ -34,16 +31,6 @@ class VirtualMachine(
 
     val currentInstruction: Instruction
         get() = program[pc]
-
-    private val returnInstructionPositions = IntArray(program.size).apply {
-        for (index in lastIndex downTo ENTRY_POINT) {
-            if (program[index].bytecode == RETURN) {
-                this[index] = program[index].position
-            } else {
-                this[index] = this[index + 1]
-            }
-        }
-    }
 
     var stack: Stack? = null
         private set
@@ -89,7 +76,7 @@ class VirtualMachine(
             executeOneInstruction()
         }
         if (callDepth > targetDepth) {
-            callbacks.onInfiniteLoop()
+            onInfiniteLoop?.invoke()
         }
     }
 
@@ -100,7 +87,7 @@ class VirtualMachine(
                 executeOneInstruction()
             }
         }
-        callbacks.onInfiniteLoop()
+        onInfiniteLoop?.invoke()
     }
 
     fun executeGoalProgram() {
@@ -143,17 +130,23 @@ class VirtualMachine(
     }
 
     private fun Instruction.executeCall() {
-        callbacks.onCall(position, returnInstructionPositions[target])
+        onCall?.invoke(this, findReturnInstructionAfter(target))
         stack = Stack.ReturnAddress(pc, stack)
         ++callDepth
         pc = target
+    }
+
+    private fun findReturnInstructionAfter(start: Int): Instruction {
+        var index = start
+        while (program[index].bytecode != RETURN) ++index
+        return program[index]
     }
 
     object Finished : Exception()
 
     private fun executeReturn() {
         if (stack == null) throw Finished
-        callbacks.onReturn()
+        onReturn?.invoke()
         pc = pop()
         --callDepth
     }
@@ -162,12 +155,12 @@ class VirtualMachine(
         when (bytecode) {
             RETURN -> executeReturn()
 
-            MOVE_FORWARD -> onMove(worldRef.updateAndGet(World::moveForward))
+            MOVE_FORWARD -> worldRef.updateAndGet(World::moveForward).also { onMove?.invoke(it) }
             TURN_LEFT -> worldRef.updateAndGet(World::turnLeft)
             TURN_AROUND -> worldRef.updateAndGet(World::turnAround)
             TURN_RIGHT -> worldRef.updateAndGet(World::turnRight)
-            PICK_BEEPER -> onBeeper(worldRef.updateAndGet(World::pickBeeper))
-            DROP_BEEPER -> onBeeper(worldRef.updateAndGet(World::dropBeeper))
+            PICK_BEEPER -> worldRef.updateAndGet(World::pickBeeper).also { onPickDrop?.invoke(it) }
+            DROP_BEEPER -> worldRef.updateAndGet(World::dropBeeper).also { onPickDrop?.invoke(it) }
 
             ON_BEEPER -> push(worldRef.world.onBeeper())
             BEEPER_AHEAD -> push(worldRef.world.beeperAhead())
