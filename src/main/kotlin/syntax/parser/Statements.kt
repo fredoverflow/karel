@@ -39,15 +39,7 @@ fun Parser.statement(): Statement = when (current) {
 
     WHILE -> While(accept(), parenthesized(::disjunction), block())
 
-    IF -> IfThenElse(accept(), parenthesized(::disjunction), block(), optional(ELSE) {
-        when (current) {
-            OPENING_BRACE -> block()
-
-            IF -> statement()
-
-            else -> token.error("else must be followed by { or if")
-        }
-    })
+    IF -> ifThenElse()
 
     VOID -> {
         val void = accept()
@@ -62,4 +54,16 @@ fun Parser.statement(): Statement = when (current) {
     END_OF_INPUT -> token.error("End of file encountered in an unclosed block.\nDid you forget a } somewhere?")
 
     else -> illegalStartOf("statement")
+}
+
+fun Parser.ifThenElse(): IfThenElse {
+    return IfThenElse(expect(IF), parenthesized(::disjunction), block(), optional(ELSE) {
+        when (current) {
+            OPENING_BRACE -> block()
+
+            IF -> ifThenElse()
+
+            else -> token.error("else must be followed by { or if")
+        }
+    })
 }

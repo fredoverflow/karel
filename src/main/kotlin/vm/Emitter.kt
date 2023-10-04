@@ -49,14 +49,14 @@ class Emitter(private val sema: Sema, instrument: Boolean) {
         emitInstruction(RETURN, body.closingBrace)
     }
 
+    private fun Block.emit() {
+        for (statement in statements) {
+            statement.emit()
+        }
+    }
+
     private fun Statement.emit() {
         when (this) {
-            is Block -> {
-                for (statement in statements) {
-                    statement.emit()
-                }
-            }
-
             is Call -> {
                 val builtin = builtinCommands[target.lexeme]
                 if (builtin != null) {
@@ -88,27 +88,37 @@ class Emitter(private val sema: Sema, instrument: Boolean) {
                 elseLabel.address = pc
             }
 
-            is IfThenElse -> {
-                if (e1se == null) {
-                    val thenLabel = Label()
-                    val elseLabel = Label()
-                    condition.emitPositive(thenLabel, elseLabel, ELSE, elseLabel, iF)
-                    thenLabel.address = pc
-                    th3n.emit()
-                    elseLabel.address = pc
-                } else {
-                    val thenLabel = Label()
-                    val elseLabel = Label()
-                    val doneLabel = Label()
-                    condition.emitPositive(thenLabel, elseLabel, ELSE, elseLabel, iF)
-                    thenLabel.address = pc
-                    th3n.emit()
-                    emitInstruction(JUMP, th3n.closingBrace).label = doneLabel
-                    elseLabel.address = pc
-                    e1se.emit()
-                    doneLabel.address = pc
-                }
-            }
+            is IfThenElse -> emit()
+        }
+    }
+
+    private fun IfThenElse.emit() {
+        if (e1se == null) {
+            val thenLabel = Label()
+            val elseLabel = Label()
+            condition.emitPositive(thenLabel, elseLabel, ELSE, elseLabel, iF)
+            thenLabel.address = pc
+            th3n.emit()
+            elseLabel.address = pc
+        } else {
+            val thenLabel = Label()
+            val elseLabel = Label()
+            val doneLabel = Label()
+            condition.emitPositive(thenLabel, elseLabel, ELSE, elseLabel, iF)
+            thenLabel.address = pc
+            th3n.emit()
+            emitInstruction(JUMP, th3n.closingBrace).label = doneLabel
+            elseLabel.address = pc
+            e1se.emit()
+            doneLabel.address = pc
+        }
+    }
+
+    private fun ElseBranch.emit() {
+        when (this) {
+            is Block -> emit()
+
+            is IfThenElse -> emit()
         }
     }
 
