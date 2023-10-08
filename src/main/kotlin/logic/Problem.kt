@@ -301,7 +301,7 @@ class Problem(
             0,
             UNKNOWN,
         ) {
-            generateLabyrinth()
+            LabyrinthGenerator.generateLabyrinth()
         }
 
         val hangTheLampions = Problem(
