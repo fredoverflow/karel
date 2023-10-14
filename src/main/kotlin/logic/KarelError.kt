@@ -1,6 +1,6 @@
 package logic
 
-abstract class KarelError(message: String) : Exception(message)
+abstract class KarelError(override val message: String) : Exception(message)
 
 class CellIsEmpty : KarelError("there is no beeper to pick")
 

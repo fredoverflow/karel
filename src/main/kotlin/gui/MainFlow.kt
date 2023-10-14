@@ -153,7 +153,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
             virtualMachine.executeUserProgram()
         } catch (_: VirtualMachine.Finished) {
         } catch (error: KarelError) {
-            throw Diagnostic(virtualMachine.currentInstruction.position, error.message!!)
+            throw Diagnostic(virtualMachine.currentInstruction.position, error.message)
         }
         if (goalWorldIterator.hasNext() && !goalWorlds.last().equalsIgnoringDirection(virtualMachine.world)) {
             worldPanel.antWorld = goalWorldIterator.next()
@@ -250,7 +250,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         } catch (error: KarelError) {
             stop()
             update()
-            showDiagnostic(error.message!!)
+            showDiagnostic(error.message)
         }
     }
 
