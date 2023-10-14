@@ -86,17 +86,19 @@ class MainHandler : MainFlow() {
         }
 
         controlPanel.stepInto.addActionListener {
-            stepInto()
+            tryStep(::stepInto)
+
+            editor.requestFocusInWindow()
         }
 
         controlPanel.stepOver.addActionListener {
-            step { virtualMachine.stepOver() }
+            tryStep(virtualMachine::stepOver)
 
             editor.requestFocusInWindow()
         }
 
         controlPanel.stepReturn.addActionListener {
-            step { virtualMachine.stepReturn() }
+            tryStep(virtualMachine::stepReturn)
 
             editor.requestFocusInWindow()
         }
@@ -174,7 +176,7 @@ class MainHandler : MainFlow() {
 
                 KeyEvent.VK_F12 -> {
                     if (controlPanel.isRunning()) {
-                        stepInto()
+                        tryStep(::stepInto)
                     } else {
                         controlPanel.startStopReset.doClick()
                     }

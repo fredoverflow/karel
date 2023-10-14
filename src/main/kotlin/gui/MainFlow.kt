@@ -28,8 +28,8 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
     var virtualMachine = VirtualMachine(emptyList(), initialWorld)
 
-    val timer: Timer = Timer(delay()) {
-        step { virtualMachine.stepInto(virtualMachinePanel.isVisible) }
+    val timer = Timer(delay()) {
+        tryStep(::stepInto)
     }
 
     fun executeGoal(goal: String) {
@@ -236,13 +236,12 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
     }
 
     fun stepInto() {
-        step { virtualMachine.stepInto(virtualMachinePanel.isVisible) }
-        editor.requestFocusInWindow()
+        virtualMachine.stepInto(virtualMachinePanel.isVisible)
     }
 
-    fun step(how: () -> Unit) {
+    inline fun tryStep(step: () -> Unit) {
         try {
-            how()
+            step()
             update()
         } catch (_: VirtualMachine.Finished) {
             stop()
