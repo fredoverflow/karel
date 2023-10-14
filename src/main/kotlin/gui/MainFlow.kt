@@ -14,7 +14,7 @@ const val CHECK_REPAINT_NS = 100_000_000L
 
 const val COMPARE = "mouse enter/exit (or click) world to compare"
 
-abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomWorld())) {
+abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
     val currentProblem: Problem
         get() = controlPanel.problemPicker.selectedItem as Problem
@@ -24,9 +24,9 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
         return if (logarithm < 0) logarithm else 1.shl(logarithm)
     }
 
-    var initialWorld: World = worldRef.world
+    var initialWorld: World = worldPanel.world
 
-    lateinit var virtualMachine: VirtualMachine
+    var virtualMachine = VirtualMachine(emptyList(), initialWorld)
 
     val timer: Timer = Timer(delay()) {
         step { virtualMachine.stepInto(virtualMachinePanel.isVisible) }
@@ -114,7 +114,7 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
                         }
                         return
                     } else if (elapsed >= nextRepaint) {
-                        worldRef.world = initialWorld
+                        worldPanel.world = initialWorld
                         worldPanel.repaint()
                         nextRepaint += CHECK_REPAINT_NS
                         EventQueue.invokeLater(::checkBetweenRepaints)
@@ -137,7 +137,6 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
         val goalWorlds = goalWorlds(goalInstructions)
         val goalWorldIterator = goalWorlds.iterator()
 
-        worldRef.world = initialWorld
         createVirtualMachine(instructions) { world ->
             if (!goalWorldIterator.hasNext()) {
                 worldPanel.antWorld = goalWorlds.last()
@@ -164,7 +163,7 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
 
     private fun createVirtualMachine(instructions: List<Instruction>, callback: (World) -> Unit) {
         virtualMachine = VirtualMachine(
-            instructions, worldRef,
+            instructions, initialWorld,
             onPickDrop = callback,
             onMove = callback.takeIf { Check.EVERY_PICK_DROP_MOVE == currentProblem.check },
         )
@@ -172,7 +171,6 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
 
     private fun goalWorlds(goalInstructions: List<Instruction>): List<World> {
         val goalWorlds = ArrayList<World>(200)
-        worldRef.world = initialWorld
         createVirtualMachine(goalInstructions, goalWorlds::add)
         try {
             virtualMachine.executeGoalProgram()
@@ -207,7 +205,7 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
         tabbedEditors.tabs.isEnabled = false
         virtualMachinePanel.setProgram(instructions)
         virtualMachine = VirtualMachine(
-            instructions, worldRef,
+            instructions, initialWorld,
             onCall = editor::push.takeIf { compiledFromSource },
             onReturn = editor::pop.takeIf { compiledFromSource },
         )
@@ -233,6 +231,7 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
             editor.setCursorTo(position)
         }
         virtualMachinePanel.update(virtualMachine.stack, virtualMachine.pc)
+        worldPanel.world = virtualMachine.world
         worldPanel.repaint()
     }
 

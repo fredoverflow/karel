@@ -3,7 +3,6 @@ package gui
 import freditor.Fronts
 import logic.Problem
 import logic.World
-import logic.WorldRef
 
 import java.awt.Dimension
 import java.awt.Graphics
@@ -68,12 +67,13 @@ private fun BufferedImage.rotatedCounterclockwise(): BufferedImage {
     return rotated
 }
 
-class WorldPanel(private val worldRef: WorldRef) : JPanel() {
+class WorldPanel(var world: World) : JPanel() {
 
     private var folder: String = Toolkit.getDefaultToolkit().screenSize.height.let { screenHeight ->
         if (screenHeight < 1000) FOLDER_40 else FOLDER_64
     }
-    private var tileSize = 1 // smallest working dummy value before loadTiles() runs
+    var tileSize = 1 // smallest working dummy value before loadTiles() runs
+        private set
     private var beeper = BufferedImage(tileSize, tileSize, BufferedImage.TYPE_INT_ARGB)
     private var karels = emptyArray<BufferedImage>()
     private var walls = emptyArray<BufferedImage>()
@@ -123,7 +123,7 @@ class WorldPanel(private val worldRef: WorldRef) : JPanel() {
     override fun paintComponent(graphics: Graphics) {
         var world = antWorld
         if (world == null || !showAntWorld) {
-            world = worldRef.world
+            world = this.world
         }
 
         graphics.drawWallsAndBeepers(world)
@@ -187,12 +187,10 @@ class WorldPanel(private val worldRef: WorldRef) : JPanel() {
     private fun listenToMouse() {
         addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(event: MouseEvent) {
-                if (!isEnabled) return
+                if (!event.component.isEnabled) return
 
                 if (SwingUtilities.isLeftMouseButton(event)) {
-                    if (antWorld == null) {
-                        toggleBeeper(event)
-                    } else {
+                    if (antWorld != null) {
                         showAntWorld = !showAntWorld
                     }
                 } else if (SwingUtilities.isRightMouseButton(event)) {
@@ -215,12 +213,6 @@ class WorldPanel(private val worldRef: WorldRef) : JPanel() {
                 }
             }
         })
-    }
-
-    private fun toggleBeeper(event: MouseEvent) {
-        val x = event.x / tileSize
-        val y = event.y / tileSize
-        worldRef.updateAndGet { it.toggleBeeper(x, y) }
     }
 
     private fun switchTileSize() {

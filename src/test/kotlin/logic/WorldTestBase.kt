@@ -10,13 +10,12 @@ open class WorldTestBase {
     protected fun executeGoal(problem: Problem) {
         val instructions = vm.createGoalInstructions(problem.goal)
         initialWorld = problem.randomWorld()
-        val worldRef = WorldRef(initialWorld)
-        val virtualMachine = VirtualMachine(instructions, worldRef)
+        val virtualMachine = VirtualMachine(instructions, initialWorld)
         try {
             virtualMachine.executeGoalProgram()
         } catch (_: VirtualMachine.Finished) {
         }
-        world = worldRef.world
+        world = virtualMachine.world
     }
 
     protected fun assertKarelAt(x: Int, y: Int, direction: Int) {

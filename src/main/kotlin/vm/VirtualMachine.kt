@@ -2,7 +2,6 @@ package vm
 
 import common.Diagnostic
 import logic.World
-import logic.WorldRef
 
 // If "step over" or "step return" do not finish within 1 second,
 // we assume the code contains an infinite loop.
@@ -15,16 +14,13 @@ const val ENTRY_POINT = 256
 
 class VirtualMachine(
     private val program: List<Instruction>,
-    private val worldRef: WorldRef,
+    var world: World,
     // callbacks
     private val onCall: ((Instruction, Instruction) -> Unit)? = null,
     private val onReturn: (() -> Unit)? = null,
     private val onPickDrop: ((World) -> Unit)? = null,
     private val onMove: ((World) -> Unit)? = null,
 ) {
-
-    val world: World
-        get() = worldRef.world
 
     var pc: Int = ENTRY_POINT
         private set
@@ -155,47 +151,47 @@ class VirtualMachine(
         when (bytecode) {
             RETURN -> executeReturn()
 
-            MOVE_FORWARD -> worldRef.updateAndGet(World::moveForward).also { onMove?.invoke(it) }
-            TURN_LEFT -> worldRef.updateAndGet(World::turnLeft)
-            TURN_AROUND -> worldRef.updateAndGet(World::turnAround)
-            TURN_RIGHT -> worldRef.updateAndGet(World::turnRight)
-            PICK_BEEPER -> worldRef.updateAndGet(World::pickBeeper).also { onPickDrop?.invoke(it) }
-            DROP_BEEPER -> worldRef.updateAndGet(World::dropBeeper).also { onPickDrop?.invoke(it) }
+            MOVE_FORWARD -> world.moveForward().let { world = it; onMove?.invoke(it) }
+            TURN_LEFT -> world = world.turnLeft()
+            TURN_AROUND -> world = world.turnAround()
+            TURN_RIGHT -> world = world.turnRight()
+            PICK_BEEPER -> world.pickBeeper().let { world = it; onPickDrop?.invoke(it) }
+            DROP_BEEPER -> world.dropBeeper().let { world = it; onPickDrop?.invoke(it) }
 
-            ON_BEEPER -> push(worldRef.world.onBeeper())
-            BEEPER_AHEAD -> push(worldRef.world.beeperAhead())
-            LEFT_IS_CLEAR -> push(worldRef.world.leftIsClear())
-            FRONT_IS_CLEAR -> push(worldRef.world.frontIsClear())
-            RIGHT_IS_CLEAR -> push(worldRef.world.rightIsClear())
+            ON_BEEPER -> push(world.onBeeper())
+            BEEPER_AHEAD -> push(world.beeperAhead())
+            LEFT_IS_CLEAR -> push(world.leftIsClear())
+            FRONT_IS_CLEAR -> push(world.frontIsClear())
+            RIGHT_IS_CLEAR -> push(world.rightIsClear())
 
             // INSTRUMENT
 
             ON_BEEPER_INSTRUMENT -> {
-                val status = worldRef.world.onBeeper()
+                val status = world.onBeeper()
                 push(status)
                 currentInstruction.bytecode = if (status) ON_BEEPER_TRUE else ON_BEEPER_FALSE
             }
 
             BEEPER_AHEAD_INSTRUMENT -> {
-                val status = worldRef.world.beeperAhead()
+                val status = world.beeperAhead()
                 push(status)
                 currentInstruction.bytecode = if (status) BEEPER_AHEAD_TRUE else BEEPER_AHEAD_FALSE
             }
 
             LEFT_IS_CLEAR_INSTRUMENT -> {
-                val status = worldRef.world.leftIsClear()
+                val status = world.leftIsClear()
                 push(status)
                 currentInstruction.bytecode = if (status) LEFT_IS_CLEAR_TRUE else LEFT_IS_CLEAR_FALSE
             }
 
             FRONT_IS_CLEAR_INSTRUMENT -> {
-                val status = worldRef.world.frontIsClear()
+                val status = world.frontIsClear()
                 push(status)
                 currentInstruction.bytecode = if (status) FRONT_IS_CLEAR_TRUE else FRONT_IS_CLEAR_FALSE
             }
 
             RIGHT_IS_CLEAR_INSTRUMENT -> {
-                val status = worldRef.world.rightIsClear()
+                val status = world.rightIsClear()
                 push(status)
                 currentInstruction.bytecode = if (status) RIGHT_IS_CLEAR_TRUE else RIGHT_IS_CLEAR_FALSE
             }
@@ -203,31 +199,31 @@ class VirtualMachine(
             // FALSE
 
             ON_BEEPER_FALSE -> {
-                val status = worldRef.world.onBeeper()
+                val status = world.onBeeper()
                 push(status)
                 if (status) currentInstruction.bytecode = ON_BEEPER
             }
 
             BEEPER_AHEAD_FALSE -> {
-                val status = worldRef.world.beeperAhead()
+                val status = world.beeperAhead()
                 push(status)
                 if (status) currentInstruction.bytecode = BEEPER_AHEAD
             }
 
             LEFT_IS_CLEAR_FALSE -> {
-                val status = worldRef.world.leftIsClear()
+                val status = world.leftIsClear()
                 push(status)
                 if (status) currentInstruction.bytecode = LEFT_IS_CLEAR
             }
 
             FRONT_IS_CLEAR_FALSE -> {
-                val status = worldRef.world.frontIsClear()
+                val status = world.frontIsClear()
                 push(status)
                 if (status) currentInstruction.bytecode = FRONT_IS_CLEAR
             }
 
             RIGHT_IS_CLEAR_FALSE -> {
-                val status = worldRef.world.rightIsClear()
+                val status = world.rightIsClear()
                 push(status)
                 if (status) currentInstruction.bytecode = RIGHT_IS_CLEAR
             }
@@ -235,31 +231,31 @@ class VirtualMachine(
             // TRUE
 
             ON_BEEPER_TRUE -> {
-                val status = worldRef.world.onBeeper()
+                val status = world.onBeeper()
                 push(status)
                 if (!status) currentInstruction.bytecode = ON_BEEPER
             }
 
             BEEPER_AHEAD_TRUE -> {
-                val status = worldRef.world.beeperAhead()
+                val status = world.beeperAhead()
                 push(status)
                 if (!status) currentInstruction.bytecode = BEEPER_AHEAD
             }
 
             LEFT_IS_CLEAR_TRUE -> {
-                val status = worldRef.world.leftIsClear()
+                val status = world.leftIsClear()
                 push(status)
                 if (!status) currentInstruction.bytecode = LEFT_IS_CLEAR
             }
 
             FRONT_IS_CLEAR_TRUE -> {
-                val status = worldRef.world.frontIsClear()
+                val status = world.frontIsClear()
                 push(status)
                 if (!status) currentInstruction.bytecode = FRONT_IS_CLEAR
             }
 
             RIGHT_IS_CLEAR_TRUE -> {
-                val status = worldRef.world.rightIsClear()
+                val status = world.rightIsClear()
                 push(status)
                 if (!status) currentInstruction.bytecode = RIGHT_IS_CLEAR
             }

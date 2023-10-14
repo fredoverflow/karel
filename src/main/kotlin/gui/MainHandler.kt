@@ -3,7 +3,10 @@ package gui
 import freditor.Freditor
 import logic.Problem
 import java.awt.event.KeyEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.util.function.Consumer
+import javax.swing.SwingUtilities
 import kotlin.streams.asSequence
 
 class MainHandler : MainFlow() {
@@ -12,7 +15,8 @@ class MainHandler : MainFlow() {
             controlPanel.startStopReset.text = "start"
 
             initialWorld = currentProblem.randomWorld()
-            worldRef.world = initialWorld
+            virtualMachine.world = initialWorld
+            worldPanel.world = initialWorld
             worldPanel.antWorld = null
             worldPanel.repaint()
 
@@ -20,9 +24,7 @@ class MainHandler : MainFlow() {
         }
 
         controlPanel.goal.addActionListener {
-            worldRef.world = initialWorld
             worldPanel.antWorld = null
-            worldPanel.repaint()
 
             executeGoal(currentProblem.goal)
             controlPanel.stepOver.isEnabled = false
@@ -37,7 +39,8 @@ class MainHandler : MainFlow() {
             controlPanel.check.toolTipText = currentProblem.check.toolTipText
 
             initialWorld = currentProblem.randomWorld()
-            worldRef.world = initialWorld
+            virtualMachine.world = initialWorld
+            worldPanel.world = initialWorld
             worldPanel.antWorld = null
             worldPanel.binaryLines = currentProblem.binaryLines
             worldPanel.repaint()
@@ -64,7 +67,8 @@ class MainHandler : MainFlow() {
                 "reset" -> {
                     controlPanel.startStopReset.text = "start"
 
-                    worldRef.world = initialWorld
+                    virtualMachine.world = initialWorld
+                    worldPanel.world = initialWorld
                     worldPanel.antWorld = null
                     worldPanel.repaint()
                 }
@@ -75,6 +79,7 @@ class MainHandler : MainFlow() {
         controlPanel.check.addActionListener {
             controlPanel.startStopReset.text = "reset"
             worldPanel.antWorld = null
+
             checkAgainst(currentProblem.goal)
 
             editor.requestFocusInWindow()
@@ -137,6 +142,22 @@ class MainHandler : MainFlow() {
                 }
             }
         }
+
+        worldPanel.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(event: MouseEvent) {
+                if (!event.component.isEnabled) return
+
+                if (SwingUtilities.isLeftMouseButton(event)) {
+                    val x = event.x / worldPanel.tileSize
+                    val y = event.y / worldPanel.tileSize
+                    val world = virtualMachine.world.toggleBeeper(x, y)
+
+                    virtualMachine.world = world
+                    worldPanel.world = world
+                    worldPanel.repaint()
+                }
+            }
+        })
 
         defaultCloseOperation = EXIT_ON_CLOSE
         tabbedEditors.saveOnExit(this)

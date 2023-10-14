@@ -2,17 +2,17 @@ package gui
 
 import freditor.*
 import logic.Problem
-import logic.WorldRef
+import logic.World
 import java.awt.BorderLayout
 import javax.swing.Box
 import javax.swing.JFrame
 import javax.swing.border.EmptyBorder
 
-abstract class MainDesign(val worldRef: WorldRef) : JFrame() {
+abstract class MainDesign(world: World) : JFrame() {
 
     val controlPanel = ControlPanel(Problem.problems)
 
-    val worldPanel = WorldPanel(worldRef)
+    val worldPanel = WorldPanel(world)
 
     val story = FreditorUI(Flexer, JavaIndenter.instance, 33, 5)
 
