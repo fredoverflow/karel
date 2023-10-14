@@ -165,7 +165,6 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
     private fun createVirtualMachine(instructions: List<Instruction>, callback: (World) -> Unit) {
         virtualMachine = VirtualMachine(
             instructions, worldRef,
-            onInfiniteLoop = ::onInfiniteLoop,
             onPickDrop = callback,
             onMove = callback.takeIf { Check.EVERY_PICK_DROP_MOVE == currentProblem.check },
         )
@@ -211,7 +210,6 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
             instructions, worldRef,
             onCall = editor::push.takeIf { compiledFromSource },
             onReturn = editor::pop.takeIf { compiledFromSource },
-            onInfiniteLoop = ::onInfiniteLoop,
         )
         controlPanel.executionStarted()
         update()
@@ -226,10 +224,6 @@ abstract class MainFlow : MainDesign(WorldRef(Problem.karelsFirstProgram.randomW
         tabbedEditors.tabs.isEnabled = true
         editor.clearStack()
         editor.requestFocusInWindow()
-    }
-
-    fun onInfiniteLoop() {
-        throw Diagnostic(virtualMachine.currentInstruction.position, "infinite loop detected")
     }
 
     fun update() {

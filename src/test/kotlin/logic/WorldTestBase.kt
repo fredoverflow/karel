@@ -1,7 +1,6 @@
 package logic
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.fail
 import vm.VirtualMachine
 
 open class WorldTestBase {
@@ -12,7 +11,7 @@ open class WorldTestBase {
         val instructions = vm.createGoalInstructions(problem.goal)
         initialWorld = problem.randomWorld()
         val worldRef = WorldRef(initialWorld)
-        val virtualMachine = VirtualMachine(instructions, worldRef, onInfiniteLoop = { fail("infinite loop detected") })
+        val virtualMachine = VirtualMachine(instructions, worldRef)
         try {
             virtualMachine.executeGoalProgram()
         } catch (_: VirtualMachine.Finished) {

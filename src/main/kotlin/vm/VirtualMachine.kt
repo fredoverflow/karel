@@ -1,5 +1,6 @@
 package vm
 
+import common.Diagnostic
 import logic.World
 import logic.WorldRef
 
@@ -18,7 +19,6 @@ class VirtualMachine(
     // callbacks
     private val onCall: ((Instruction, Instruction) -> Unit)? = null,
     private val onReturn: (() -> Unit)? = null,
-    private val onInfiniteLoop: (() -> Unit)? = null,
     private val onPickDrop: ((World) -> Unit)? = null,
     private val onMove: ((World) -> Unit)? = null,
 ) {
@@ -76,7 +76,7 @@ class VirtualMachine(
             executeOneInstruction()
         }
         if (callDepth > targetDepth) {
-            onInfiniteLoop?.invoke()
+            throw Diagnostic(currentInstruction.position, "infinite loop detected")
         }
     }
 
@@ -87,7 +87,7 @@ class VirtualMachine(
                 executeOneInstruction()
             }
         }
-        onInfiniteLoop?.invoke()
+        throw Diagnostic(currentInstruction.position, "infinite loop detected")
     }
 
     fun executeGoalProgram() {
