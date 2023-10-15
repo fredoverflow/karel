@@ -17,7 +17,7 @@ fun verticalBoxPanel(vararg components: Component) = JPanel().apply {
     components.forEach(::add)
 }
 
-fun JComponent.onKeyPressed(handler: (KeyEvent) -> Unit) {
+inline fun JComponent.onKeyPressed(crossinline handler: (KeyEvent) -> Unit) {
     addKeyListener(object : KeyAdapter() {
         override fun keyPressed(event: KeyEvent) {
             handler(event)
