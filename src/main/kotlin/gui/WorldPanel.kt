@@ -17,25 +17,25 @@ import javax.swing.SwingUtilities
 private const val FOLDER_40 = "40"
 private const val FOLDER_64 = "64"
 
-private fun loadTile(folder: String, name: String): BufferedImage {
-    val image = ImageIO.read(WorldPanel::class.java.getResourceAsStream("/tiles/$folder/$name.png"))
-    val scale: Int = screenHeight / 1000
-    return if (scale <= 1) image else image.scaled(scale)
-}
-
 class WorldPanel(var world: World) : JPanel() {
 
     private var folder: String = if (screenHeight < 1000) FOLDER_40 else FOLDER_64
 
-    var tileSize = 1 // smallest working dummy value before loadTiles() runs
+    private fun loadTile(name: String): BufferedImage {
+        val image = ImageIO.read(WorldPanel::class.java.getResourceAsStream("/tiles/$folder/$name.png"))
+        val scale: Int = screenHeight / 1000
+        return if (scale <= 1) image else image.scaled(scale)
+    }
+
+    var tileSize = 0
         private set
 
-    private var beeper = BufferedImage(tileSize, tileSize, BufferedImage.TYPE_INT_ARGB)
+    private var beeper = BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB)
     private var karels = emptyArray<BufferedImage>()
     private var walls = emptyArray<BufferedImage>()
 
     private fun loadTiles() {
-        beeper = loadTile(folder, "beeper")
+        beeper = loadTile("beeper")
         tileSize = beeper.width
         loadKarels()
         loadWalls()
@@ -47,7 +47,7 @@ class WorldPanel(var world: World) : JPanel() {
     }
 
     private fun loadKarels() {
-        val east = loadTile(folder, "karel")
+        val east = loadTile("karel")
         val north = east.rotatedCounterclockwise()
         val west = north.rotatedCounterclockwise()
         val south = west.rotatedCounterclockwise()
@@ -56,9 +56,9 @@ class WorldPanel(var world: World) : JPanel() {
     }
 
     private fun loadWalls() {
-        walls = Array(16) { loadTile(folder, "cross") }
+        walls = Array(16) { loadTile("cross") }
 
-        val east = loadTile(folder, "wall")
+        val east = loadTile("wall")
         val north = east.rotatedCounterclockwise()
         val west = north.rotatedCounterclockwise()
         val south = west.rotatedCounterclockwise()
