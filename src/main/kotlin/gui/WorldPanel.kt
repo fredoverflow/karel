@@ -6,7 +6,6 @@ import logic.World
 
 import java.awt.Dimension
 import java.awt.Graphics
-import java.awt.Toolkit
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.image.BufferedImage
@@ -20,7 +19,7 @@ private const val FOLDER_64 = "64"
 
 private fun loadTile(folder: String, name: String): BufferedImage {
     val image = ImageIO.read(WorldPanel::class.java.getResourceAsStream("/tiles/$folder/$name.png"))
-    val scale: Int = Toolkit.getDefaultToolkit().screenSize.height / 1000
+    val scale: Int = screenHeight / 1000
     return if (scale <= 1) image else image.scaled(scale)
 }
 
@@ -69,11 +68,11 @@ private fun BufferedImage.rotatedCounterclockwise(): BufferedImage {
 
 class WorldPanel(var world: World) : JPanel() {
 
-    private var folder: String = Toolkit.getDefaultToolkit().screenSize.height.let { screenHeight ->
-        if (screenHeight < 1000) FOLDER_40 else FOLDER_64
-    }
+    private var folder: String = if (screenHeight < 1000) FOLDER_40 else FOLDER_64
+
     var tileSize = 1 // smallest working dummy value before loadTiles() runs
         private set
+
     private var beeper = BufferedImage(tileSize, tileSize, BufferedImage.TYPE_INT_ARGB)
     private var karels = emptyArray<BufferedImage>()
     private var walls = emptyArray<BufferedImage>()
@@ -130,8 +129,7 @@ class WorldPanel(var world: World) : JPanel() {
         graphics.drawKarel(world)
         graphics.drawNumbers(world)
 
-        // see https://stackoverflow.com/questions/19480076
-        Toolkit.getDefaultToolkit().sync()
+        flushGraphicsBuffers()
     }
 
     private fun Graphics.drawWallsAndBeepers(world: World) {
