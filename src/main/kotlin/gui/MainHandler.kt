@@ -43,6 +43,7 @@ class MainHandler : MainFlow() {
             worldPanel.world = initialWorld
             worldPanel.antWorld = null
             worldPanel.binaryLines = currentProblem.binaryLines
+            worldPanel.clearRaster()
             worldPanel.repaint()
 
             story.load(currentProblem.story)

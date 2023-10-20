@@ -3,13 +3,12 @@ package gui
 import freditor.Fronts
 import logic.Problem
 import logic.World
-
+import java.awt.Color
 import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.image.BufferedImage
-
 import javax.imageio.ImageIO
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
@@ -76,6 +75,14 @@ class WorldPanel(var world: World) : JPanel() {
     var antWorld: World? = null
     var showAntWorld: Boolean = false
 
+    private val raster: Array<BooleanArray> = Array(3 * Problem.HEIGHT) { BooleanArray(3 * Problem.WIDTH) }
+
+    fun clearRaster() {
+        for (line in raster) {
+            line.fill(false)
+        }
+    }
+
     override fun paintComponent(graphics: Graphics) {
         var world = antWorld
         if (world == null || !showAntWorld) {
@@ -83,6 +90,7 @@ class WorldPanel(var world: World) : JPanel() {
         }
 
         graphics.drawWallsAndBeepers(world)
+        graphics.drawRaster(raster)
         graphics.drawKarel(world)
         graphics.drawNumbers(world)
 
@@ -97,6 +105,23 @@ class WorldPanel(var world: World) : JPanel() {
                     drawTile(x, y, beeper)
                 }
             }
+        }
+    }
+
+    private fun Graphics.drawRaster(raster: Array<BooleanArray>) {
+        color = Color(0x7fff0000, true)
+        var y1 = 0
+        raster.forEachIndexed { y, line ->
+            val y2 = ((y + 1) * tileSize + 1) / 3
+            var x1 = 0
+            line.forEachIndexed { x, cell ->
+                val x2 = ((x + 1) * tileSize + 1) / 3
+                if (cell) {
+                    fillRect(x1, y1, x2 - x1, y2 - y1)
+                }
+                x1 = x2
+            }
+            y1 = y2
         }
     }
 
@@ -140,7 +165,7 @@ class WorldPanel(var world: World) : JPanel() {
     }
 
     private fun listenToMouse() {
-        addMouseListener(object : MouseAdapter() {
+        val mouseAdapter = object : MouseAdapter() {
             override fun mouseClicked(event: MouseEvent) {
                 if (!event.component.isEnabled) return
 
@@ -149,7 +174,10 @@ class WorldPanel(var world: World) : JPanel() {
                         showAntWorld = !showAntWorld
                     }
                 } else if (SwingUtilities.isRightMouseButton(event)) {
-                    switchTileSize()
+                    when (event.clickCount) {
+                        2 -> clearRaster()
+                        3 -> switchTileSize()
+                    }
                 }
                 repaint()
             }
@@ -167,7 +195,25 @@ class WorldPanel(var world: World) : JPanel() {
                     repaint()
                 }
             }
-        })
+
+            override fun mouseDragged(event: MouseEvent) {
+                val x = event.x * 3 / tileSize
+                val y = event.y * 3 / tileSize
+                when {
+                    y !in raster.indices -> return
+                    x !in raster[y].indices -> return
+
+                    x % 3 != 1 && y % 3 != 1 -> return
+
+                    SwingUtilities.isLeftMouseButton(event) -> raster[y][x] = true
+                    SwingUtilities.isRightMouseButton(event) -> raster[y][x] = false
+                }
+                repaint()
+            }
+        }
+
+        addMouseListener(mouseAdapter)
+        addMouseMotionListener(mouseAdapter)
     }
 
     private fun switchTileSize() {
