@@ -23,49 +23,6 @@ private fun loadTile(folder: String, name: String): BufferedImage {
     return if (scale <= 1) image else image.scaled(scale)
 }
 
-private fun BufferedImage.scaled(scale: Int): BufferedImage {
-    require(scale >= 2) { "scale $scale too small" }
-    require(width == height) { "$width * $height is not a square" }
-
-    val srcSize = width
-    val dstSize = srcSize * scale
-    val src = IntArray(srcSize * srcSize)
-    val dst = IntArray(dstSize * dstSize)
-    getRGB(0, 0, srcSize, srcSize, src, 0, srcSize)
-
-    var j = 0
-    for (y in 0 until dstSize) {
-        val i = (y / scale) * srcSize
-        for (x in 0 until dstSize) {
-            dst[j++] = src[i + (x / scale)]
-        }
-    }
-    val scaled = BufferedImage(dstSize, dstSize, BufferedImage.TYPE_INT_ARGB)
-    scaled.setRGB(0, 0, dstSize, dstSize, dst, 0, dstSize)
-    return scaled
-}
-
-private fun BufferedImage.rotatedCounterclockwise(): BufferedImage {
-    require(width == height) { "$width * $height is not a square" }
-
-    val tileSize = width
-    val src = IntArray(tileSize * tileSize)
-    val dst = IntArray(tileSize * tileSize)
-    getRGB(0, 0, tileSize, tileSize, src, 0, tileSize)
-
-    var j = 0
-    for (y in 0 until tileSize) {
-        var i = tileSize - 1 - y
-        for (x in 0 until tileSize) {
-            dst[j++] = src[i]
-            i += tileSize
-        }
-    }
-    val rotated = BufferedImage(tileSize, tileSize, BufferedImage.TYPE_INT_ARGB)
-    rotated.setRGB(0, 0, tileSize, tileSize, dst, 0, tileSize)
-    return rotated
-}
-
 class WorldPanel(var world: World) : JPanel() {
 
     private var folder: String = if (screenHeight < 1000) FOLDER_40 else FOLDER_64
