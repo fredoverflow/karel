@@ -139,7 +139,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
         createVirtualMachine(instructions) { world ->
             if (!goalWorldIterator.hasNext()) {
-                worldPanel.antWorld = goalWorlds.last()
+                worldPanel.antWorld = goalWorlds.lastOrNull() ?: initialWorld
                 throw Diagnostic(virtualMachine.currentInstruction.position, "overshoots goal\n$COMPARE")
             }
             val goalWorld = goalWorldIterator.next()
