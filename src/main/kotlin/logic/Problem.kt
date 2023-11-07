@@ -443,17 +443,17 @@ class Problem(
             "\u0007\ud108\u000a\uc106\u0001\ub100\u0002\ub100\u0000",
             Check.EVERY_PICK_DROP_MOVE,
             0,
-            16000.toBigInteger(),
+            14400.toBigInteger(),
         ) { id ->
             val rng = WorldEntropy(id)
             var world = emptyWorld
 
-            val xy = rng.nextInt(10)
+            val zeroToEight = rng.nextInt(9)
             when (rng.nextInt(4)) {
-                EAST -> world = world.dropBeeper(9, xy)
-                WEST -> world = world.dropBeeper(0, xy)
-                NORTH -> world = world.dropBeeper(xy, 0)
-                SOUTH -> world = world.dropBeeper(xy, 9)
+                NORTH -> world = world.dropBeeper(zeroToEight, 0)
+                EAST -> world = world.dropBeeper(9, zeroToEight)
+                SOUTH -> world = world.dropBeeper(9 - zeroToEight, 9)
+                WEST -> world = world.dropBeeper(0, 9 - zeroToEight)
             }
             val x = rng.nextInt(10)
             val y = rng.nextInt(10)
