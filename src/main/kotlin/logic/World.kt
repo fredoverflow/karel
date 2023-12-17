@@ -55,24 +55,24 @@ data class World(private val hi: Long, private val lo: Long, val floorPlan: Floo
 
     // BEEPERS
 
-    private fun beepersAt(input: Long, position: Int): Int {
-        return input.ushr(position).toInt().and(1)
+    private fun beepersAt(input: Long, shift: Int): Int {
+        return input.ushr(shift).toInt().and(1)
     }
 
-    private fun pickBeeper(input: Long, position: Int): Long {
-        val output = input.and((1L.shl(position)).inv())
+    private fun pickBeeper(input: Long, shift: Int): Long {
+        val output = input.and(1L.shl(shift).inv())
         if (output == input) throw CellIsEmpty()
         return output
     }
 
-    private fun dropBeeper(input: Long, position: Int): Long {
-        val output = input.or(1L.shl(position))
+    private fun dropBeeper(input: Long, shift: Int): Long {
+        val output = input.or(1L.shl(shift))
         if (output == input) throw CellIsFull()
         return output
     }
 
-    private fun toggleBeeper(input: Long, position: Int): Long {
-        return input.xor(1L.shl(position))
+    private fun toggleBeeper(input: Long, shift: Int): Long {
+        return input.xor(1L.shl(shift))
     }
 
     fun beeperAt(x: Int, y: Int): Boolean {
@@ -80,38 +80,38 @@ data class World(private val hi: Long, private val lo: Long, val floorPlan: Floo
     }
 
     fun beepersAt(x: Int, y: Int): Int {
-        val index = y * 10 + x
-        return if (index >= 64) {
-            beepersAt(hi, index - 64)
+        val shift = y * 10 + x
+        return if (shift >= 64) {
+            beepersAt(hi, shift)
         } else {
-            beepersAt(lo, index)
+            beepersAt(lo, shift)
         }
     }
 
     fun pickBeeper(x: Int, y: Int): World {
-        val index = y * 10 + x
-        return if (index >= 64) {
-            copy(hi = pickBeeper(hi, index - 64))
+        val shift = y * 10 + x
+        return if (shift >= 64) {
+            copy(hi = pickBeeper(hi, shift))
         } else {
-            copy(lo = pickBeeper(lo, index))
+            copy(lo = pickBeeper(lo, shift))
         }
     }
 
     fun dropBeeper(x: Int, y: Int): World {
-        val index = y * 10 + x
-        return if (index >= 64) {
-            copy(hi = dropBeeper(hi, index - 64))
+        val shift = y * 10 + x
+        return if (shift >= 64) {
+            copy(hi = dropBeeper(hi, shift))
         } else {
-            copy(lo = dropBeeper(lo, index))
+            copy(lo = dropBeeper(lo, shift))
         }
     }
 
     fun toggleBeeper(x: Int, y: Int): World {
-        val index = y * 10 + x
-        return if (index >= 64) {
-            copy(hi = toggleBeeper(hi, index - 64))
+        val shift = y * 10 + x
+        return if (shift >= 64) {
+            copy(hi = toggleBeeper(hi, shift))
         } else {
-            copy(lo = toggleBeeper(lo, index))
+            copy(lo = toggleBeeper(lo, shift))
         }
     }
 
