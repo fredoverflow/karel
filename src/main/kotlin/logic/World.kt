@@ -24,7 +24,7 @@ private val deltaX = intArrayOf(1, 0, -1, 0)
 private val deltaY = intArrayOf(0, -1, 0, 1)
 private val deltaXY = longArrayOf(1L.shl(X_SHIFT), 15L.shl(Y_SHIFT), 15L.shl(X_SHIFT), 1L.shl(Y_SHIFT))
 
-data class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan) {
+class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan) {
     val beepersLo: Long
         get() = lo
 
@@ -45,12 +45,12 @@ data class World(private val hi: Long, private val lo: Long, val floorPlan: Floo
         get() = hi.ushr(D_SHIFT).toInt()
 
     fun withBeepers(hi: Long, lo: Long): World {
-        return copy(hi = hi, lo = lo)
+        return World(hi, lo, floorPlan)
     }
 
     fun withKarelAt(x: Int, y: Int, direction: Int): World {
-        val coordinates = direction.toLong().shl(D_SHIFT).or(y.toLong().shl(Y_SHIFT)).or(x.toLong().shl(X_SHIFT))
-        return copy(hi = hi.and(BEEPERS_HI).or(coordinates))
+        val coordinates = direction.toLong().shl(D_SHIFT) or y.toLong().shl(Y_SHIFT) or x.toLong().shl(X_SHIFT)
+        return World(hi.and(BEEPERS_HI).or(coordinates), lo, floorPlan)
     }
 
     // BEEPERS
@@ -91,32 +91,32 @@ data class World(private val hi: Long, private val lo: Long, val floorPlan: Floo
     fun pickBeeper(x: Int, y: Int): World {
         val shift = y * 10 + x
         return if (shift >= 64) {
-            copy(hi = pickBeeper(hi, shift))
+            World(pickBeeper(hi, shift), lo, floorPlan)
         } else {
-            copy(lo = pickBeeper(lo, shift))
+            World(hi, pickBeeper(lo, shift), floorPlan)
         }
     }
 
     fun dropBeeper(x: Int, y: Int): World {
         val shift = y * 10 + x
         return if (shift >= 64) {
-            copy(hi = dropBeeper(hi, shift))
+            World(dropBeeper(hi, shift), lo, floorPlan)
         } else {
-            copy(lo = dropBeeper(lo, shift))
+            World(hi, dropBeeper(lo, shift), floorPlan)
         }
     }
 
     fun toggleBeeper(x: Int, y: Int): World {
         val shift = y * 10 + x
         return if (shift >= 64) {
-            copy(hi = toggleBeeper(hi, shift))
+            World(toggleBeeper(hi, shift), lo, floorPlan)
         } else {
-            copy(lo = toggleBeeper(lo, shift))
+            World(hi, toggleBeeper(lo, shift), floorPlan)
         }
     }
 
     fun fillWithBeepers(): World {
-        return copy(hi = hi.or(BEEPERS_HI), lo = -1)
+        return World(hi.or(BEEPERS_HI), -1, floorPlan)
     }
 
     fun countBeepers(): Int {
@@ -159,11 +159,11 @@ data class World(private val hi: Long, private val lo: Long, val floorPlan: Floo
 
     fun moveForward(): World {
         if (!frontIsClear()) throw BlockedByWall()
-        return copy(hi = (hi + deltaXY[direction]).and(CLEAR_CARRY))
+        return World((hi + deltaXY[direction]).and(CLEAR_CARRY), lo, floorPlan)
     }
 
     fun turn(delta: Int): World {
-        return copy(hi = (hi + (delta.toLong().shl(D_SHIFT))).and(CLEAR_CARRY))
+        return World((hi + delta.toLong().shl(D_SHIFT)).and(CLEAR_CARRY), lo, floorPlan)
     }
 
     fun turnLeft(): World {
