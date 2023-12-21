@@ -173,6 +173,9 @@ class MainHandler : MainFlow() {
             when (event.keyCode) {
                 KeyEvent.VK_M -> if (event.isControlDown && event.isShiftDown) {
                     virtualMachinePanel.isVisible = !virtualMachinePanel.isVisible
+                    if (virtualMachinePanel.isVisible) {
+                        virtualMachinePanel.update(virtualMachine.copyUsedStack(), virtualMachine.pc)
+                    }
                 }
 
                 KeyEvent.VK_F12 -> {

@@ -28,19 +28,25 @@ class VirtualMachine(
     val currentInstruction: Instruction
         get() = program[pc]
 
-    var stack: Stack? = null
-        private set
+    private var stack = IntArray(20) // big enough for most problems
+    private var used = 0
+    fun copyUsedStack() = stack.copyOf(used)
 
     private var callDepth: Int = 0
 
+    private fun push(x: Int) {
+        if (used >= stack.size) {
+            stack = stack.copyOf(10 * used) // worst case for findShelters
+        }
+        stack[used++] = x
+    }
+
     private fun push(x: Boolean) {
-        stack = Stack.Boolean(if (x) 1 else 0, stack)
+        push(if (x) -1 else 0)
     }
 
     private fun pop(): Int {
-        val stack = this.stack!!
-        this.stack = stack.tail
-        return stack.head
+        return stack[--used]
     }
 
     fun stepInto(virtualMachineVisible: Boolean) {
@@ -111,23 +117,22 @@ class VirtualMachine(
     }
 
     private fun Instruction.executePush() {
-        stack = Stack.LoopCounter(target, stack)
+        push(target)
         ++pc
     }
 
     private fun Instruction.executeLoop() {
-        val remaining = pop() - 1
-        if (remaining > 0) {
-            stack = Stack.LoopCounter(remaining, stack)
+        if (--stack[used - 1] > 0) {
             pc = target
         } else {
+            --used
             ++pc
         }
     }
 
     private fun Instruction.executeCall() {
         onCall?.invoke(this, findReturnInstructionAfter(target))
-        stack = Stack.ReturnAddress(pc, stack)
+        push(pc)
         ++callDepth
         pc = target
     }
@@ -141,7 +146,7 @@ class VirtualMachine(
     object Finished : Exception()
 
     private fun executeReturn() {
-        if (stack == null) throw Finished
+        if (used <= 0) throw Finished
         onReturn?.invoke()
         pc = pop()
         --callDepth

@@ -1,7 +1,6 @@
 package gui
 
 import vm.Instruction
-import vm.Stack
 import javax.swing.Box
 import javax.swing.BoxLayout
 import javax.swing.JPanel
@@ -22,8 +21,8 @@ class VirtualMachinePanel : JPanel() {
         bytecodeTable.setProgram(program)
     }
 
-    fun update(stack: Stack?, pc: Int) {
-        stackTable.setStack(stack)
+    fun update(stack: IntArray, pc: Int) {
+        stackTable.stack = stack
         bytecodeTable.highlightLine(pc)
     }
 }

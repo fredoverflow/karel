@@ -48,7 +48,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
             if (main != null) {
                 val instructions = Emitter(parser.sema, true).emit(main)
                 virtualMachinePanel.setProgram(instructions)
-                virtualMachinePanel.update(null, ENTRY_POINT)
+                virtualMachinePanel.update(EMPTY_STACK, ENTRY_POINT)
 
                 val goalInstructions = createGoalInstructions(goal)
 
@@ -230,7 +230,9 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         if (position > 0) {
             editor.setCursorTo(position)
         }
-        virtualMachinePanel.update(virtualMachine.stack, virtualMachine.pc)
+        if (virtualMachinePanel.isVisible) {
+            virtualMachinePanel.update(virtualMachine.copyUsedStack(), virtualMachine.pc)
+        }
         worldPanel.world = virtualMachine.world
         worldPanel.repaint()
     }

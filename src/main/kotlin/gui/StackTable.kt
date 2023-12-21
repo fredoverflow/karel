@@ -1,17 +1,14 @@
 package gui
 
 import freditor.Fronts
-import vm.Stack
-import vm.forEach
-import vm.size
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Graphics
 import javax.swing.JComponent
 
-class StackTable : JComponent() {
-    private var stack: Stack? = null
+val EMPTY_STACK = IntArray(0)
 
+class StackTable : JComponent() {
     init {
         resize(0)
     }
@@ -24,37 +21,36 @@ class StackTable : JComponent() {
         revalidate()
     }
 
-    fun setStack(newStack: Stack?) {
-        if (newStack !== stack) {
-            if (newStack.size != stack.size) {
-                resize(newStack.size)
+    var stack = EMPTY_STACK
+        set(value) {
+            val oldSize = field.size
+            val newSize = value.size
+            field = value
+            if (newSize != oldSize) {
+                resize(newSize)
             }
-            stack = newStack
             repaint()
         }
-    }
 
     override fun paint(graphics: Graphics) {
         graphics.color = Color.WHITE
         graphics.fillRect(0, 0, width, height)
 
-        var y = 0
         val frontHeight = Fronts.front.height
         val frontRight = 4 * Fronts.front.width
 
-        stack.forEach { stack ->
-            when (stack) {
-                is Stack.ReturnAddress -> Fronts.front.drawHexRight(graphics, frontRight, y, stack.head, 0x808080)
+        var y = stack.size * frontHeight
 
-                is Stack.LoopCounter -> Fronts.front.drawIntRight(graphics, frontRight, y, stack.head, 0x6400c8)
+        for (value in stack) {
+            y -= frontHeight
+            when (value) {
+                0 -> Fronts.front.drawString(graphics, 0, y, "false", 0xff0000)
+                -1 -> Fronts.front.drawString(graphics, 0, y, "true", 0x008000)
 
-                is Stack.Boolean -> if (stack.head == 0) {
-                    Fronts.front.drawString(graphics, 0, y, "false", 0xff0000)
-                } else {
-                    Fronts.front.drawString(graphics, 0, y, "true", 0x008000)
-                }
+                in 1..255 -> Fronts.front.drawIntRight(graphics, frontRight, y, value, 0x6400c8)
+
+                else -> Fronts.front.drawHexRight(graphics, frontRight, y, value, 0x808080)
             }
-            y += frontHeight
         }
     }
 }
