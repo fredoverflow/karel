@@ -8,6 +8,7 @@ import syntax.parser.Parser
 import syntax.parser.program
 import vm.*
 import java.awt.EventQueue
+import java.util.concurrent.ArrayBlockingQueue
 import javax.swing.Timer
 
 const val CHECK_TOTAL_NS = 2_000_000_000L
@@ -77,21 +78,44 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
             update()
         }
 
+        val queue = ArrayBlockingQueue<List<World>>(2)
+
+        val producer = Thread {
+            try {
+                for (initialWorld in currentProblem.randomWorlds()) {
+                    val goalWorlds = ArrayList<World>(200)
+                    goalWorlds.add(initialWorld)
+                    val virtualMachine = createVirtualMachine(goalInstructions, initialWorld, goalWorlds::add)
+                    try {
+                        virtualMachine.executeGoalProgram()
+                    } catch (_: VirtualMachine.Finished) {
+                    }
+                    queue.put(goalWorlds)
+                }
+                queue.put(emptyList()) // producer has no more elements
+            } catch (_: InterruptedException) {
+                // consumer needs no more elements
+            }
+        }
+        producer.start()
+
         val start = System.nanoTime()
         var nextRepaint = CHECK_REPAINT_NS
 
-        val worlds = currentProblem.randomWorlds().iterator()
         var worldCounter = 0
 
         fun checkBetweenRepaints() {
             try {
-                while (worlds.hasNext()) {
-                    initialWorld = worlds.next()
-                    checkOneWorld(instructions, goalInstructions)
+                while (true) {
+                    val goalWorlds = queue.take()
+                    if (goalWorlds.isEmpty()) break
+
+                    checkOneWorld(instructions, goalWorlds)
                     ++worldCounter
 
                     val elapsed = System.nanoTime() - start
                     if (elapsed >= CHECK_TOTAL_NS) {
+                        producer.interrupt()
                         cleanup()
                         reportFirstRedundantCondition(instructions)
                         if (currentProblem.numWorlds == UNKNOWN) {
@@ -120,13 +144,13 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         checkBetweenRepaints()
     }
 
-    private fun checkOneWorld(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
-        val goalWorlds = goalWorlds(goalInstructions)
+    private fun checkOneWorld(instructions: List<Instruction>, goalWorlds: List<World>) {
         val goalWorldIterator = goalWorlds.iterator()
+        initialWorld = goalWorldIterator.next()
 
-        createVirtualMachine(instructions) { world ->
+        virtualMachine = createVirtualMachine(instructions, initialWorld) { world ->
             if (!goalWorldIterator.hasNext()) {
-                worldPanel.antWorld = goalWorlds.lastOrNull() ?: initialWorld
+                worldPanel.antWorld = goalWorlds.last()
                 throw Diagnostic(virtualMachine.currentInstruction.position, "overshoots goal\n$COMPARE")
             }
             val goalWorld = goalWorldIterator.next()
@@ -148,22 +172,16 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         }
     }
 
-    private fun createVirtualMachine(instructions: List<Instruction>, callback: (World) -> Unit) {
-        virtualMachine = VirtualMachine(
+    private fun createVirtualMachine(
+        instructions: List<Instruction>,
+        initialWorld: World,
+        callback: (World) -> Unit,
+    ): VirtualMachine {
+        return VirtualMachine(
             instructions, initialWorld,
             onPickDrop = callback,
             onMove = callback.takeIf { Check.EVERY_PICK_DROP_MOVE == currentProblem.check },
         )
-    }
-
-    private fun goalWorlds(goalInstructions: List<Instruction>): List<World> {
-        val goalWorlds = ArrayList<World>(200)
-        createVirtualMachine(goalInstructions, goalWorlds::add)
-        try {
-            virtualMachine.executeGoalProgram()
-        } catch (_: VirtualMachine.Finished) {
-        }
-        return goalWorlds
     }
 
     private fun reportFirstRedundantCondition(instructions: List<Instruction>) {
