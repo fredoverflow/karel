@@ -1,6 +1,7 @@
 package gui
 
 import common.Diagnostic
+import common.subList
 import logic.*
 import syntax.lexer.Lexer
 import syntax.parser.Parser
@@ -76,20 +77,6 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
             update()
         }
 
-        fun reportFirstRedundantCondition() {
-            for (instruction in instructions) {
-                when (instruction.bytecode) {
-                    ON_BEEPER_FALSE, BEEPER_AHEAD_FALSE, LEFT_IS_CLEAR_FALSE, FRONT_IS_CLEAR_FALSE, RIGHT_IS_CLEAR_FALSE -> {
-                        throw Diagnostic(instruction.position, "condition was always false")
-                    }
-
-                    ON_BEEPER_TRUE, BEEPER_AHEAD_TRUE, LEFT_IS_CLEAR_TRUE, FRONT_IS_CLEAR_TRUE, RIGHT_IS_CLEAR_TRUE -> {
-                        throw Diagnostic(instruction.position, "condition was always true")
-                    }
-                }
-            }
-        }
-
         val start = System.nanoTime()
         var nextRepaint = CHECK_REPAINT_NS
 
@@ -106,7 +93,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
                     val elapsed = System.nanoTime() - start
                     if (elapsed >= CHECK_TOTAL_NS) {
                         cleanup()
-                        reportFirstRedundantCondition()
+                        reportFirstRedundantCondition(instructions)
                         if (currentProblem.numWorlds == UNKNOWN) {
                             showDiagnostic("OK: checked $worldCounter random worlds")
                         } else {
@@ -122,7 +109,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
                     }
                 }
                 cleanup()
-                reportFirstRedundantCondition()
+                reportFirstRedundantCondition(instructions)
                 showDiagnostic("OK: checked all ${currentProblem.numWorlds} possible worlds")
             } catch (diagnostic: Diagnostic) {
                 cleanup()
@@ -177,6 +164,20 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         } catch (_: VirtualMachine.Finished) {
         }
         return goalWorlds
+    }
+
+    private fun reportFirstRedundantCondition(instructions: List<Instruction>) {
+        for (instruction in instructions.subList(ENTRY_POINT)) {
+            when (instruction.bytecode) {
+                ON_BEEPER_FALSE, BEEPER_AHEAD_FALSE, LEFT_IS_CLEAR_FALSE, FRONT_IS_CLEAR_FALSE, RIGHT_IS_CLEAR_FALSE -> {
+                    throw Diagnostic(instruction.position, "condition was always false")
+                }
+
+                ON_BEEPER_TRUE, BEEPER_AHEAD_TRUE, LEFT_IS_CLEAR_TRUE, FRONT_IS_CLEAR_TRUE, RIGHT_IS_CLEAR_TRUE -> {
+                    throw Diagnostic(instruction.position, "condition was always true")
+                }
+            }
+        }
     }
 
     fun parseAndExecute() {
