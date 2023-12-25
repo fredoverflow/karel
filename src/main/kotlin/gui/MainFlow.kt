@@ -2,12 +2,14 @@ package gui
 
 import common.Diagnostic
 import common.subList
+import common.whenCompleteAsync
 import logic.*
 import syntax.lexer.Lexer
 import syntax.parser.Parser
 import syntax.parser.program
 import vm.*
 import java.awt.EventQueue
+import java.util.concurrent.CompletableFuture
 import javax.swing.Timer
 
 const val CHECK_TOTAL_NS = 2_000_000_000L
@@ -68,56 +70,45 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         worldPanel.isEnabled = false
         tabbedEditors.tabs.isEnabled = false
 
-        fun cleanup() {
+        CompletableFuture.supplyAsync {
+            val start = System.nanoTime()
+            var nextRepaint = CHECK_REPAINT_NS
+
+            var worldCounter = 0
+            for (world in currentProblem.randomWorlds()) {
+                initialWorld = world
+                checkOneWorld(instructions, goalInstructions)
+                ++worldCounter
+
+                val elapsed = System.nanoTime() - start
+                if (elapsed >= CHECK_TOTAL_NS) {
+                    reportFirstRedundantCondition(instructions)
+                    return@supplyAsync if (currentProblem.numWorlds == UNKNOWN) {
+                        "OK: checked $worldCounter random worlds"
+                    } else {
+                        "OK: checked $worldCounter random worlds\n    from ${currentProblem.numWorlds} possible worlds"
+                    }
+                } else if (elapsed >= nextRepaint) {
+                    worldPanel.world = initialWorld
+                    worldPanel.repaint()
+                    nextRepaint += CHECK_REPAINT_NS
+                }
+            }
+            reportFirstRedundantCondition(instructions)
+            return@supplyAsync "OK: checked all ${currentProblem.numWorlds} possible worlds"
+        }.whenCompleteAsync(EventQueue::invokeLater) { successMessage, wrappedDiagnostic ->
             controlPanel.checkFinished(currentProblem.isRandom)
             worldPanel.isEnabled = true
             tabbedEditors.tabs.isEnabled = true
 
             editor.clearStack()
             update()
-        }
-
-        val start = System.nanoTime()
-        var nextRepaint = CHECK_REPAINT_NS
-
-        val worlds = currentProblem.randomWorlds().iterator()
-        var worldCounter = 0
-
-        fun checkBetweenRepaints() {
-            try {
-                while (worlds.hasNext()) {
-                    initialWorld = worlds.next()
-                    checkOneWorld(instructions, goalInstructions)
-                    ++worldCounter
-
-                    val elapsed = System.nanoTime() - start
-                    if (elapsed >= CHECK_TOTAL_NS) {
-                        cleanup()
-                        reportFirstRedundantCondition(instructions)
-                        if (currentProblem.numWorlds == UNKNOWN) {
-                            showDiagnostic("OK: checked $worldCounter random worlds")
-                        } else {
-                            showDiagnostic("OK: checked $worldCounter random worlds\n    from ${currentProblem.numWorlds} possible worlds")
-                        }
-                        return
-                    } else if (elapsed >= nextRepaint) {
-                        worldPanel.world = initialWorld
-                        worldPanel.repaint()
-                        nextRepaint += CHECK_REPAINT_NS
-                        EventQueue.invokeLater(::checkBetweenRepaints)
-                        return
-                    }
-                }
-                cleanup()
-                reportFirstRedundantCondition(instructions)
-                showDiagnostic("OK: checked all ${currentProblem.numWorlds} possible worlds")
-            } catch (diagnostic: Diagnostic) {
-                cleanup()
-                showDiagnostic(diagnostic)
+            if (successMessage != null) {
+                showDiagnostic(successMessage)
+            } else {
+                showDiagnostic(wrappedDiagnostic!!.cause as Diagnostic)
             }
         }
-
-        checkBetweenRepaints()
     }
 
     private fun checkOneWorld(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
