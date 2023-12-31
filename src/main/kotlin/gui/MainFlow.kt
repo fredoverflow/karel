@@ -121,7 +121,12 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
     }
 
     private fun checkOneWorld(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
-        val goalWorlds = goalWorlds(goalInstructions)
+        val goalWorlds = ArrayList<World>(200)
+        createVirtualMachine(goalInstructions, goalWorlds::add)
+        try {
+            virtualMachine.executeGoalProgram()
+        } catch (_: VirtualMachine.Finished) {
+        }
         val goalWorldIterator = goalWorlds.iterator()
 
         createVirtualMachine(instructions) { world ->
@@ -154,16 +159,6 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
             onPickDrop = callback,
             onMove = callback.takeIf { Check.EVERY_PICK_DROP_MOVE == currentProblem.check },
         )
-    }
-
-    private fun goalWorlds(goalInstructions: List<Instruction>): List<World> {
-        val goalWorlds = ArrayList<World>(200)
-        createVirtualMachine(goalInstructions, goalWorlds::add)
-        try {
-            virtualMachine.executeGoalProgram()
-        } catch (_: VirtualMachine.Finished) {
-        }
-        return goalWorlds
     }
 
     private fun reportFirstRedundantCondition(instructions: List<Instruction>) {
