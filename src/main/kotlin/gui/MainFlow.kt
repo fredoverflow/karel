@@ -121,20 +121,19 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
     }
 
     private fun checkOneWorld(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
-        val goalWorlds = ArrayList<World>(200)
+        val goalWorlds = GoalWorldBuffer(currentProblem.goalWorldBufferSize)
         createVirtualMachine(goalInstructions, goalWorlds::add)
         try {
             virtualMachine.executeGoalProgram()
         } catch (_: VirtualMachine.Finished) {
         }
-        val goalWorldIterator = goalWorlds.iterator()
 
         createVirtualMachine(instructions) { world ->
-            if (!goalWorldIterator.hasNext()) {
+            if (!goalWorlds.hasNext()) {
                 worldPanel.antWorld = goalWorlds.lastOrNull() ?: initialWorld
                 throw Diagnostic(virtualMachine.currentInstruction.position, "overshoots goal\n$COMPARE")
             }
-            val goalWorld = goalWorldIterator.next()
+            val goalWorld = goalWorlds.next()
             if (!goalWorld.equalsIgnoringDirection(world)) {
                 worldPanel.antWorld = goalWorld
                 throw Diagnostic(virtualMachine.currentInstruction.position, "deviates from goal\n$COMPARE")
@@ -147,8 +146,8 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         } catch (error: KarelError) {
             throw Diagnostic(virtualMachine.currentInstruction.position, error.message)
         }
-        if (goalWorldIterator.hasNext() && !goalWorlds.last().equalsIgnoringDirection(virtualMachine.world)) {
-            worldPanel.antWorld = goalWorldIterator.next()
+        if (goalWorlds.hasNext() && !goalWorlds.last().equalsIgnoringDirection(virtualMachine.world)) {
+            worldPanel.antWorld = goalWorlds.next()
             throw Diagnostic(virtualMachine.currentInstruction.position, "falls short of goal\n$COMPARE")
         }
     }

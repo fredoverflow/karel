@@ -18,6 +18,12 @@ class Problem(
     val numWorlds: BigInteger,
     val createWorld: (id: Int) -> World
 ) {
+    val goalWorldBufferSize: Int = when (name) {
+        "addSlow" -> 1022
+        "findShelters" -> 303
+        else -> 200
+    }
+
     override fun toString(): String = "$index $name"
 
     val isRandom: Boolean
