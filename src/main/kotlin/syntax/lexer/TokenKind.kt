@@ -28,5 +28,5 @@ enum class TokenKind(val lexeme: String) {
         get() = lexeme.first().isLowerCase()
 }
 
-val keywords: StringedValueMap<TokenKind> = TokenKind.values().filter(TokenKind::isKeyword)
+val keywords: StringedValueMap<TokenKind> = TokenKind.entries.filter(TokenKind::isKeyword)
     .fold(StringedValueMap.empty(), StringedValueMap<TokenKind>::put)
