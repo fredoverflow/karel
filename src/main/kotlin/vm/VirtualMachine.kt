@@ -138,7 +138,9 @@ class VirtualMachine(
         return program[index]
     }
 
-    object Finished : Exception()
+    object Finished : Exception() {
+        private fun readResolve(): Any = Finished
+    }
 
     private fun executeReturn() {
         if (stack == null) throw Finished
