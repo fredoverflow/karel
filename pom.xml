@@ -92,16 +92,7 @@
             <plugin>
                 <groupId>com.github.wvengen</groupId>
                 <artifactId>proguard-maven-plugin</artifactId>
-                <version>2.6.0</version>
-                <!-- https://github.com/wvengen/proguard-maven-plugin/issues/300 -->
-                <dependencies>
-                    <dependency>
-                        <groupId>com.guardsquare</groupId>
-                        <artifactId>proguard-core</artifactId>
-                        <version>9.1.1</version>
-                        <scope>runtime</scope>
-                    </dependency>
-                </dependencies>
+                <version>2.6.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
