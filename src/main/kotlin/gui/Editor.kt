@@ -99,7 +99,7 @@ class Editor(freditor: Freditor) : FreditorUI(freditor, 60, 1) {
     }
 
     fun pop() {
-        lines.removeLast()
+        lines.removeAt(lines.lastIndex)
         repaint()
     }
 
