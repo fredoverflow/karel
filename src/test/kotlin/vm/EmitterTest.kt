@@ -120,7 +120,27 @@ class EmitterTest {
             MOVE_FORWARD,
             LOOP + 0x102,
             LOOP + 0x101,
-            RETURN
+            RETURN,
+        )
+    }
+
+    @Test
+    fun intersperse() {
+        assertBytecode(
+            """
+            void main() {
+                repeat (7) {
+                    moveForward();
+                } intersperse {
+                    pickBeeper();                    
+                }
+            }
+            """,
+            PUSH + 7, JUMP + 0x103,
+            PICK_BEEPER,
+            MOVE_FORWARD,
+            LOOP + 0x102,
+            RETURN,
         )
     }
 

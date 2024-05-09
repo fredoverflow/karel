@@ -35,7 +35,7 @@ fun Parser.block(): Block {
 fun Parser.statement(): Statement = when (current) {
     IDENTIFIER -> sema(Call(accept().emptyParens()).semicolon())
 
-    REPEAT -> Repeat(accept(), parenthesized { expect(NUMBER).toInt(2..4095) }, block())
+    REPEAT -> Repeat(accept(), parenthesized { expect(NUMBER).toInt(2..4095) }, block(), optional(INTERSPERSE, ::block))
 
     WHILE -> While(accept(), parenthesized(::disjunction), block())
 

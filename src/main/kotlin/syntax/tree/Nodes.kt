@@ -18,7 +18,7 @@ sealed class Statement
 
 class Call(val target: Token) : Statement()
 
-class Repeat(val repeat: Token, val times: Int, val body: Block) : Statement()
+class Repeat(val repeat: Token, val times: Int, val body: Block, val intersperse: Block?) : Statement()
 
 class IfThenElse(val iF: Token, val condition: Condition, val th3n: Block, val e1se: ElseBranch?) : Statement(),
     ElseBranch

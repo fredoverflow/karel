@@ -5,6 +5,7 @@ import freditor.persistent.StringedValueMap
 enum class TokenKind(val lexeme: String) {
     VOID("void"),
     REPEAT("repeat"),
+    INTERSPERSE("intersperse"),
     IF("if"),
     ELSE("else"),
     WHILE("while"),
