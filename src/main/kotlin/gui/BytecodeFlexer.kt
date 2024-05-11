@@ -18,7 +18,7 @@ object BytecodeFlexer : freditor.Flexer() {
         .verbatim(
             EMPTY, "@", "CODE", "MNEMONIC",
             "RET",
-            "MOVE", "TRNL", "TRNA", "TRNR", "PICK", "DROP",
+            "MOVE", "BACK", "TRNL", "TRNA", "TRNR", "PICK", "DROP",
             "BEEP", "HEAD", "LCLR", "FCLR", "RCLR",
             "PUSH", "LOOP", "CALL", "JUMP", "ELSE", "THEN",
         )

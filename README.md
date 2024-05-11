@@ -150,6 +150,8 @@ The full path is displayed in the title bar.
 | F5       | `pickBeeper();`   | Karel picks a beeper from the square he currently stands on.<br>Fails if there is no beeper. |
 | F6       | `dropBeeper();`   | Karel drops a beeper onto the square he currently stands on.<br>Fails if there already is a beeper. |
 
+An optional `moveBackward();` command appears in 5 recursive problems (3.1.1 through 3.3.1) to illustrate recursive ascent.
+
 ### Custom commands
 
 Sometimes the same sequence of commands appears multiple times:

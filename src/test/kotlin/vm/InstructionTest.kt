@@ -23,6 +23,8 @@ class InstructionTest {
             assertPause(bytecode, GOAL)
             assertPause(bytecode, HUMAN)
         }
+        assertPause(MOVE_BACKWARD, GOAL)
+        assertPause(MOVE_BACKWARD, HUMAN)
     }
 
     @Test

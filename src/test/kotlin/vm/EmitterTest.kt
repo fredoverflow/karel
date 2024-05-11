@@ -28,6 +28,7 @@ class EmitterTest {
             """
             void main() {
                 moveForward();
+                moveBackward();
                 turnLeft();
                 turnAround();
                 turnRight();
@@ -36,6 +37,7 @@ class EmitterTest {
             }
             """,
             MOVE_FORWARD,
+            MOVE_BACKWARD,
             TURN_LEFT,
             TURN_AROUND,
             TURN_RIGHT,

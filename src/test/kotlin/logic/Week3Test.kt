@@ -41,7 +41,7 @@ class Week3Test : WorldTestBase() {
     @Test
     fun layAndRemoveTiles() {
         executeGoal(Problem.layAndRemoveTiles)
-        assertKarelAt(0, 9, WEST)
+        assertKarelAt(0, 9, EAST)
         assertNoBeepers()
     }
 

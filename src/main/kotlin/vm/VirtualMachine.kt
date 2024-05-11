@@ -154,6 +154,7 @@ class VirtualMachine(
             RETURN -> executeReturn()
 
             MOVE_FORWARD -> world.moveForward().let { world = it; onMove?.invoke(it) }
+            MOVE_BACKWARD -> world.moveBackward().let { world = it; onMove?.invoke(it) }
             TURN_LEFT -> world = world.turnLeft()
             TURN_AROUND -> world = world.turnAround()
             TURN_RIGHT -> world = world.turnRight()

@@ -5,7 +5,7 @@ import syntax.tree.Call
 import syntax.tree.Command
 import syntax.tree.Program
 
-val BUILTIN_COMMANDS = setOf("moveForward", "turnLeft", "turnAround", "turnRight", "pickBeeper", "dropBeeper")
+val BUILTIN_COMMANDS = setOf("moveForward", "moveBackward", "turnLeft", "turnAround", "turnRight", "pickBeeper", "dropBeeper")
 
 class Sema {
     private val commands = HashMap<String, Command>()

@@ -26,7 +26,7 @@ class Instruction(var bytecode: Int, val position: Int) {
         return when (bytecode) {
             RETURN -> compiledFromSource
 
-            MOVE_FORWARD, TURN_LEFT, TURN_AROUND, TURN_RIGHT, PICK_BEEPER, DROP_BEEPER -> true
+            MOVE_FORWARD, MOVE_BACKWARD, TURN_LEFT, TURN_AROUND, TURN_RIGHT, PICK_BEEPER, DROP_BEEPER -> true
 
             ON_BEEPER, BEEPER_AHEAD, LEFT_IS_CLEAR, FRONT_IS_CLEAR, RIGHT_IS_CLEAR -> compiledFromSource
 
@@ -39,6 +39,7 @@ class Instruction(var bytecode: Int, val position: Int) {
             RETURN -> "RET"
 
             MOVE_FORWARD -> "MOVE"
+            MOVE_BACKWARD -> "BACK"
             TURN_LEFT -> "TRNL"
             TURN_AROUND -> "TRNA"
             TURN_RIGHT -> "TRNR"
@@ -69,6 +70,7 @@ class Instruction(var bytecode: Int, val position: Int) {
 const val RETURN = 0x0000
 
 const val MOVE_FORWARD = 0x0001
+const val MOVE_BACKWARD = 0x000f
 const val TURN_LEFT = 0x0002
 const val TURN_AROUND = 0x0003
 const val TURN_RIGHT = 0x0004
@@ -111,6 +113,7 @@ const val THEN = 0xd000
 
 val builtinCommands: ChampMap<String, Int> = ChampMap.of(
     "moveForward", MOVE_FORWARD,
+    "moveBackward", MOVE_BACKWARD,
     "turnLeft", TURN_LEFT,
     "turnAround", TURN_AROUND,
     "turnRight", TURN_RIGHT,
@@ -118,7 +121,7 @@ val builtinCommands: ChampMap<String, Int> = ChampMap.of(
     "dropBeeper", DROP_BEEPER,
 )
 
-private val basicGoalInstructions = Array(RIGHT_IS_CLEAR + 1) { Instruction(it, 0) }
+private val basicGoalInstructions = Array(MOVE_BACKWARD + 1) { Instruction(it, 0) }
 
 fun createInstructionBuffer(): MutableList<Instruction> {
     return MutableList(ENTRY_POINT) { basicGoalInstructions[RETURN] }

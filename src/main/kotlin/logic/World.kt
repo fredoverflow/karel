@@ -162,6 +162,11 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
         return World((hi + deltaXY[direction]).and(CLEAR_CARRY), lo, floorPlan)
     }
 
+    fun moveBackward(): World {
+        if (!floorPlan.isClear(x, y, direction xor 2)) throw BlockedByWall()
+        return World((hi + deltaXY[direction xor 2]).and(CLEAR_CARRY), lo, floorPlan)
+    }
+
     fun turn(delta: Int): World {
         return World((hi + delta.toLong().shl(D_SHIFT)).and(CLEAR_CARRY), lo, floorPlan)
     }
@@ -171,7 +176,7 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
     }
 
     fun turnAround(): World {
-        return turn(2)
+        return World(hi xor 2L.shl(D_SHIFT), lo, floorPlan)
     }
 
     fun turnRight(): World {
