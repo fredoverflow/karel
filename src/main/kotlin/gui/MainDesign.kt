@@ -30,13 +30,10 @@ open class MainDesign(val atomicWorld: AtomicReference<World>) : JFrame() {
         editor.setComponentToRepaint(this)
     }
 
-    val virtualMachinePanel = VirtualMachinePanel()
-
     init {
         title = editor.autosaver.pathname
         add(left, BorderLayout.WEST)
         add(editorWithLineNumbers, BorderLayout.CENTER)
-        add(virtualMachinePanel, BorderLayout.EAST)
         pack()
         isVisible = true
     }

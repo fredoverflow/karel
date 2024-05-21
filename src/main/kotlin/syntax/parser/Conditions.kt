@@ -29,11 +29,11 @@ fun Parser.primaryCondition(): Condition = when (current) {
         "false" -> False(accept())
         "true" -> True(accept())
 
-        "onBeeper" -> OnBeeper(accept().emptyParens())
-        "beeperAhead" -> BeeperAhead(accept().emptyParens())
-        "leftIsClear" -> LeftIsClear(accept().emptyParens())
-        "frontIsClear" -> FrontIsClear(accept().emptyParens())
-        "rightIsClear" -> RightIsClear(accept().emptyParens())
+        "onBeeper",
+        "beeperAhead",
+        "leftIsClear",
+        "frontIsClear",
+        "rightIsClear" -> Predicate(accept().emptyParens())
 
         else -> {
             val bestMatches = Levenshtein.bestMatches(token.lexeme, PREDICATES)

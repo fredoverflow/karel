@@ -34,8 +34,10 @@ fun Parser.block(): Block {
 fun Parser.statement(): Statement = when (current) {
     IDENTIFIER -> sema(Call(accept().emptyParens()).semicolon())
 
-    REPEAT -> Repeat(accept(), parenthesized { expect(NUMBER).toInt(2..4095) }, block())
+    REPEAT -> Repeat(accept(), parenthesized { expect(NUMBER).toInt(2..32767) }, block())
+
     WHILE -> While(accept(), parenthesized(::disjunction), block())
+
     IF -> IfThenElse(accept(), parenthesized(::disjunction), block(), optional(ELSE) {
         when (current) {
             OPENING_BRACE -> block()
@@ -52,6 +54,8 @@ fun Parser.statement(): Statement = when (current) {
             else -> void.error("Command calls have no void before the command name")
         }
     }
+
     END_OF_INPUT -> token.error("End of file encountered in an unclosed block.\nDid you forget a } somewhere?")
+
     else -> illegalStartOf("statement")
 }

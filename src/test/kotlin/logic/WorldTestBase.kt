@@ -1,33 +1,19 @@
 package logic
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.fail
-import vm.VirtualMachine
+import vm.Karel
 
 import java.util.concurrent.atomic.AtomicReference
 
-open class WorldTestBase : VirtualMachine.Callbacks {
+open class WorldTestBase : Karel.Callbacks {
     protected var initialWorld: World = Problem.emptyWorld
     protected var world: World = Problem.emptyWorld
 
     protected fun executeGoal(problem: Problem) {
-        val instructions = vm.createInstructionBuffer()
-        instructions.addAll(problem.goal.map { vm.goalInstruction(it.code) })
         initialWorld = problem.createWorld()
         val atomicWorld = AtomicReference(initialWorld)
-        val virtualMachine = VirtualMachine(instructions, atomicWorld, this)
-        try {
-            virtualMachine.stepReturn()
-        } catch (error: AssertionError) {
-            // TODO Does Kotlin have exception filters/guards?
-            if (!error.message!!.contains("empty")) throw error
-            // The final RET instruction tried to pop off the empty stack.
-        }
+        Problem.karel.execute(atomicWorld, this, problem.name)
         world = atomicWorld.get()
-    }
-
-    override fun onInfiniteLoop() {
-        fail("infinite loop detected")
     }
 
     protected fun assertKarelAt(x: Int, y: Int, direction: Int) {

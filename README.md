@@ -1,4 +1,4 @@
-![hangTheLampions](https://i.imgur.com/EMKIohi.png)
+![hangTheLampions](solveTheMaze.png)
 
 ## Background
 

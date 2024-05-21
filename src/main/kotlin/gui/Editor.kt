@@ -6,7 +6,7 @@ import freditor.Autosaver
 import freditor.FreditorUI
 import freditor.JavaIndenter
 import syntax.lexer.keywords
-import vm.builtinCommands
+import syntax.parser.BUILTIN_COMMANDS
 
 import java.awt.*
 import java.awt.event.KeyEvent
@@ -87,11 +87,11 @@ void karelsFirstProgram()
 
     private fun renameCommand() {
         val oldName = symbolNearCursor(Flexer.IDENTIFIER_TAIL)
-        if (oldName.isNotEmpty() && oldName !in keywords && oldName !in builtinCommands) {
+        if (oldName.isNotEmpty() && oldName !in keywords && oldName !in BUILTIN_COMMANDS) {
             val input = JOptionPane.showInputDialog(this, oldName, "rename command", JOptionPane.QUESTION_MESSAGE, null, null, oldName)
             if (input != null) {
                 val newName = input.toString()
-                if (NAME.matches(newName) && newName !in keywords && newName !in builtinCommands) {
+                if (NAME.matches(newName) && newName !in keywords && newName !in BUILTIN_COMMANDS) {
                     replace("""\b$oldName(\s*\(\s*\))""", "$newName$1")
                 }
             }

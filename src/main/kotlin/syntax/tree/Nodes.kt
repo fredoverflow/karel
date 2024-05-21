@@ -30,15 +30,7 @@ data class False(val fa1se: Token) : Condition()
 
 data class True(val tru3: Token) : Condition()
 
-data class OnBeeper(val onBeeper: Token) : Condition()
-
-data class BeeperAhead(val beeperAhead: Token) : Condition()
-
-data class LeftIsClear(val leftIsClear: Token) : Condition()
-
-data class FrontIsClear(val frontIsClear: Token) : Condition()
-
-data class RightIsClear(val rightIsClear: Token) : Condition()
+data class Predicate(val predicate: Token) : Condition()
 
 data class Not(val not: Token, val p: Condition) : Condition()
 

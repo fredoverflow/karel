@@ -215,9 +215,9 @@ class ParserNegativeTest {
 
     @Test
     fun tooManyRepetitions() {
-        assertDiagnostic("4096 out of range", """
+        assertDiagnostic("32768 out of range", """
         void main() {
-            repeat (4096) {
+            repeat (32768) {
                 moveForward();
             }
         }

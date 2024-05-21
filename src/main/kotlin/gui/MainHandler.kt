@@ -8,7 +8,7 @@ class MainHandler : MainFlow() {
             atomicWorld.set(initialWorld)
             worldPanel.repaint()
 
-            executeGoal(currentProblem.goal)
+            executeGoal()
             controlPanel.stepOver.isEnabled = false
             controlPanel.stepReturn.isEnabled = false
 
@@ -31,12 +31,12 @@ class MainHandler : MainFlow() {
 
         controlPanel.startStopReset.addActionListener {
             when (controlPanel.startStopReset.text) {
-                "start" ->
+                "start" -> {
                     parseAndExecute()
-
-                "stop" ->
-                    stop()
-
+                }
+                "stop" -> {
+                    queue.put(Step.STOP)
+                }
                 "reset" -> {
                     controlPanel.startStopReset.text = "start"
                     atomicWorld.set(initialWorld)
@@ -47,18 +47,17 @@ class MainHandler : MainFlow() {
         }
 
         controlPanel.stepInto.addActionListener {
-            stepInto()
+            queue.offer(Step.INTO)
+            editor.requestFocusInWindow()
         }
 
         controlPanel.stepOver.addActionListener {
-            step { virtualMachine.stepOver() }
-
+            queue.offer(Step.OVER)
             editor.requestFocusInWindow()
         }
 
         controlPanel.stepReturn.addActionListener {
-            step { virtualMachine.stepReturn() }
-
+            queue.offer(Step.RETURN)
             editor.requestFocusInWindow()
         }
 
@@ -78,12 +77,9 @@ class MainHandler : MainFlow() {
 
         editor.onKeyPressed { event ->
             when (event.keyCode) {
-                KeyEvent.VK_M -> if (event.isControlDown && event.isShiftDown) {
-                    virtualMachinePanel.isVisible = !virtualMachinePanel.isVisible
-                }
                 KeyEvent.VK_F12 -> {
                     if (controlPanel.isRunning()) {
-                        stepInto()
+                        queue.offer(Step.INTO)
                     } else {
                         controlPanel.startStopReset.doClick()
                     }
