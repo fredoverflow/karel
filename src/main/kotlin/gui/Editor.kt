@@ -41,7 +41,7 @@ class Editor(freditor: Freditor) : FreditorUI(freditor, 60, 1) {
     }
 
     private fun insertCommand(command: String) {
-        if (lineBeforeSelection.all(Char::isWhitespace)) {
+        if (lineIsBlankBefore(selectionStart())) {
             insert(command)
         } else {
             simulateEnter()
