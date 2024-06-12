@@ -38,6 +38,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
     }
 
     fun checkAgainst(goal: String) {
+        editor.isolateBraces()
         editor.indent()
         editor.saveWithBackup()
         editor.clearDiagnostics()
@@ -176,6 +177,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
     }
 
     fun parseAndExecute() {
+        editor.isolateBraces()
         editor.indent()
         editor.saveWithBackup()
         editor.clearDiagnostics()
