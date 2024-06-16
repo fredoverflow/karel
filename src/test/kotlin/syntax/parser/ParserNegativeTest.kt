@@ -20,7 +20,7 @@ class ParserNegativeTest {
     @Test
     fun tooManyClosingBraces() {
         assertDiagnostic(
-            "too many closing braces", """
+            "closing brace has no opening partner", """
         void main() {
           }
         }
@@ -31,7 +31,7 @@ class ParserNegativeTest {
     @Test
     fun firstCommandMissingVoid() {
         assertDiagnostic(
-            "expected void", """
+            "Command definitions look like this", """
         main() {
         }
         """
@@ -41,7 +41,7 @@ class ParserNegativeTest {
     @Test
     fun secondCommandMissingVoid() {
         assertDiagnostic(
-            "expected void", """
+            "Command definitions look like this", """
         void first() {
         }
         second() {
@@ -53,7 +53,7 @@ class ParserNegativeTest {
     @Test
     fun repeatBelongsInsideCommand() {
         assertDiagnostic(
-            "repeat belongs inside command", """
+            "belongs inside a command", """
         void main() {
         }
         repeat
@@ -64,7 +64,7 @@ class ParserNegativeTest {
     @Test
     fun whileBelongsInsideCommand() {
         assertDiagnostic(
-            "while belongs inside command", """
+            "belongs inside a command", """
         void main() {
         }
         while
@@ -75,7 +75,7 @@ class ParserNegativeTest {
     @Test
     fun ifBelongsInsideCommand() {
         assertDiagnostic(
-            "if belongs inside command", """
+            "belongs inside a command", """
         void main() {
         }
         if
@@ -86,7 +86,7 @@ class ParserNegativeTest {
     @Test
     fun commandCallsBelongInsideCommand() {
         assertDiagnostic(
-            "Command calls belong inside command", """
+            "belongs inside a command", """
         void main() {
         }
         moveForward();
@@ -126,7 +126,7 @@ class ParserNegativeTest {
     @Test
     fun nestedCommands() {
         assertDiagnostic(
-            "nested", """
+            "Command definitions do not nest", """
         void outer() {
             void inner() {
             }
@@ -138,10 +138,22 @@ class ParserNegativeTest {
     @Test
     fun unclosedBlock() {
         assertDiagnostic(
-            "unclosed block", """
+            "missing }", """
         void main() {
             if (onBeeper()) {
                 pickBeeper();
+        }
+        """
+        )
+    }
+
+    @Test
+    fun strayElse() {
+        assertDiagnostic(
+            "{ or if", """
+        void main() {
+            if (onBeeper()) {
+            } else
         }
         """
         )

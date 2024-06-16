@@ -8,8 +8,10 @@ import syntax.tree.Program
 val BUILTIN_COMMANDS = setOf("moveForward", "turnLeft", "turnAround", "turnRight", "pickBeeper", "dropBeeper")
 
 class Sema {
-    private val commands = HashMap<String, Command>()
+    private val commands = LinkedHashMap<String, Command>()
     private val calls = ArrayList<Call>()
+
+    fun previousCommandName(): String = commands.keys.last()
 
     fun command(name: String): Command? = commands[name]
 

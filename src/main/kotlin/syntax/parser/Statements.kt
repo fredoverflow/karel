@@ -3,29 +3,48 @@ package syntax.parser
 import syntax.lexer.TokenKind.*
 import syntax.tree.*
 
+const val EXPECTED_VOID = """Command definitions look like this:
+
+void commandNameHere()
+{
+    // your code here
+
+}"""
+
+private var currentCommandName = ""
+
 fun Parser.program(): Program {
-    if (current != VOID) token.error("expected void")
+    if (current != VOID) token.error(EXPECTED_VOID)
 
     return sema(Program(list1Until(END_OF_INPUT, ::command)))
 }
 
-fun Parser.command(): Command = when (current) {
-    VOID -> sema(Command(accept(), expect(IDENTIFIER).emptyParens(), block()))
+fun Parser.command(): Command {
+    val previousClosingBrace = previous
 
-    CLOSING_BRACE -> token.error("too many closing braces")
-
-    REPEAT, WHILE, IF -> token.error("$current belongs inside command.\nDid you close too many braces?")
-
-    IDENTIFIER -> {
-        val identifier = accept().emptyParens()
-        when (current) {
-            SEMICOLON -> identifier.error("Command calls belong inside command.\nDid you close too many braces?")
-
-            else -> identifier.error("expected void")
+    return when (current) {
+        VOID -> {
+            val void = accept()
+            val identifier = expect(IDENTIFIER).emptyParens()
+            currentCommandName = identifier.lexeme
+            sema(Command(void, identifier, block()))
         }
-    }
 
-    else -> token.error("expected void")
+        CLOSING_BRACE -> token.error("remove }\n\nThis closing brace has no opening partner")
+
+        REPEAT, WHILE, IF -> previousClosingBrace.error("|\n|\n|\nremove }\n\nThe command ${sema.previousCommandName()}() ends here,\nbut the following $current-statement\nstill belongs inside a command")
+
+        IDENTIFIER -> {
+            val identifier = accept().emptyParens()
+            when (current) {
+                SEMICOLON -> previousClosingBrace.error("|\n|\n|\nremove }\n\nThe command ${sema.previousCommandName()}() ends here,\nbut the following call ${identifier.lexeme}();\nstill belongs inside a command")
+
+                else -> identifier.error(EXPECTED_VOID)
+            }
+        }
+
+        else -> token.error(EXPECTED_VOID)
+    }
 }
 
 fun Parser.block(): Block {
@@ -43,15 +62,15 @@ fun Parser.statement(): Statement = when (current) {
 
     VOID -> {
         val void = accept()
-        expect(IDENTIFIER).emptyParens()
+        val identifier = expect(IDENTIFIER).emptyParens()
         when (current) {
-            OPENING_BRACE -> void.error("Command definitions cannot be nested.\nDid you forget a } somewhere?")
+            OPENING_BRACE -> void.error("missing }\n\nCannot define command ${identifier.lexeme}()\nINSIDE command $currentCommandName()\n\nCommand definitions do not nest")
 
-            else -> void.error("Command calls have no void before the command name")
+            else -> void.error("remove void\n\nYou want to CALL ${identifier.lexeme}(), not DEFINE it, right?")
         }
     }
 
-    END_OF_INPUT -> token.error("End of file encountered in an unclosed block.\nDid you forget a } somewhere?")
+    END_OF_INPUT -> token.error("missing }")
 
     else -> illegalStartOf("statement")
 }
@@ -63,7 +82,7 @@ fun Parser.ifThenElse(): IfThenElse {
 
             IF -> ifThenElse()
 
-            else -> token.error("else must be followed by { or if")
+            else -> previous.error("else must be followed by { or if")
         }
     })
 }
