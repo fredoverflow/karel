@@ -25,7 +25,7 @@ class ControlPanel(problems: List<Problem>) : JPanel() {
     val startStopReset = JButton("start").sansSerif()
 
     val check = JButton("\uD83D\uDC1C").sansSerif().apply {
-        toolTipText = problems[0].check.toolTipText
+        toolTipText = "check every ${problems[0].check.singular}"
     }
 
     val stepInto = JButton("step into (F12)").sansSerif()

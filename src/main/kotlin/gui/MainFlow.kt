@@ -96,9 +96,9 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
                         cleanup()
                         reportFirstRedundantCondition(instructions)
                         if (currentProblem.numWorlds == UNKNOWN) {
-                            showDiagnostic("OK: checked $worldCounter random worlds")
+                            showDiagnostic("OK: checked $worldCounter random worlds :-)")
                         } else {
-                            showDiagnostic("OK: checked $worldCounter random worlds\n    from ${currentProblem.numWorlds} possible worlds")
+                            showDiagnostic("OK: checked $worldCounter random worlds :-)\n    from ${currentProblem.numWorlds} possible worlds")
                         }
                         return
                     } else if (elapsed >= nextRepaint) {
@@ -111,7 +111,11 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
                 }
                 cleanup()
                 reportFirstRedundantCondition(instructions)
-                showDiagnostic("OK: checked all ${currentProblem.numWorlds} possible worlds")
+                if (currentProblem.numWorlds == ONE) {
+                    showDiagnostic("OK: every ${currentProblem.check.singular} matches the goal :-)")
+                } else {
+                    showDiagnostic("OK: checked all ${currentProblem.numWorlds} possible worlds :-)")
+                }
             } catch (diagnostic: Diagnostic) {
                 cleanup()
                 showDiagnostic(diagnostic)
@@ -128,17 +132,19 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
             virtualMachine.executeGoalProgram()
         } catch (_: VirtualMachine.Finished) {
         }
-        val goalWorldIterator = goalWorlds.iterator()
+        val finalGoalWorld = virtualMachine.world
+        var index = 0
+        val size = goalWorlds.size
 
         createVirtualMachine(instructions) { world ->
-            if (!goalWorldIterator.hasNext()) {
-                worldPanel.antWorld = goalWorlds.lastOrNull() ?: initialWorld
-                virtualMachine.error("overshoots goal\n$COMPARE")
+            if (index == size) {
+                worldPanel.antWorld = finalGoalWorld
+                virtualMachine.error("extra ${currentProblem.check.singular}\n\n$COMPARE")
             }
-            val goalWorld = goalWorldIterator.next()
+            val goalWorld = goalWorlds[index++]
             if (!goalWorld.equalsIgnoringDirection(world)) {
                 worldPanel.antWorld = goalWorld
-                virtualMachine.error("deviates from goal\n$COMPARE")
+                virtualMachine.error("wrong ${currentProblem.check.singular}\n\n$COMPARE")
             }
         }
 
@@ -148,9 +154,14 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         } catch (error: KarelError) {
             virtualMachine.error(error.message)
         }
-        if (goalWorldIterator.hasNext() && !goalWorlds.last().equalsIgnoringDirection(virtualMachine.world)) {
-            worldPanel.antWorld = goalWorldIterator.next()
-            virtualMachine.error("falls short of goal\n$COMPARE")
+        if (index < size && !finalGoalWorld.equalsIgnoringDirection(virtualMachine.world)) {
+            worldPanel.antWorld = finalGoalWorld
+            if (currentProblem.numWorlds == ONE) {
+                val missing = size - index
+                virtualMachine.error("missing $missing ${currentProblem.check.numerus(missing)}\n\n$COMPARE")
+            } else {
+                virtualMachine.error("missing ${currentProblem.check.plural}\n\n$COMPARE")
+            }
         }
     }
 

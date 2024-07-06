@@ -36,7 +36,7 @@ class MainHandler : MainFlow() {
         controlPanel.problemPicker.addActionListener {
             controlPanel.startStopReset.text = "start"
             controlPanel.randomize.isEnabled = currentProblem.isRandom
-            controlPanel.check.toolTipText = currentProblem.check.toolTipText
+            controlPanel.check.toolTipText = "check every ${currentProblem.check.singular}"
 
             initialWorld = currentProblem.randomWorld()
             virtualMachine.world = initialWorld
@@ -150,13 +150,15 @@ class MainHandler : MainFlow() {
                 if (!event.component.isEnabled) return
 
                 if (SwingUtilities.isLeftMouseButton(event)) {
-                    val x = event.x / worldPanel.tileSize
-                    val y = event.y / worldPanel.tileSize
-                    val world = virtualMachine.world.toggleBeeper(x, y)
+                    if (worldPanel.antWorld == null) {
+                        val x = event.x / worldPanel.tileSize
+                        val y = event.y / worldPanel.tileSize
+                        val world = virtualMachine.world.toggleBeeper(x, y)
+                        virtualMachine.world = world
 
-                    virtualMachine.world = world
-                    worldPanel.world = world
-                    worldPanel.repaint()
+                        worldPanel.world = world
+                        worldPanel.repaint()
+                    }
                 }
             }
         })
