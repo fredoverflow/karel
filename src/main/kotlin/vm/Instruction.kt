@@ -1,5 +1,6 @@
 package vm
 
+import common.Diagnostic
 import freditor.persistent.ChampMap
 
 class Instruction(var bytecode: Int, val position: Int) {
@@ -130,4 +131,8 @@ fun createGoalInstructions(goal: String): List<Instruction> {
             Instruction(code, 0)
         }
     }
+}
+
+fun Instruction.error(message: String) {
+    throw Diagnostic(position, message)
 }

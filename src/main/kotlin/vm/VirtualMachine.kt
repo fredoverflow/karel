@@ -1,6 +1,5 @@
 package vm
 
-import common.Diagnostic
 import logic.World
 
 // If "step over" or "step return" do not finish within 1 second,
@@ -72,7 +71,7 @@ class VirtualMachine(
             executeOneInstruction()
         }
         if (callDepth > targetDepth) {
-            throw Diagnostic(currentInstruction.position, "infinite loop detected")
+            error("infinite loop detected")
         }
     }
 
@@ -83,7 +82,7 @@ class VirtualMachine(
                 executeOneInstruction()
             }
         }
-        throw Diagnostic(currentInstruction.position, "infinite loop detected")
+        error("infinite loop detected")
     }
 
     fun executeGoalProgram() {
@@ -266,4 +265,8 @@ class VirtualMachine(
         }
         ++pc
     }
+}
+
+fun VirtualMachine.error(message: String) {
+    currentInstruction.error(message)
 }

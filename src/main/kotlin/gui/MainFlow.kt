@@ -133,12 +133,12 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         createVirtualMachine(instructions) { world ->
             if (!goalWorldIterator.hasNext()) {
                 worldPanel.antWorld = goalWorlds.lastOrNull() ?: initialWorld
-                throw Diagnostic(virtualMachine.currentInstruction.position, "overshoots goal\n$COMPARE")
+                virtualMachine.error("overshoots goal\n$COMPARE")
             }
             val goalWorld = goalWorldIterator.next()
             if (!goalWorld.equalsIgnoringDirection(world)) {
                 worldPanel.antWorld = goalWorld
-                throw Diagnostic(virtualMachine.currentInstruction.position, "deviates from goal\n$COMPARE")
+                virtualMachine.error("deviates from goal\n$COMPARE")
             }
         }
 
@@ -146,11 +146,11 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
             virtualMachine.executeUserProgram()
         } catch (_: VirtualMachine.Finished) {
         } catch (error: KarelError) {
-            throw Diagnostic(virtualMachine.currentInstruction.position, error.message)
+            virtualMachine.error(error.message)
         }
         if (goalWorldIterator.hasNext() && !goalWorlds.last().equalsIgnoringDirection(virtualMachine.world)) {
             worldPanel.antWorld = goalWorldIterator.next()
-            throw Diagnostic(virtualMachine.currentInstruction.position, "falls short of goal\n$COMPARE")
+            virtualMachine.error("falls short of goal\n$COMPARE")
         }
     }
 
@@ -166,11 +166,11 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         for (instruction in instructions.subList(ENTRY_POINT)) {
             when (instruction.bytecode) {
                 ON_BEEPER_FALSE, BEEPER_AHEAD_FALSE, LEFT_IS_CLEAR_FALSE, FRONT_IS_CLEAR_FALSE, RIGHT_IS_CLEAR_FALSE -> {
-                    throw Diagnostic(instruction.position, "condition was always false")
+                    instruction.error("condition was always false")
                 }
 
                 ON_BEEPER_TRUE, BEEPER_AHEAD_TRUE, LEFT_IS_CLEAR_TRUE, FRONT_IS_CLEAR_TRUE, RIGHT_IS_CLEAR_TRUE -> {
-                    throw Diagnostic(instruction.position, "condition was always true")
+                    instruction.error("condition was always true")
                 }
             }
         }
