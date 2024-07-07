@@ -47,12 +47,6 @@ class StackTable : JComponent() {
                 is Stack.ReturnAddress -> Fronts.front.drawHexRight(graphics, frontRight, y, stack.head, 0x808080)
 
                 is Stack.LoopCounter -> Fronts.front.drawIntRight(graphics, frontRight, y, stack.head, 0x6400c8)
-
-                is Stack.Boolean -> if (stack.head == 0) {
-                    Fronts.front.drawString(graphics, 0, y, "false", 0xff0000)
-                } else {
-                    Fronts.front.drawString(graphics, 0, y, "true", 0x008000)
-                }
             }
             y += frontHeight
         }

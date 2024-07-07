@@ -6,8 +6,6 @@ sealed class Stack(@JvmField val head: Int, @JvmField val tail: Stack?) {
 
     class LoopCounter(head: Int, tail: Stack?) : Stack(head, tail)
 
-    class Boolean(head: Int, tail: Stack?) : Stack(head, tail)
-
     @JvmField
     val size: Int = tail.size + 1
 }
