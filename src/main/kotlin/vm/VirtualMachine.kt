@@ -12,7 +12,7 @@ const val TIMEOUT = 1_000_000_000L
 const val ENTRY_POINT = 256
 
 class VirtualMachine(
-    private val program: List<Instruction>,
+    private val program: Array<Instruction>,
     var world: World,
     // callbacks
     private val onCall: ((Instruction, Instruction) -> Unit)? = null,

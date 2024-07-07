@@ -1,7 +1,6 @@
 package gui
 
 import common.Diagnostic
-import common.subList
 import logic.*
 import syntax.lexer.Lexer
 import syntax.parser.Parser
@@ -27,7 +26,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
     var initialWorld: World = worldPanel.world
 
-    var virtualMachine = VirtualMachine(emptyList(), initialWorld)
+    var virtualMachine = VirtualMachine(emptyArray(), initialWorld)
 
     val timer = Timer(delay()) {
         tryStep(::stepInto)
@@ -54,7 +53,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
                 val goalInstructions = createGoalInstructions(goal)
 
-                check(instructions, goalInstructions)
+                check(instructions.toTypedArray(), goalInstructions.toTypedArray())
             } else {
                 editor.setCursorTo(editor.length())
                 showDiagnostic("void ${currentProblem.name}() not found")
@@ -64,7 +63,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         }
     }
 
-    private fun check(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
+    private fun check(instructions: Array<Instruction>, goalInstructions: Array<Instruction>) {
         controlPanel.checkStarted()
         worldPanel.isEnabled = false
         tabbedEditors.tabs.isEnabled = false
@@ -125,7 +124,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         checkBetweenRepaints()
     }
 
-    private fun checkOneWorld(instructions: List<Instruction>, goalInstructions: List<Instruction>) {
+    private fun checkOneWorld(instructions: Array<Instruction>, goalInstructions: Array<Instruction>) {
         val goalWorlds = ArrayList<World>(200)
         createVirtualMachine(goalInstructions, goalWorlds::add)
         try {
@@ -165,7 +164,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         }
     }
 
-    private fun createVirtualMachine(instructions: List<Instruction>, callback: (World) -> Unit) {
+    private fun createVirtualMachine(instructions: Array<Instruction>, callback: (World) -> Unit) {
         virtualMachine = VirtualMachine(
             instructions, initialWorld,
             onPickDrop = callback,
@@ -173,8 +172,9 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         )
     }
 
-    private fun reportFirstRedundantCondition(instructions: List<Instruction>) {
-        for (instruction in instructions.subList(ENTRY_POINT)) {
+    private fun reportFirstRedundantCondition(instructions: Array<Instruction>) {
+        for (index in ENTRY_POINT until instructions.size) {
+            val instruction = instructions[index]
             when (instruction.bytecode) {
                 ON_BEEPER_FALSE, BEEPER_AHEAD_FALSE, LEFT_IS_CLEAR_FALSE, FRONT_IS_CLEAR_FALSE, RIGHT_IS_CLEAR_FALSE -> {
                     instruction.error("condition was always false")
@@ -214,7 +214,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         tabbedEditors.tabs.isEnabled = false
         virtualMachinePanel.setProgram(instructions)
         virtualMachine = VirtualMachine(
-            instructions, initialWorld,
+            instructions.toTypedArray(), initialWorld,
             onCall = editor::push.takeIf { compiledFromSource },
             onReturn = editor::pop.takeIf { compiledFromSource },
         )

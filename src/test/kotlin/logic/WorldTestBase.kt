@@ -10,7 +10,7 @@ open class WorldTestBase {
     protected fun executeGoal(problem: Problem) {
         val instructions = vm.createGoalInstructions(problem.goal)
         initialWorld = problem.randomWorld()
-        val virtualMachine = VirtualMachine(instructions, initialWorld)
+        val virtualMachine = VirtualMachine(instructions.toTypedArray(), initialWorld)
         try {
             virtualMachine.executeGoalProgram()
         } catch (_: VirtualMachine.Finished) {
