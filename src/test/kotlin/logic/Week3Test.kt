@@ -88,18 +88,18 @@ class Week3Test : WorldTestBase() {
     @Test
     fun addSmart() {
         executeGoal(Problem.addSmart)
-        val one = initialWorld.binaryNumber(0)
-        val two = initialWorld.binaryNumber(1)
-        val sum = world.binaryNumber(2)
+        val one = initialWorld.firstByte()
+        val two = initialWorld.secondByte()
+        val sum = world.thirdByte()
         assertEquals((one + two).and(255), sum)
     }
 
     @Test
     fun computeFibonacci() {
         executeGoal(Problem.computeFibonacci)
-        val numbers = (0..9).map(world::binaryNumber)
-        for ((a, b, c) in numbers.windowed(3)) {
-            assertEquals(a + b, c)
+        val bytes = world.allBytes()
+        for (i in 2..9) {
+            assertEquals(bytes[i - 2] + bytes[i - 1], bytes[i])
         }
     }
 }

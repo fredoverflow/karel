@@ -31,25 +31,25 @@ class Week2Test : WorldTestBase() {
     @Test
     fun increment() {
         executeGoal(Problem.increment)
-        val before = initialWorld.binaryNumber()
-        val after = world.binaryNumber()
+        val before = initialWorld.firstByte()
+        val after = world.firstByte()
         assertEquals((before + 1).and(255), after)
     }
 
     @Test
     fun decrement() {
         executeGoal(Problem.decrement)
-        val before = initialWorld.binaryNumber()
-        val after = world.binaryNumber()
+        val before = initialWorld.firstByte()
+        val after = world.firstByte()
         assertEquals((before - 1).and(255), after)
     }
 
     @Test
     fun addSlow() {
         executeGoal(Problem.addSlow)
-        val one = initialWorld.binaryNumber(0)
-        val two = initialWorld.binaryNumber(1)
-        val sum = world.binaryNumber(1)
+        val one = initialWorld.firstByte()
+        val two = initialWorld.secondByte()
+        val sum = world.secondByte()
         assertEquals((one + two).and(255), sum)
     }
 
@@ -97,9 +97,9 @@ class Week2Test : WorldTestBase() {
     @Test
     fun addFast() {
         executeGoal(Problem.addFast)
-        val one = initialWorld.binaryNumber(0)
-        val two = initialWorld.binaryNumber(1)
-        val sum = world.binaryNumber(3)
+        val one = initialWorld.firstByte()
+        val two = initialWorld.secondByte()
+        val sum = world.fourthByte()
         assertEquals((one + two).and(255), sum)
     }
 }
