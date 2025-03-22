@@ -120,11 +120,7 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
     }
 
     fun countBeepers(): Int {
-        val a = Integer.bitCount(beepersHi.ushr(32).toInt())
-        val b = Integer.bitCount(hi.toInt())
-        val c = Integer.bitCount(lo.ushr(32).toInt())
-        val d = Integer.bitCount(lo.toInt())
-        return a + b + c + d
+        return beepersHi.countOneBits() + beepersLo.countOneBits()
     }
 
     fun binaryNumber(y: Int = 0): Int {
