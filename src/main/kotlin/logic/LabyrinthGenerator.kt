@@ -110,7 +110,7 @@ object LabyrinthGenerator {
 
         val walls = LongArray(10) { y ->
             val positionY = ORIGIN + y * NEIGHBOUR_Y
-            IntRange(0, 9).fold(0L) { line, x ->
+            (9 downTo 0).fold(0L) { line, x ->
                 val position = positionY + x * NEIGHBOUR_X
 
                 val east = labyrinth[position + EAST].code and 1

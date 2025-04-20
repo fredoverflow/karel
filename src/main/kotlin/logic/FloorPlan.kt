@@ -5,20 +5,12 @@ open class FloorPlan(protected val walls: LongArray) {
         assert(walls.size == 10)
     }
 
-    // Each cell takes up 4 bits (for the 4 walls), hence the shift by 2.
-    // Internally, the world is flipped horizontally, hence the sub from 9.
-    // (We are using hex literals to write down some simple worlds,
-    // and those start with the most significant digit on the left.)
-    protected fun shift(x: Int): Int {
-        return (9 - x).shl(2)
-    }
-
     fun isClear(x: Int, y: Int, direction: Int): Boolean {
-        return wallsAt(x, y).and(1.shl(direction)) == WALL_NONE
+        return walls[y].ushr(4 * x + direction).and(1L) == 0L
     }
 
     fun wallsAt(x: Int, y: Int): Int {
-        return walls[y].ushr(shift(x)).toInt().and(WALL_ALL)
+        return walls[y].ushr(4 * x).toInt().and(WALL_ALL)
     }
 
     fun numberOfWallsAt(x: Int, y: Int): Int {
@@ -44,8 +36,22 @@ open class FloorPlan(protected val walls: LongArray) {
 
         const val WALL_ALL = 15
 
-        operator fun invoke(vararg walls: Long): FloorPlan {
-            return FloorPlan(walls)
+        operator fun invoke(vararg ws: Long): FloorPlan {
+            for (i in ws.indices) {
+                // flip hex literal
+                val w = ws[i]
+                ws[i] = w.shr(0x24).and(0x000000000f) or
+                        w.shr(0x1c).and(0x00000000f0) or
+                        w.shr(0x14).and(0x0000000f00) or
+                        w.shr(0x0c).and(0x000000f000) or
+                        w.shr(0x04).and(0x00000f0000) or
+                        w.shl(0x04).and(0x0000f00000) or
+                        w.shl(0x0c).and(0x000f000000) or
+                        w.shl(0x14).and(0x00f0000000) or
+                        w.shl(0x1c).and(0x0f00000000) or
+                        w.shl(0x24).and(0xf000000000)
+            }
+            return FloorPlan(ws)
         }
 
         val empty = FloorPlan(
@@ -158,7 +164,7 @@ class FloorBuilder(walls: LongArray) : FloorPlan(walls) {
 
     // calculate the appropriate bitmask to access and update walls
     private fun bitmask(x: Int, directions: Int): Long {
-        return directions.toLong().shl(shift(x))
+        return directions.toLong().shl(4 * x)
     }
 
     fun buildHorizontalWall(x: Int, y: Int): FloorBuilder {
