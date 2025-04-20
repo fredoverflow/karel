@@ -1,6 +1,7 @@
 package logic
 
-class FloorPlan(private val walls: LongArray) {
+@JvmInline
+value class FloorPlan(private val walls: LongArray) {
     init {
         assert(walls.size == 10)
     }
@@ -160,7 +161,8 @@ class FloorPlan(private val walls: LongArray) {
     }
 }
 
-class FloorBuilder(private val walls: LongArray) {
+@JvmInline
+value class FloorBuilder(private val walls: LongArray) {
 
     // calculate the appropriate bitmask to access and update walls
     private fun bitmask(x: Int, directions: Int): Long {
