@@ -1,6 +1,6 @@
 package logic
 
-open class FloorPlan(protected val walls: LongArray) {
+class FloorPlan(private val walls: LongArray) {
     init {
         assert(walls.size == 10)
     }
@@ -160,7 +160,7 @@ open class FloorPlan(protected val walls: LongArray) {
     }
 }
 
-class FloorBuilder(walls: LongArray) : FloorPlan(walls) {
+class FloorBuilder(private val walls: LongArray) {
 
     // calculate the appropriate bitmask to access and update walls
     private fun bitmask(x: Int, directions: Int): Long {
@@ -169,20 +169,20 @@ class FloorBuilder(walls: LongArray) : FloorPlan(walls) {
 
     fun buildHorizontalWall(x: Int, y: Int): FloorBuilder {
         if (y < Problem.HEIGHT) {
-            walls[y] = walls[y].or(bitmask(x, WALL_NORTH))
+            walls[y] = walls[y].or(bitmask(x, FloorPlan.WALL_NORTH))
         }
         if (y > 0) {
-            walls[y - 1] = walls[y - 1].or(bitmask(x, WALL_SOUTH))
+            walls[y - 1] = walls[y - 1].or(bitmask(x, FloorPlan.WALL_SOUTH))
         }
         return this
     }
 
     fun buildVerticalWall(x: Int, y: Int): FloorBuilder {
         if (x < Problem.WIDTH) {
-            walls[y] = walls[y].or(bitmask(x, WALL_WEST))
+            walls[y] = walls[y].or(bitmask(x, FloorPlan.WALL_WEST))
         }
         if (x > 0) {
-            walls[y] = walls[y].or(bitmask(x - 1, WALL_EAST))
+            walls[y] = walls[y].or(bitmask(x - 1, FloorPlan.WALL_EAST))
         }
         return this
     }
@@ -190,5 +190,9 @@ class FloorBuilder(walls: LongArray) : FloorPlan(walls) {
     fun tearDownWall(x: Int, y: Int, direction: Int): FloorBuilder {
         walls[y] = walls[y].and(bitmask(x, 1.shl(direction)).inv())
         return this
+    }
+
+    fun world(): World {
+        return FloorPlan(walls).world()
     }
 }
