@@ -6,7 +6,6 @@ import syntax.lexer.Lexer
 import syntax.parser.Parser
 import syntax.parser.program
 import vm.*
-import java.awt.EventQueue
 import javax.swing.Timer
 
 const val CHECK_TOTAL_NS = 2_000_000_000L
@@ -51,9 +50,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
                 virtualMachinePanel.setProgram(instructions)
                 virtualMachinePanel.update(null, ENTRY_POINT)
 
-                val goalInstructions = createGoalInstructions(goal)
-
-                check(instructions.toTypedArray(), goalInstructions.toTypedArray())
+                tryCheck(instructions.toTypedArray(), createGoalInstructions(goal).toTypedArray())
             } else {
                 editor.setCursorTo(editor.length())
                 showDiagnostic("void ${currentProblem.name}() not found")
@@ -63,20 +60,19 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         }
     }
 
-    private fun check(instructions: Array<Instruction>, goalInstructions: Array<Instruction>) {
-
-        controlPanel.checkStarted()
-        worldPanel.isEnabled = false
-        tabbedEditors.tabs.isEnabled = false
-
-        fun cleanup() {
-            controlPanel.checkFinished(currentProblem.isRandom)
-            worldPanel.isEnabled = true
-            tabbedEditors.tabs.isEnabled = true
-
-            editor.clearStack()
+    private fun tryCheck(instructions: Array<Instruction>, goalInstructions: Array<Instruction>) {
+        try {
+            val successMessage = check(instructions, goalInstructions)
+            reportFirstRedundantCondition(instructions)
             update()
+            showDiagnostic(successMessage)
+        } catch (diagnostic: Diagnostic) {
+            update()
+            showDiagnostic(diagnostic)
         }
+    }
+
+    private fun check(instructions: Array<Instruction>, goalInstructions: Array<Instruction>): String {
 
         val start = System.nanoTime()
         var nextRepaint = CHECK_REPAINT_NS
@@ -84,54 +80,35 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         val worlds = currentProblem.randomWorlds().iterator()
         var worldCounter = 0
 
-        fun checkBetweenRepaints() {
-            try {
-                while (true) {
-                    initialWorld = worlds.next()
-                    checkOneWorld(instructions, goalInstructions)
-                    ++worldCounter
+        while (true) {
+            initialWorld = worlds.next()
+            checkOneWorld(instructions, goalInstructions)
+            ++worldCounter
 
-                    if (!worlds.hasNext()) {
-                        cleanup()
-                        reportFirstRedundantCondition(instructions)
-
-                        if (currentProblem.numWorlds == ONE) {
-                            showDiagnostic("OK: every ${currentProblem.check.singular} matches the goal :-)")
-                        } else {
-                            showDiagnostic("OK: checked all ${currentProblem.numWorlds} possible worlds :-)")
-                        }
-                        return
-                    }
-
-                    val elapsed = System.nanoTime() - start
-
-                    if (elapsed >= CHECK_TOTAL_NS) {
-                        cleanup()
-                        reportFirstRedundantCondition(instructions)
-
-                        if (currentProblem.numWorlds == UNKNOWN) {
-                            showDiagnostic("OK: checked $worldCounter random worlds :-)")
-                        } else {
-                            showDiagnostic("OK: checked $worldCounter random worlds :-)\n    from ${currentProblem.numWorlds} possible worlds")
-                        }
-                        return
-                    }
-
-                    if (elapsed >= nextRepaint) {
-                        worldPanel.world = initialWorld
-                        worldPanel.repaint()
-                        nextRepaint += CHECK_REPAINT_NS
-                        EventQueue.invokeLater(::checkBetweenRepaints)
-                        return
-                    }
+            if (!worlds.hasNext()) {
+                return if (currentProblem.numWorlds == ONE) {
+                    "OK: every ${currentProblem.check.singular} matches the goal :-)"
+                } else {
+                    "OK: checked all ${currentProblem.numWorlds} possible worlds :-)"
                 }
-            } catch (diagnostic: Diagnostic) {
-                cleanup()
-                showDiagnostic(diagnostic)
+            }
+
+            val elapsed = System.nanoTime() - start
+
+            if (elapsed >= CHECK_TOTAL_NS) {
+                return if (currentProblem.numWorlds == UNKNOWN) {
+                    "OK: checked $worldCounter random worlds :-)"
+                } else {
+                    "OK: checked $worldCounter random worlds :-)\n    from ${currentProblem.numWorlds} possible worlds"
+                }
+            }
+
+            if (elapsed >= nextRepaint) {
+                worldPanel.world = initialWorld
+                worldPanel.paintImmediately(0, 0, worldPanel.width, worldPanel.height)
+                nextRepaint += CHECK_REPAINT_NS
             }
         }
-
-        checkBetweenRepaints()
     }
 
     private fun checkOneWorld(instructions: Array<Instruction>, goalInstructions: Array<Instruction>) {

@@ -74,22 +74,6 @@ class ControlPanel(problems: List<Problem>) : JPanel() {
         setEnabledStepButtons(false)
     }
 
-    fun checkStarted() {
-        randomize.isEnabled = false
-        goal.isEnabled = false
-        problemPicker.isEnabled = false
-        startStopReset.isEnabled = false
-        check.isEnabled = false
-    }
-
-    fun checkFinished(isRandom: Boolean) {
-        randomize.isEnabled = isRandom
-        goal.isEnabled = true
-        problemPicker.isEnabled = true
-        startStopReset.isEnabled = true
-        check.isEnabled = true
-    }
-
     fun isRunning(): Boolean {
         return startStopReset.text === "stop"
     }
