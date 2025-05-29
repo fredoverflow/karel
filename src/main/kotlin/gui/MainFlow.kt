@@ -64,6 +64,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
     }
 
     private fun check(instructions: Array<Instruction>, goalInstructions: Array<Instruction>) {
+
         controlPanel.checkStarted()
         worldPanel.isEnabled = false
         tabbedEditors.tabs.isEnabled = false
@@ -85,35 +86,44 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
         fun checkBetweenRepaints() {
             try {
-                while (worlds.hasNext()) {
+                while (true) {
                     initialWorld = worlds.next()
                     checkOneWorld(instructions, goalInstructions)
                     ++worldCounter
 
+                    if (!worlds.hasNext()) {
+                        cleanup()
+                        reportFirstRedundantCondition(instructions)
+
+                        if (currentProblem.numWorlds == ONE) {
+                            showDiagnostic("OK: every ${currentProblem.check.singular} matches the goal :-)")
+                        } else {
+                            showDiagnostic("OK: checked all ${currentProblem.numWorlds} possible worlds :-)")
+                        }
+                        return
+                    }
+
                     val elapsed = System.nanoTime() - start
+
                     if (elapsed >= CHECK_TOTAL_NS) {
                         cleanup()
                         reportFirstRedundantCondition(instructions)
+
                         if (currentProblem.numWorlds == UNKNOWN) {
                             showDiagnostic("OK: checked $worldCounter random worlds :-)")
                         } else {
                             showDiagnostic("OK: checked $worldCounter random worlds :-)\n    from ${currentProblem.numWorlds} possible worlds")
                         }
                         return
-                    } else if (elapsed >= nextRepaint) {
+                    }
+
+                    if (elapsed >= nextRepaint) {
                         worldPanel.world = initialWorld
                         worldPanel.repaint()
                         nextRepaint += CHECK_REPAINT_NS
                         EventQueue.invokeLater(::checkBetweenRepaints)
                         return
                     }
-                }
-                cleanup()
-                reportFirstRedundantCondition(instructions)
-                if (currentProblem.numWorlds == ONE) {
-                    showDiagnostic("OK: every ${currentProblem.check.singular} matches the goal :-)")
-                } else {
-                    showDiagnostic("OK: checked all ${currentProblem.numWorlds} possible worlds :-)")
                 }
             } catch (diagnostic: Diagnostic) {
                 cleanup()
