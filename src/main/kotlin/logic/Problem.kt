@@ -504,7 +504,7 @@ class Problem(
                     }
                     world = world.turnLeft()
                 }
-                world = world.turn(-angle)
+                world = world.turn(4 - angle)
             }
 
             generateMaze()
