@@ -3,10 +3,11 @@ package logic
 // The state of the world is stored in just two 64-bit longs:
 //
 //       56       48       40       32       24       16        8        0
-// ........ ...cyyyy ...cxxxx .cddbbbb bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb   hi
+// cppppppp ...cyyyy ...cxxxx .cddbbbb bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb   hi
 // bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb bbbbbbbb   lo
 //
 // c : carry
+// p : position (0..99)
 // y : y position
 // x : x position
 // d : direction
@@ -15,19 +16,20 @@ package logic
 private const val D_SHIFT = 36
 private const val X_SHIFT = 40
 private const val Y_SHIFT = 48
+private const val P_SHIFT = 56
 
 private const val BEEPERS_HI = 0x0000000fffffffffL
-private const val CLEAR_CARRY = 0x000f0f3fffffffffL
+private const val CLEAR_CARRY = 0x7f0f0f3fffffffffL
 private const val IGNORING_DIRECTION = 3L.shl(D_SHIFT).inv()
 
 //                              E  N   W  S
 private val deltaX = intArrayOf(1, 0, -1, 0)
 private val deltaY = intArrayOf(0, -1, 0, 1)
-private val deltaXY = longArrayOf(
-    1L.shl(X_SHIFT),
-    15L.shl(Y_SHIFT),
-    15L.shl(X_SHIFT),
-    1L.shl(Y_SHIFT),
+private val deltaXYP = longArrayOf(
+    1L.shl(X_SHIFT) + 1L.shl(P_SHIFT),
+    15L.shl(Y_SHIFT) + 118L.shl(P_SHIFT),
+    15L.shl(X_SHIFT) + 127L.shl(P_SHIFT),
+    1L.shl(Y_SHIFT) + 10L.shl(P_SHIFT),
 )
 
 class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan) {
@@ -46,6 +48,9 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
     val y: Int
         get() = hi.ushr(Y_SHIFT).toInt().and(15)
 
+    val position: Int
+        get() = hi.ushr(P_SHIFT).toInt()
+
     fun equalsIgnoringDirection(that: World): Boolean {
         return this.lo == that.lo && this.hi.and(IGNORING_DIRECTION) == that.hi.and(IGNORING_DIRECTION)
     }
@@ -55,7 +60,8 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
     }
 
     fun withKarelAt(x: Int, y: Int, direction: Int): World {
-        val coordinates = y.toLong().shl(Y_SHIFT) or
+        val coordinates = (y * 10 + x).toLong().shl(P_SHIFT) or
+                y.toLong().shl(Y_SHIFT) or
                 x.toLong().shl(X_SHIFT) or
                 direction.toLong().shl(D_SHIFT)
         return World(hi.and(BEEPERS_HI).or(coordinates), lo, floorPlan)
@@ -84,7 +90,10 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
     }
 
     fun beeperAt(x: Int, y: Int): Boolean {
-        val shift = y * 10 + x
+        return beeperAt(y * 10 + x)
+    }
+
+    fun beeperAt(shift: Int): Boolean {
         return if (shift >= 64) {
             beeperAt(hi, shift)
         } else {
@@ -93,7 +102,10 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
     }
 
     fun pickBeeper(x: Int, y: Int): World {
-        val shift = y * 10 + x
+        return pickBeeper(y * 10 + x)
+    }
+
+    fun pickBeeper(shift: Int): World {
         return if (shift >= 64) {
             World(pickBeeper(hi, shift), lo, floorPlan)
         } else {
@@ -102,7 +114,10 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
     }
 
     fun dropBeeper(x: Int, y: Int): World {
-        val shift = y * 10 + x
+        return dropBeeper(y * 10 + x)
+    }
+
+    fun dropBeeper(shift: Int): World {
         return if (shift >= 64) {
             World(dropBeeper(hi, shift), lo, floorPlan)
         } else {
@@ -111,7 +126,10 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
     }
 
     fun toggleBeeper(x: Int, y: Int): World {
-        val shift = y * 10 + x
+        return toggleBeeper(y * 10 + x)
+    }
+
+    fun toggleBeeper(shift: Int): World {
         return if (shift >= 64) {
             World(toggleBeeper(hi, shift), lo, floorPlan)
         } else {
@@ -180,7 +198,7 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
 
     fun moveForward(): World {
         if (!frontIsClear()) throw BlockedByWall()
-        return World((hi + deltaXY[direction]).and(CLEAR_CARRY), lo, floorPlan)
+        return World((hi + deltaXYP[direction]).and(CLEAR_CARRY), lo, floorPlan)
     }
 
     fun turn(delta: Int): World {
@@ -200,7 +218,7 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
     }
 
     fun onBeeper(): Boolean {
-        return beeperAt(x, y)
+        return beeperAt(position)
     }
 
     fun beeperAhead(): Boolean {
@@ -214,11 +232,11 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
     }
 
     fun pickBeeper(): World {
-        return pickBeeper(x, y)
+        return pickBeeper(position)
     }
 
     fun dropBeeper(): World {
-        return dropBeeper(x, y)
+        return dropBeeper(position)
     }
 }
 
