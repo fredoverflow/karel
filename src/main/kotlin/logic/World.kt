@@ -63,8 +63,8 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
 
     // BEEPERS
 
-    private fun beepersAt(input: Long, shift: Int): Int {
-        return input.ushr(shift).toInt().and(1)
+    private fun beeperAt(input: Long, shift: Int): Boolean {
+        return input.ushr(shift).and(1L) != 0L
     }
 
     private fun pickBeeper(input: Long, shift: Int): Long {
@@ -84,15 +84,11 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
     }
 
     fun beeperAt(x: Int, y: Int): Boolean {
-        return beepersAt(x, y) != 0
-    }
-
-    fun beepersAt(x: Int, y: Int): Int {
         val shift = y * 10 + x
         return if (shift >= 64) {
-            beepersAt(hi, shift)
+            beeperAt(hi, shift)
         } else {
-            beepersAt(lo, shift)
+            beeperAt(lo, shift)
         }
     }
 
@@ -165,7 +161,7 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
     }
 
     fun countBeepersInColumn(x: Int): Int {
-        return (0..9).sumOf { y -> beepersAt(x, y) }
+        return (0..9).count { y -> beeperAt(x, y) }
     }
 
     // KAREL
