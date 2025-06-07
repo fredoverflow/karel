@@ -89,12 +89,14 @@ class WorldPanel(var world: World) : JPanel() {
     }
 
     private fun Graphics.drawWallsAndBeepers(world: World) {
+        var position = 0
         for (y in 0 until 10) {
             for (x in 0 until 10) {
-                drawTile(x, y, walls[world.floorPlan.wallsAt(x, y)])
-                if (world.beeperAt(x, y)) {
+                drawTile(x, y, walls[world.floorPlan.wallsAt(position)])
+                if (world.beeperAt(position)) {
                     drawTile(x, y, beeper)
                 }
+                ++position
             }
         }
     }

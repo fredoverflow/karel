@@ -108,20 +108,25 @@ object LabyrinthGenerator {
             destination = destinationOpen(ORIGIN, EAST, 99)
         } while (destination == BACKTRACK_BUDGET_EXHAUSTED)
 
-        val walls = LongArray(10) { y ->
-            val positionY = ORIGIN + y * NEIGHBOUR_Y
-            (9 downTo 0).fold(0L) { line, x ->
-                val position = positionY + x * NEIGHBOUR_X
+        val walls = ByteArray(100)
+        var i = 0
+        var position = ORIGIN
+
+        for (y in 0 until 10) {
+            for (x in 0 until 10) {
 
                 val east = labyrinth[position + EAST].code and 1
                 val north = labyrinth[position + NORTH].code and 2
                 val west = labyrinth[position + WEST].code and 4
                 val south = labyrinth[position + SOUTH].code and 8
 
-                val cell = (south).or(west).or(north).or(east).toLong()
-                line.shl(4).or(cell)
+                walls[i++] = (south).or(west).or(north).or(east).toByte()
+
+                position += NEIGHBOUR_X
             }
+            position += NEIGHBOUR_Y - 10 * NEIGHBOUR_X
         }
+
         val y = destination / NEIGHBOUR_Y
         val x = destination % NEIGHBOUR_Y / NEIGHBOUR_X
 

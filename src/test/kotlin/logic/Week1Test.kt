@@ -84,9 +84,9 @@ class Week1Test : WorldTestBase() {
     fun repairTheStreet() {
         executeGoal(Problem.repairTheStreet)
         assertKarelAt(9, 8, EAST)
-        for (x in 0..9) {
-            val isSolid = (world.floorPlan.wallsAt(x, 9).and(FloorPlan.WALL_NORTH)) != 0
-            val isRepaired = world.beeperAt(x, 9)
+        for (position in 90 until 100) {
+            val isSolid = world.floorPlan.wallsAt(position).and(FloorPlan.WALL_NORTH) != 0
+            val isRepaired = world.beeperAt(position)
             assertTrue(isSolid.xor(isRepaired))
         }
     }

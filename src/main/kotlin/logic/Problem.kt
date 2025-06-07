@@ -495,11 +495,11 @@ class Problem(
                 world = world.pickBeeper().turn(angle)
                 repeat(4) {
                     if (world.beeperAhead()) {
-                        builder.tearDownWall(world.x, world.y, world.direction)
+                        builder.tearDownWall(world.position, world.direction)
                         world = world.moveForward()
                         generateMaze()
                         world = world.turnAround()
-                        builder.tearDownWall(world.x, world.y, world.direction)
+                        builder.tearDownWall(world.position, world.direction)
                         world = world.moveForward().turnAround()
                     }
                     world = world.turnLeft()
