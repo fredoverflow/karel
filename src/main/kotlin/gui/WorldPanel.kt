@@ -1,7 +1,6 @@
 package gui
 
 import freditor.Fronts
-import logic.Problem
 import logic.World
 
 import java.awt.Dimension
@@ -40,7 +39,7 @@ class WorldPanel(var world: World) : JPanel() {
         loadKarels()
         loadWalls()
 
-        val panelSize = Dimension(tileSize * Problem.WIDTH, tileSize * Problem.HEIGHT)
+        val panelSize = Dimension(tileSize * 10, tileSize * 10)
         minimumSize = panelSize
         preferredSize = panelSize
         maximumSize = panelSize
@@ -90,8 +89,8 @@ class WorldPanel(var world: World) : JPanel() {
     }
 
     private fun Graphics.drawWallsAndBeepers(world: World) {
-        for (y in 0 until Problem.HEIGHT) {
-            for (x in 0 until Problem.WIDTH) {
+        for (y in 0 until 10) {
+            for (x in 0 until 10) {
                 drawTile(x, y, walls[world.floorPlan.wallsAt(x, y)])
                 if (world.beeperAt(x, y)) {
                     drawTile(x, y, beeper)

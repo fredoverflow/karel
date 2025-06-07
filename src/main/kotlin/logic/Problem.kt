@@ -36,9 +36,6 @@ class Problem(
     }
 
     companion object {
-        const val HEIGHT = 10
-        const val WIDTH = 10
-
         const val EAST = 0
         const val NORTH = 1
         const val WEST = 2

@@ -45,8 +45,8 @@ open class WorldTestBase {
     }
 
     protected fun assertAllBeepersTouch(walls: Int) {
-        for (y in 0 until Problem.HEIGHT) {
-            for (x in 0 until Problem.WIDTH) {
+        for (y in 0 until 10) {
+            for (x in 0 until 10) {
                 if (world.beeperAt(x, y)) {
                     assertEquals(walls, world.floorPlan.wallsAt(x, y).and(walls))
                 }
@@ -55,8 +55,8 @@ open class WorldTestBase {
     }
 
     protected fun assertNoBeepersTouch(walls: Int) {
-        for (y in 0 until Problem.HEIGHT) {
-            for (x in 0 until Problem.WIDTH) {
+        for (y in 0 until 10) {
+            for (x in 0 until 10) {
                 if (world.beeperAt(x, y)) {
                     assertEquals(FloorPlan.WALL_NONE, world.floorPlan.wallsAt(x, y).and(walls))
                 }

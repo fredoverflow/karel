@@ -170,7 +170,7 @@ value class FloorBuilder(private val walls: LongArray) {
     }
 
     fun buildHorizontalWall(x: Int, y: Int): FloorBuilder {
-        if (y < Problem.HEIGHT) {
+        if (y < 10) {
             walls[y] = walls[y].or(bitmask(x, FloorPlan.WALL_NORTH))
         }
         if (y > 0) {
@@ -180,7 +180,7 @@ value class FloorBuilder(private val walls: LongArray) {
     }
 
     fun buildVerticalWall(x: Int, y: Int): FloorBuilder {
-        if (x < Problem.WIDTH) {
+        if (x < 10) {
             walls[y] = walls[y].or(bitmask(x, FloorPlan.WALL_WEST))
         }
         if (x > 0) {

@@ -206,7 +206,7 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
     }
 
     fun isInsideWorld(x: Int, y: Int): Boolean {
-        return (0 <= x && x < Problem.WIDTH) && (0 <= y && y < Problem.HEIGHT)
+        return (0 <= x && x < 10) && (0 <= y && y < 10)
     }
 
     fun pickBeeper(): World {
