@@ -52,32 +52,30 @@ class Week3Test : WorldTestBase() {
         val floorPlan = floodWorld.floorPlan
 
         // mark reachable positions with beepers
-        fun floodFill(x: Int, y: Int) {
-            if (floodWorld.beeperAt(x, y)) return
+        fun floodFill(position: Int) {
+            if (floodWorld.beeperAt(position)) return
 
-            floodWorld = floodWorld.dropBeeper(x, y)
+            floodWorld = floodWorld.dropBeeper(position)
 
-            if (floorPlan.isClear(x, y, EAST)) {
-                floodFill(x + 1, y)
+            if (floorPlan.isClear(position, EAST)) {
+                floodFill(position + 1)
             }
-            if (floorPlan.isClear(x, y, NORTH)) {
-                floodFill(x, y - 1)
+            if (floorPlan.isClear(position, NORTH)) {
+                floodFill(position - 10)
             }
-            if (floorPlan.isClear(x, y, WEST)) {
-                floodFill(x - 1, y)
+            if (floorPlan.isClear(position, WEST)) {
+                floodFill(position - 1)
             }
-            if (floorPlan.isClear(x, y, SOUTH)) {
-                floodFill(x, y + 1)
+            if (floorPlan.isClear(position, SOUTH)) {
+                floodFill(position + 10)
             }
         }
-        floodFill(world.x, world.y)
+        floodFill(world.position)
 
         // remove beepers from shelters
-        for (y in 0 until 10) {
-            for (x in 0 until 10) {
-                if (floodWorld.beeperAt(x, y) && floorPlan.numberOfWallsAt(x, y) >= 3) {
-                    floodWorld = floodWorld.pickBeeper(x, y)
-                }
+        for (position in 0 until 100) {
+            if (floodWorld.beeperAt(position) && floorPlan.numberOfWallsAt(position) >= 3) {
+                floodWorld = floodWorld.pickBeeper(position)
             }
         }
 

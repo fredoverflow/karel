@@ -185,15 +185,15 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
     // KAREL
 
     fun leftIsClear(): Boolean {
-        return floorPlan.isClear(x, y, (direction + 1).and(3))
+        return floorPlan.isClear(position, (direction + 1).and(3))
     }
 
     fun frontIsClear(): Boolean {
-        return floorPlan.isClear(x, y, direction)
+        return floorPlan.isClear(position, direction)
     }
 
     fun rightIsClear(): Boolean {
-        return floorPlan.isClear(x, y, (direction + 3).and(3))
+        return floorPlan.isClear(position, (direction + 3).and(3))
     }
 
     fun moveForward(): World {
