@@ -29,12 +29,11 @@ class WorldPanel(var world: World) : JPanel() {
     var tileSize = 0
         private set
 
-    private var beeper = BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB)
     private var karels = emptyArray<BufferedImage>()
-    private var walls = emptyArray<BufferedImage>()
+    private var wallsAndBeepers = emptyArray<BufferedImage>()
 
     private fun loadTiles() {
-        beeper = loadTile("beeper")
+        val beeper = loadTile("beeper")
         tileSize = beeper.width
 
         var east = loadTile("karel")
@@ -47,12 +46,13 @@ class WorldPanel(var world: World) : JPanel() {
         north = east.rotatedCounterclockwise()
         west = north.rotatedCounterclockwise()
         south = west.rotatedCounterclockwise()
-        walls = Array(16) { i ->
+        wallsAndBeepers = Array(32) { i ->
             loadTile("cross").apply {
                 if (i and 1 != 0) graphics.drawImage(east, 0, 0, null)
                 if (i and 2 != 0) graphics.drawImage(north, 0, 0, null)
                 if (i and 4 != 0) graphics.drawImage(west, 0, 0, null)
                 if (i and 8 != 0) graphics.drawImage(south, 0, 0, null)
+                if (i and 16 != 0) graphics.drawImage(beeper, 0, 0, null)
             }
         }
 
@@ -82,10 +82,11 @@ class WorldPanel(var world: World) : JPanel() {
         var position = 0
         for (y in 0 until 10) {
             for (x in 0 until 10) {
-                drawTile(x, y, walls[world.floorPlan.wallsAt(position)])
+                var index = world.floorPlan.wallsAt(position)
                 if (world.beeperAt(position)) {
-                    drawTile(x, y, beeper)
+                    index += 16
                 }
+                drawTile(x, y, wallsAndBeepers[index])
                 ++position
             }
         }
