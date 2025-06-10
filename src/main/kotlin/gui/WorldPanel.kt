@@ -36,40 +36,30 @@ class WorldPanel(var world: World) : JPanel() {
     private fun loadTiles() {
         beeper = loadTile("beeper")
         tileSize = beeper.width
-        loadKarels()
-        loadWalls()
+
+        var east = loadTile("karel")
+        var north = east.rotatedCounterclockwise()
+        var west = north.rotatedCounterclockwise()
+        var south = west.rotatedCounterclockwise()
+        karels = arrayOf(east, north, west, south)
+
+        east = loadTile("wall")
+        north = east.rotatedCounterclockwise()
+        west = north.rotatedCounterclockwise()
+        south = west.rotatedCounterclockwise()
+        walls = Array(16) { i ->
+            loadTile("cross").apply {
+                if (i and 1 != 0) graphics.drawImage(east, 0, 0, null)
+                if (i and 2 != 0) graphics.drawImage(north, 0, 0, null)
+                if (i and 4 != 0) graphics.drawImage(west, 0, 0, null)
+                if (i and 8 != 0) graphics.drawImage(south, 0, 0, null)
+            }
+        }
 
         val panelSize = Dimension(tileSize * 10, tileSize * 10)
         minimumSize = panelSize
         preferredSize = panelSize
         maximumSize = panelSize
-    }
-
-    private fun loadKarels() {
-        val east = loadTile("karel")
-        val north = east.rotatedCounterclockwise()
-        val west = north.rotatedCounterclockwise()
-        val south = west.rotatedCounterclockwise()
-
-        karels = arrayOf(east, north, west, south)
-    }
-
-    private fun loadWalls() {
-        walls = Array(16) { loadTile("cross") }
-
-        val east = loadTile("wall")
-        val north = east.rotatedCounterclockwise()
-        val west = north.rotatedCounterclockwise()
-        val south = west.rotatedCounterclockwise()
-
-        intArrayOf(1, 3, 5, 7, 9, 11, 13, 15).forEach { drawWall(it, east) }
-        intArrayOf(2, 3, 6, 7, 10, 11, 14, 15).forEach { drawWall(it, north) }
-        intArrayOf(4, 5, 6, 7, 12, 13, 14, 15).forEach { drawWall(it, west) }
-        intArrayOf(8, 9, 10, 11, 12, 13, 14, 15).forEach { drawWall(it, south) }
-    }
-
-    private fun drawWall(index: Int, wall: BufferedImage) {
-        walls[index].graphics.drawImage(wall, 0, 0, null)
     }
 
     var antWorld: World? = null
