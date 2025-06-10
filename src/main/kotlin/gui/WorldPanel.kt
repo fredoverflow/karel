@@ -125,10 +125,9 @@ class WorldPanel(var world: World) : JPanel() {
     }
 
     private fun Graphics.drawNumber(x: Int, y: Int, value: Int, color: Int) {
-        val str = "%3d".format(value)
-        val width = str.length * Fronts.front.width
-        val leftPad = (tileSize - width).shr(1)
-        Fronts.front.drawString(this, x * tileSize + leftPad, y * tileSize, str, color)
+        val width = Fronts.front.width * if (value <= -100) 4 else 3
+        val rightPad = (tileSize - width) shr 1
+        Fronts.front.drawIntRight(this, (x + 1) * tileSize - rightPad, y * tileSize, value, color)
     }
 
     private fun listenToMouse() {
