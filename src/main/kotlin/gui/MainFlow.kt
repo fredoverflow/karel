@@ -23,9 +23,9 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         return if (logarithm < 0) logarithm else 1.shl(logarithm)
     }
 
-    var initialWorld: World = worldPanel.world
+    var initialWorld: World = worldPanel.world.clone()
 
-    var virtualMachine = VirtualMachine(emptyArray(), initialWorld)
+    var virtualMachine = VirtualMachine(emptyArray(), worldPanel.world)
 
     val timer = Timer(delay()) {
         tryStep(::stepInto)
@@ -104,32 +104,37 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
             }
 
             if (elapsed >= nextRepaint) {
-                worldPanel.world = initialWorld
+                worldPanel.world = initialWorld.clone()
                 worldPanel.paintImmediately(0, 0, worldPanel.width, worldPanel.height)
                 nextRepaint += CHECK_REPAINT_NS
             }
         }
     }
 
+    private val goalWorlds = LongArray(2044) // addSlow worst case
+
     private fun checkOneWorld(instructions: Array<Instruction>, goalInstructions: Array<Instruction>) {
-        val goalWorlds = ArrayList<World>(200)
-        createVirtualMachine(goalInstructions, goalWorlds::add)
+        var size = 0
+        createVirtualMachine(goalInstructions) { world ->
+            size = world.serialize(goalWorlds, size)
+        }
+
         try {
             virtualMachine.executeGoalProgram()
         } catch (_: VirtualMachine.Finished) {
         }
         val finalGoalWorld = virtualMachine.world
         var index = 0
-        val size = goalWorlds.size
 
         createVirtualMachine(instructions) { world ->
             if (index == size) {
                 worldPanel.antWorld = finalGoalWorld
                 virtualMachine.error("extra ${currentProblem.check.singular}\n\n$COMPARE")
             }
-            val goalWorld = goalWorlds[index++]
-            if (!goalWorld.equalsIgnoringDirection(world)) {
-                worldPanel.antWorld = goalWorld
+            val hi = goalWorlds[index++]
+            val lo = goalWorlds[index++]
+            if (!world.equalsIgnoringDirection(hi, lo)) {
+                worldPanel.antWorld = World(hi, lo, world.floorPlan)
                 virtualMachine.error("wrong ${currentProblem.check.singular}\n\n$COMPARE")
             }
         }
@@ -153,7 +158,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
     private fun createVirtualMachine(instructions: Array<Instruction>, callback: (World) -> Unit) {
         virtualMachine = VirtualMachine(
-            instructions, initialWorld,
+            instructions, initialWorld.clone(),
             onPickDrop = callback,
             onMove = callback.takeIf { Check.EVERY_PICK_DROP_MOVE == currentProblem.check },
         )
@@ -201,10 +206,11 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         tabbedEditors.tabs.isEnabled = false
         virtualMachinePanel.setProgram(instructions)
         virtualMachine = VirtualMachine(
-            instructions.toTypedArray(), initialWorld,
+            instructions.toTypedArray(), initialWorld.clone(),
             onCall = editor::push.takeIf { compiledFromSource },
             onReturn = editor::pop.takeIf { compiledFromSource },
         )
+        worldPanel.world = virtualMachine.world
         controlPanel.executionStarted()
         update()
         if (delay() >= 0) {
@@ -227,7 +233,6 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
             editor.setCursorTo(position)
         }
         virtualMachinePanel.update(virtualMachine.stack, virtualMachine.pc)
-        worldPanel.world = virtualMachine.world
         worldPanel.repaint()
     }
 

@@ -48,39 +48,39 @@ class Week3Test : WorldTestBase() {
     @Test
     fun findShelters() {
         executeGoal(Problem.findShelters)
-        var floodWorld = initialWorld
-        val floorPlan = floodWorld.floorPlan
+        initialWorld.clone().apply {
+            // mark reachable positions with beepers
+            fun floodFill(position: Int) {
+                if (beeperAt(position)) return
 
-        // mark reachable positions with beepers
-        fun floodFill(position: Int) {
-            if (floodWorld.beeperAt(position)) return
+                dropBeeper(position)
 
-            floodWorld = floodWorld.dropBeeper(position)
+                if (floorPlan.isClear(position, EAST)) {
+                    floodFill(position + 1)
+                }
+                if (floorPlan.isClear(position, NORTH)) {
+                    floodFill(position - 10)
+                }
+                if (floorPlan.isClear(position, WEST)) {
+                    floodFill(position - 1)
+                }
+                if (floorPlan.isClear(position, SOUTH)) {
+                    floodFill(position + 10)
+                }
+            }
 
-            if (floorPlan.isClear(position, EAST)) {
-                floodFill(position + 1)
+            floodFill(position)
+
+            // remove beepers from shelters
+            for (position in 0 until 100) {
+                if (beeperAt(position) && floorPlan.numberOfWallsAt(position) >= 3) {
+                    pickBeeper(position)
+                }
             }
-            if (floorPlan.isClear(position, NORTH)) {
-                floodFill(position - 10)
-            }
-            if (floorPlan.isClear(position, WEST)) {
-                floodFill(position - 1)
-            }
-            if (floorPlan.isClear(position, SOUTH)) {
-                floodFill(position + 10)
-            }
+
+            assertEquals(beepersHi, world.beepersHi)
+            assertEquals(beepersLo, world.beepersLo)
         }
-        floodFill(world.position)
-
-        // remove beepers from shelters
-        for (position in 0 until 100) {
-            if (floodWorld.beeperAt(position) && floorPlan.numberOfWallsAt(position) >= 3) {
-                floodWorld = floodWorld.pickBeeper(position)
-            }
-        }
-
-        assertEquals(floodWorld.beepersHi, world.beepersHi)
-        assertEquals(floodWorld.beepersLo, world.beepersLo)
     }
 
     @Test

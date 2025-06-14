@@ -130,7 +130,9 @@ object LabyrinthGenerator {
         val y = destination / NEIGHBOUR_Y
         val x = destination % NEIGHBOUR_Y / NEIGHBOUR_X
 
-        return FloorPlan(walls).world().dropBeeper(x - 1, y - 1)
+        return FloorPlan(walls).world().apply {
+            dropBeeper(x - 1, y - 1)
+        }
     }
 
     private fun isUncharted(position: Int): Boolean {
