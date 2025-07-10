@@ -111,6 +111,8 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         }
     }
 
+    private var index = 0
+
     private fun checkOneWorld(instructions: Array<Instruction>, goalInstructions: Array<Instruction>) {
         val goalWorlds = ArrayList<World>(200)
         createVirtualMachine(goalInstructions, goalWorlds::add)
@@ -119,11 +121,10 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         } catch (_: VirtualMachine.Finished) {
         }
         val finalGoalWorld = virtualMachine.world
-        var index = 0
-        val size = goalWorlds.size
+        index = 0
 
         createVirtualMachine(instructions) { world ->
-            if (index == size) {
+            if (index == goalWorlds.size) {
                 worldPanel.antWorld = finalGoalWorld
                 virtualMachine.error("extra ${currentProblem.check.singular}\n\n$COMPARE")
             }
@@ -140,10 +141,10 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         } catch (error: KarelError) {
             virtualMachine.error(error.message)
         }
-        if (index < size && !finalGoalWorld.equalsIgnoringDirection(virtualMachine.world)) {
+        if (index < goalWorlds.size && !finalGoalWorld.equalsIgnoringDirection(virtualMachine.world)) {
             worldPanel.antWorld = finalGoalWorld
             if (currentProblem.numWorlds == ONE) {
-                val missing = size - index
+                val missing = goalWorlds.size - index
                 virtualMachine.error("missing $missing ${currentProblem.check.numerus(missing)}\n\n$COMPARE")
             } else {
                 virtualMachine.error("missing ${currentProblem.check.plural}\n\n$COMPARE")
