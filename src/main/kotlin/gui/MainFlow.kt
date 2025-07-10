@@ -23,9 +23,9 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         return if (logarithm < 0) logarithm else 1.shl(logarithm)
     }
 
-    var initialWorld: World = worldPanel.world
+    var initialWorld: World = worldPanel.world.clone()
 
-    var virtualMachine = VirtualMachine(emptyArray(), initialWorld)
+    var virtualMachine = VirtualMachine(emptyArray(), worldPanel.world)
 
     val timer = Timer(delay()) {
         tryStep(::stepInto)
@@ -104,18 +104,23 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
             }
 
             if (elapsed >= nextRepaint) {
-                worldPanel.world = initialWorld
+                worldPanel.world = initialWorld.clone()
                 worldPanel.paintImmediately(0, 0, worldPanel.width, worldPanel.height)
                 nextRepaint += CHECK_REPAINT_NS
             }
         }
     }
 
+    private val goalWorlds = LongArray(2044) // addSlow worst case
+    private var size = 0
     private var index = 0
 
     private fun checkOneWorld(instructions: Array<Instruction>, goalInstructions: Array<Instruction>) {
-        val goalWorlds = ArrayList<World>(200)
-        createVirtualMachine(goalInstructions, goalWorlds::add)
+        size = 0
+        createVirtualMachine(goalInstructions) { world ->
+            size = world.serialize(goalWorlds, size)
+        }
+
         try {
             virtualMachine.executeGoalProgram()
         } catch (_: VirtualMachine.Finished) {
@@ -124,15 +129,18 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         index = 0
 
         createVirtualMachine(instructions) { world ->
-            if (index == goalWorlds.size) {
+            val i = index
+            if (i == size) {
                 worldPanel.antWorld = finalGoalWorld
                 virtualMachine.error("extra ${currentProblem.check.singular}\n\n$COMPARE")
             }
-            val goalWorld = goalWorlds[index++]
-            if (!goalWorld.equalsIgnoringDirection(world)) {
-                worldPanel.antWorld = goalWorld
+            val hi = goalWorlds[i]
+            val lo = goalWorlds[i + 1]
+            if (!world.equalsIgnoringDirection(hi, lo)) {
+                worldPanel.antWorld = World(hi, lo, world.floorPlan)
                 virtualMachine.error("wrong ${currentProblem.check.singular}\n\n$COMPARE")
             }
+            index = i + 2
         }
 
         try {
@@ -141,10 +149,10 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         } catch (error: KarelError) {
             virtualMachine.error(error.message)
         }
-        if (index < goalWorlds.size && !finalGoalWorld.equalsIgnoringDirection(virtualMachine.world)) {
+        if (index < size && !finalGoalWorld.equalsIgnoringDirection(virtualMachine.world)) {
             worldPanel.antWorld = finalGoalWorld
             if (currentProblem.numWorlds == ONE) {
-                val missing = goalWorlds.size - index
+                val missing = size - index
                 virtualMachine.error("missing $missing ${currentProblem.check.numerus(missing)}\n\n$COMPARE")
             } else {
                 virtualMachine.error("missing ${currentProblem.check.plural}\n\n$COMPARE")
@@ -154,7 +162,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
     private fun createVirtualMachine(instructions: Array<Instruction>, callback: (World) -> Unit) {
         virtualMachine = VirtualMachine(
-            instructions, initialWorld,
+            instructions, initialWorld.clone(),
             onPickDrop = callback,
             onMove = callback.takeIf { Check.EVERY_PICK_DROP_MOVE == currentProblem.check },
         )
@@ -202,10 +210,11 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         tabbedEditors.tabs.isEnabled = false
         virtualMachinePanel.setProgram(instructions)
         virtualMachine = VirtualMachine(
-            instructions.toTypedArray(), initialWorld,
+            instructions.toTypedArray(), initialWorld.clone(),
             onCall = editor::push.takeIf { compiledFromSource },
             onReturn = editor::pop.takeIf { compiledFromSource },
         )
+        worldPanel.world = virtualMachine.world
         controlPanel.executionStarted()
         update()
         if (delay() >= 0) {

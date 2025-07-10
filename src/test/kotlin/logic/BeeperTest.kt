@@ -7,43 +7,50 @@ import org.junit.jupiter.api.assertThrows
 class BeeperTest {
     @Test
     fun dropOneBeeper() {
-        val beforeDrop = Problem.emptyWorld
-        val afterDrop = beforeDrop.dropBeeper(1, 2)
-
-        assertFalse(beforeDrop.beeperAt(1, 2))
-        assertTrue(afterDrop.beeperAt(1, 2))
+        FloorPlan.empty.world().apply {
+            assertFalse(beeperAt(1, 2))
+            dropBeeper(1, 2)
+            assertTrue(beeperAt(1, 2))
+        }
     }
 
     @Test
     fun dropAnotherBeeper() {
-        val one = Problem.emptyWorld.dropBeeper(1, 2)
-        assertThrows<CellIsFull> {
-            one.dropBeeper(1, 2)
+        FloorPlan.empty.world().apply {
+            dropBeeper(1, 2)
+            assertThrows<CellIsFull> {
+                dropBeeper(1, 2)
+            }
         }
     }
 
     @Test
     fun dropFourCornerBeepers() {
-        val beforeDrop = Problem.emptyWorld
-        val afterDrop = beforeDrop.dropBeeper(0, 0).dropBeeper(9, 0).dropBeeper(0, 9).dropBeeper(9, 9)
-
-        assertEquals(0, beforeDrop.countBeepers())
-        assertEquals(4, afterDrop.countBeepers())
+        FloorPlan.empty.world().apply {
+            assertEquals(0, countBeepers())
+            dropBeeper(0, 0)
+            dropBeeper(9, 0)
+            dropBeeper(0, 9)
+            dropBeeper(9, 9)
+            assertEquals(4, countBeepers())
+        }
     }
 
     @Test
     fun pickOneBeeper() {
-        val beforePick = World(0, 1, FloorPlan.empty)
-        val afterPick = beforePick.pickBeeper(0, 0)
-
-        assertTrue(beforePick.beeperAt(0, 0))
-        assertFalse(afterPick.beeperAt(0, 0))
+        World(0, 1, FloorPlan.empty).apply {
+            assertTrue(beeperAt(0, 0))
+            pickBeeper(0, 0)
+            assertFalse(beeperAt(0, 0))
+        }
     }
 
     @Test
     fun pickImaginaryBeeper() {
-        assertThrows<CellIsEmpty> {
-            Problem.emptyWorld.pickBeeper(0, 0)
+        FloorPlan.empty.world().apply {
+            assertThrows<CellIsEmpty> {
+                pickBeeper(0, 0)
+            }
         }
     }
 }

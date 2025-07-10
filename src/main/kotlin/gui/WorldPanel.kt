@@ -138,6 +138,11 @@ class WorldPanel(var world: World) : JPanel() {
                 if (SwingUtilities.isLeftMouseButton(event)) {
                     if (antWorld != null) {
                         showAntWorld = !showAntWorld
+                    } else {
+                        val x = event.x / tileSize
+                        val y = event.y / tileSize
+                        world.toggleBeeper(x, y)
+                        repaint()
                     }
                 } else if (SwingUtilities.isRightMouseButton(event)) {
                     switchTileSize()

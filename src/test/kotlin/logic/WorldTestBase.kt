@@ -4,13 +4,13 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import vm.VirtualMachine
 
 open class WorldTestBase {
-    protected var initialWorld: World = Problem.emptyWorld
-    protected var world: World = Problem.emptyWorld
+    protected var initialWorld: World = FloorPlan.empty.world()
+    protected var world: World = initialWorld.clone()
 
     protected fun executeGoal(problem: Problem) {
         val instructions = vm.createGoalInstructions(problem.goal)
         initialWorld = problem.randomWorld()
-        val virtualMachine = VirtualMachine(instructions.toTypedArray(), initialWorld)
+        val virtualMachine = VirtualMachine(instructions.toTypedArray(), initialWorld.clone())
         try {
             virtualMachine.executeGoalProgram()
         } catch (_: VirtualMachine.Finished) {
@@ -25,7 +25,9 @@ open class WorldTestBase {
     }
 
     protected fun assertSoleBeeperAt(x: Int, y: Int) {
-        val expected = Problem.emptyWorld.dropBeeper(x, y)
+        val expected = FloorPlan.empty.world().apply {
+            dropBeeper(x, y)
+        }
         assertEquals(expected.beepersHi, world.beepersHi)
         assertEquals(expected.beepersLo, world.beepersLo)
     }
