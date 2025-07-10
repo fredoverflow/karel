@@ -3,10 +3,7 @@ package gui
 import freditor.Freditor
 import logic.Problem
 import java.awt.event.KeyEvent
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
 import java.util.function.Consumer
-import javax.swing.SwingUtilities
 import kotlin.streams.asSequence
 
 class MainHandler : MainFlow() {
@@ -15,8 +12,7 @@ class MainHandler : MainFlow() {
             controlPanel.startStopReset.text = "start"
 
             initialWorld = currentProblem.randomWorld()
-            virtualMachine.world = initialWorld
-            worldPanel.world = initialWorld
+            worldPanel.world = initialWorld.clone()
             worldPanel.antWorld = null
             worldPanel.repaint()
 
@@ -39,8 +35,7 @@ class MainHandler : MainFlow() {
             controlPanel.check.toolTipText = "check every ${currentProblem.check.singular}"
 
             initialWorld = currentProblem.randomWorld()
-            virtualMachine.world = initialWorld
-            worldPanel.world = initialWorld
+            worldPanel.world = initialWorld.clone()
             worldPanel.antWorld = null
             worldPanel.binaryLines = currentProblem.binaryLines
             worldPanel.repaint()
@@ -67,8 +62,7 @@ class MainHandler : MainFlow() {
                 "reset" -> {
                     controlPanel.startStopReset.text = "start"
 
-                    virtualMachine.world = initialWorld
-                    worldPanel.world = initialWorld
+                    worldPanel.world = initialWorld.clone()
                     worldPanel.antWorld = null
                     worldPanel.repaint()
                 }
@@ -144,24 +138,6 @@ class MainHandler : MainFlow() {
                 }
             }
         }
-
-        worldPanel.addMouseListener(object : MouseAdapter() {
-            override fun mouseClicked(event: MouseEvent) {
-                if (!event.component.isEnabled) return
-
-                if (SwingUtilities.isLeftMouseButton(event)) {
-                    if (worldPanel.antWorld == null) {
-                        val x = event.x / worldPanel.tileSize
-                        val y = event.y / worldPanel.tileSize
-                        val world = virtualMachine.world.toggleBeeper(x, y)
-                        virtualMachine.world = world
-
-                        worldPanel.world = world
-                        worldPanel.repaint()
-                    }
-                }
-            }
-        })
 
         defaultCloseOperation = EXIT_ON_CLOSE
         tabbedEditors.saveOnExit(this)
