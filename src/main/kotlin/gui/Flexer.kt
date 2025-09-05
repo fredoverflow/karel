@@ -43,12 +43,14 @@ object Flexer : freditor.Flexer() {
         return lexemeColors[endState] ?: 0x000000
     }
 
+    val VOID: FlexerState = START.read("void")
+
     private val lexemeColors = ChampMap.of(ERROR, 0x808080)
         .put(START.read("/", "&", "|"), 0x808080)
         .put(SLASH_SLASH, SLASH_ASTERISK, SLASH_ASTERISK___ASTERISK, SLASH_ASTERISK___ASTERISK_SLASH, 0x008000)
         .put(NUMBER_HEAD, NUMBER_TAIL, 0x6400c8)
         .put(START.read("else", "if", "repeat", "while"), 0x0000ff)
-        .put(START.read("void"), 0x008080)
+        .put(VOID, 0x008080)
         .put(START.read("(", ")", "{", "}"), 0xff0000)
         .put(START.read("!", "&&", "||"), 0x804040)
 }

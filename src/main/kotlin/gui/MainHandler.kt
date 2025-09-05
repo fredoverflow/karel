@@ -1,16 +1,32 @@
 package gui
 
 import freditor.Freditor
+import freditor.FreditorUI
 import logic.Problem
 import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.util.function.Consumer
+import javax.swing.DefaultComboBoxModel
 import javax.swing.SwingUtilities
-import kotlin.streams.asSequence
+import javax.swing.event.PopupMenuEvent
+import javax.swing.event.PopupMenuListener
 
 class MainHandler : MainFlow() {
     init {
+        val clearAndFocus = object : PopupMenuListener {
+            override fun popupMenuWillBecomeVisible(event: PopupMenuEvent) {
+            }
+
+            override fun popupMenuWillBecomeInvisible(event: PopupMenuEvent) {
+                editor.clearDiagnostics()
+                editor.requestFocusInWindow()
+            }
+
+            override fun popupMenuCanceled(event: PopupMenuEvent) {
+            }
+        }
+
         controlPanel.randomize.addActionListener {
             controlPanel.startStopReset.text = "start"
 
@@ -47,16 +63,28 @@ class MainHandler : MainFlow() {
 
             story.load(currentProblem.story)
 
-            val pattern = Regex("""\bvoid\s+(${currentProblem.name})\b""").toPattern()
+            macroPanel.configureLevel(currentProblem.level)
 
-            tabbedEditors.stream().asSequence()
-                .minus(editor).plus(editor) // check current editor last
-                .filter { it.setCursorTo(pattern, 1) }
-                .lastOrNull()
-                ?.let(tabbedEditors::selectEditor)
+            val name = currentProblem.name
+            for (editor in tabbedEditors.stream().sorted(compareBy { it != editor })) {
+                for (matchGroup in editor.commandMatchGroups()) {
+                    if (matchGroup.value == name) {
+                        tabbedEditors.selectEditor(editor)
+                        editor.setCursorTo(matchGroup.range.first)
+                        return@addActionListener
+                    }
+                }
+            }
 
-            editor.requestFocusInWindow()
+            if (editor.stateAt(editor.cursor() - 2) == Flexer.VOID
+                && editor.stateAt(editor.cursor() - 1) == freditor.Flexer.SPACE_HEAD
+                && editor.stateAt(editor.cursor()) == freditor.Flexer.OPENING_PAREN
+                && editor.stateAt(editor.cursor() + 1) == freditor.Flexer.CLOSING_PAREN
+            ) {
+                editor.insert(name)
+            }
         }
+        controlPanel.problemPicker.addPopupMenuListener(clearAndFocus)
 
         controlPanel.startStopReset.addActionListener {
             when (controlPanel.startStopReset.text) {
@@ -163,6 +191,74 @@ class MainHandler : MainFlow() {
             }
         })
 
+        macroPanel.undo.addActionListener {
+            editor.undo()
+
+            editor.clearDiagnostics()
+            editor.requestFocusInWindow()
+        }
+
+        macroPanel.redo.addActionListener {
+            editor.redo()
+
+            editor.clearDiagnostics()
+            editor.requestFocusInWindow()
+        }
+
+        macroPanel.void.addActionListener {
+            editor.insertMacro("void ", "()\n{\n", "\n}\n\n")
+            val name = currentProblem.name
+            if (editor.commandMatchGroups().none { it.value == name }) {
+                editor.insert(name)
+            }
+            editor.clearDiagnostics()
+            editor.requestFocusInWindow()
+        }
+
+        macroPanel.commands.addMouseListener(object : MouseAdapter() {
+            override fun mouseEntered(event: MouseEvent) {
+                val commands = editor.commandMatchGroups()
+                    .filterNot { it.value in Problem.names }
+                    .mapTo(macroPanel.builtinCommands.toMutableList()) { Macro(it.value, it.value + "();") }
+
+                val selectedItem = macroPanel.commands.selectedItem
+                val model = DefaultComboBoxModel(commands.toTypedArray())
+                model.selectedItem = selectedItem
+                macroPanel.commands.model = model
+            }
+        })
+
+        macroPanel.commands.addActionListener {
+            val command = macroPanel.commands.selectedItem as Macro
+            editor.insertCommand(command.code)
+        }
+        macroPanel.commands.addPopupMenuListener(clearAndFocus)
+
+        macroPanel.repeats.addActionListener {
+            val macro = macroPanel.repeats.selectedItem as Macro
+            editor.insertMacro(macro.code, ")\n{\n", "\n}")
+        }
+        macroPanel.repeats.addPopupMenuListener(clearAndFocus)
+
+        macroPanel.ifs.addActionListener {
+            val macro = macroPanel.ifs.selectedItem as Macro
+            editor.insertMacro("if (", ")\n{\n", macro.code)
+        }
+        macroPanel.ifs.addPopupMenuListener(clearAndFocus)
+
+        macroPanel.conditions.addActionListener {
+            val condition = macroPanel.conditions.selectedItem as Macro
+            editor.insert(condition.code)
+        }
+        macroPanel.conditions.addPopupMenuListener(clearAndFocus)
+
+        macroPanel.`while`.addActionListener {
+            editor.insertMacro("while (", ")\n{\n", "\n}")
+
+            editor.clearDiagnostics()
+            editor.requestFocusInWindow()
+        }
+
         defaultCloseOperation = EXIT_ON_CLOSE
         tabbedEditors.saveOnExit(this)
     }
@@ -198,4 +294,12 @@ class MainHandler : MainFlow() {
 
         return editor
     }
+}
+
+private val COMMANDS = Regex("""\bvoid\s+(\p{javaJavaIdentifierStart}\p{javaJavaIdentifierPart}*)\s*\(\s*\)""")
+
+fun FreditorUI.commandMatchGroups(): Sequence<MatchGroup> {
+    return COMMANDS.findAll(text)
+        .filter { stateAt(it.range.first + 3) == Flexer.VOID } // ignore comments
+        .map { it.groups[1]!! }
 }

@@ -40,16 +40,23 @@ class Editor(freditor: Freditor) : FreditorUI(freditor, 60, 1) {
         }
     }
 
-    private fun insertCommand(command: String) {
-        if (lineIsBlankBefore(selectionStart())) {
-            insert(command)
-        } else {
+    fun insertCommand(command: String) {
+        if (!lineIsBlankBefore(selectionStart())) {
             simulateEnter()
-            insert(command)
-            // Remove the commit between simulateEnter and insertString,
-            // effectively committing both changes as a single commit
-            uncommit()
         }
+        insert(command)
+    }
+
+    fun insertMacro(beforeCursor: String, beforeSelection: String, afterSelection: String) {
+        if (selectionIsEmpty()) {
+            if (!lineIsBlankBefore(selectionStart())) {
+                simulateEnter()
+            }
+        } else {
+            balanceSelection()
+        }
+        insert(beforeCursor, beforeSelection, afterSelection)
+        indent()
     }
 
     private fun autocompleteCall() {

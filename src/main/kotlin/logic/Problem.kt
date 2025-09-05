@@ -11,6 +11,7 @@ val SHUFFLE = TWO..65536.toBigInteger()
 class Problem(
     val index: String,
     val name: String,
+    val level: Level,
     val story: String,
     val goal: String,
     val check: Check,
@@ -73,6 +74,7 @@ class Problem(
         val karelsFirstProgram = Problem(
             "0.0.1",
             "karelsFirstProgram",
+            Level.REPEAT,
             "Click the GOAL button (top left)\nand watch Karel go. Drag slider\nto adjust animation speed.\nCan you program Karel to perform\nthe same steps? Test with START!",
             "\u0001\u0005\u0001\u0002\u0001\u0004\u0001\u0006\u0001\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -87,6 +89,7 @@ class Problem(
         val obtainArtifact = Problem(
             "1.1.1 \uD83E\uDD20",
             "obtainArtifact",
+            Level.REPEAT,
             "Karel auditions for the new Indy\nmovie. To demonstrate talent,\nKarel re-enacts the classic scene\nwhere Indy saves some valuable\nartifact from an ancient temple.",
             "\u0004\ua106\u0005\ua106\u0006\u0000\u0001\u0002\u0001\u0001\u0001\u0002\u0001\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -101,6 +104,7 @@ class Problem(
         val defuseOneBomb = Problem(
             "1.1.2",
             "defuseOneBomb",
+            Level.REPEAT,
             "Karel the demolition expert\ndefuses a bomb at the other end\nof the room and returns filled\nwith pride and self-confidence.\nHave you learned repeat (n) yet?",
             "\ua106\u0005\u0003\ua106\u0003\u0000\u8009\u0001\u9107\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -115,6 +119,7 @@ class Problem(
         val defuseTwoBombs = Problem(
             "1.1.3",
             "defuseTwoBombs",
+            Level.REPEAT,
             "One bomb is no problem for Karel.\nLet's spice up the challenge!\nShouldn't this be rather simple,\ngiven that Karel already knows\nhow to defuse one single bomb?",
             "\ua102\u0002\ua108\u0005\u0003\ua108\u0003\u0000\u8009\u0001\u9109\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -129,6 +134,7 @@ class Problem(
         val practiceHomeRun = Problem(
             "1.1.4",
             "practiceHomeRun",
+            Level.REPEAT,
             "Karel's heart burns for baseball,\nbut merely watching does not cut\nit anymore. Tonight, let's sneak\ninto the stadium and perform our\nfirst home run. Adrenaline rush!",
             "\u8004\u8009\u0001\u9102\u0005\u0002\u9101\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -143,6 +149,7 @@ class Problem(
         val climbTheStairs = Problem(
             "1.2.1",
             "climbTheStairs",
+            Level.REPEAT,
             "The elevator seems to be\nout of service as of late...\nBut Karel is still pumped from\nthat home run and full of energy!",
             "\u0001\u8006\u0002\u0001\u0004\u0001\u9102\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -157,6 +164,7 @@ class Problem(
         val fillTheHoles = Problem(
             "1.2.2",
             "fillTheHoles",
+            Level.REPEAT,
             "Karel considers a career in den-\ndistry. The local dental school\nhas Open House day. Coincidence?\nKarel gets to fill 4 carious\nteeth with dental amalgam. Ouch!",
             "\u8004\u0001\u0004\u0001\u0006\u0003\u0001\u0004\u0001\u9101\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -171,6 +179,7 @@ class Problem(
         val saveTheFlower = Problem(
             "1.2.3",
             "saveTheFlower",
+            Level.REPEAT,
             "During a vacation in the alps,\nKarel discovers a rare flower\nwhich has trouble blooming\nat such low altitude...\nIt's a long way to the top!",
             "\u0001\u0005\u8004\u0002\u0001\u0001\u0004\u0001\u9103\u0006\u8004\u0001\u0004\u0001\u0001\u0002\u910b\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -185,6 +194,7 @@ class Problem(
         val mowTheLawn = Problem(
             "1.2.4",
             "mowTheLawn",
+            Level.REPEAT,
             "Karel promised Granger to help in\nthe garden. Granger has already\npulled up the weeds, so Karel\ncan focus on mowing the lawn.",
             "\u8002\ua106\u0004\u0001\u0004\u9101\ua10a\u0002\u0001\u0002\u8006\u0001\u0005\u910b\u0001\u0000",
             Check.EVERY_PICK_DROP,
@@ -199,6 +209,7 @@ class Problem(
         val harvestTheField = Problem(
             "1.3.1",
             "harvestTheField",
+            Level.REPEAT,
             "Granger is an agricult -- erm...\nfarmer. After mowing the lawn,\nKarel can't reject the desperate\nplea for help on the farm.\nThe wheat is already overripe!",
             "\ua105\u0004\u0001\u0004\u0001\ua10a\u0001\u0002\u0001\u0002\u8003\u0005\u0004\u0001\u0002\u0001\u910b\u0005\u0000",
             Check.EVERY_PICK_DROP,
@@ -213,6 +224,7 @@ class Problem(
         val repairTheStreet = Problem(
             "1.3.2",
             "repairTheStreet",
+            Level.IF,
             "Click the DICE button. Notice\nsomething? Not all streets are\ncreated equal! Have you learned\nabout the if/else statement yet?\nF7..F11 are Karel's conditions.",
             "\u8009\ua104\u0001\u9101\u000b\uc10c\u0004\u0001\u0006\u0003\u0001\u0004\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -236,6 +248,7 @@ class Problem(
         val cleanTheRoom = Problem(
             "1.3.3",
             "cleanTheRoom",
+            Level.IF,
             "Granger is paying Karel a surprise\nvisit. But Karel's apartment\nis *really* out of shape :(\nThe chaos is almost overwhelming.\nCan Karel clean up in time?",
             "\u8004\ua106\u0004\u0001\u0004\u9101\ua10a\u0002\u0001\u0002\u8009\u0007\uc10e\u0005\u0001\u910b\u0007\uc113\u0005\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -252,6 +265,7 @@ class Problem(
         val tileTheFloor = Problem(
             "1.3.4",
             "tileTheFloor",
+            Level.IF,
             "During a routine visit to the\nhardware store, Karel can't\nresist buying some flagstones.\nThey seem to be a perfect fit\nfor the luxurious bathroom!",
             "\u8064\u0006\u0008\ud106\u000a\ud107\u0002\u0001\u9101\u0000",
             Check.EVERY_PICK_DROP,
@@ -264,6 +278,7 @@ class Problem(
         val stealOlympicFire = Problem(
             "1.4.1",
             "stealOlympicFire",
+            Level.IF,
             "Karel is mad with olympic fever\nand somehow comes to believe\nit would be a good idea to\nsteal the olympic fire O_o\nLet's hope nobody will notice...",
             "\u0001\u8006\u0002\u0001\u0004\u0001\u9102\u0005\u0001\u0004\u8006\u0001\u910b\u0002\u0001\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -278,6 +293,7 @@ class Problem(
         val removeTheTiles = Problem(
             "1.4.2",
             "removeTheTiles",
+            Level.IF,
             "The flagstones were supposed to\nbe a surprise for Karel's new\nsweetheart, Taylor. Too bad green\nis not Taylor's favourite color.\nOh well, back to square one...",
             "\u8064\u0005\u0008\ud105\u0002\u0001\u9101\u0000",
             Check.EVERY_PICK_DROP,
@@ -292,6 +308,7 @@ class Problem(
         val walkTheLabyrinth = Problem(
             "1.4.3",
             "walkTheLabyrinth",
+            Level.IF,
             "Click DICE several times.\nNote how the generated labyrinths\nare rather simple? They contain\nneither crossroads nor dead ends.\nExactly one path to the beeper!",
             "\u8063\u000a\ud10a\u0009\uc109\u0002\u0001\u9101\u0000\u0004\u0001\u9101\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -304,6 +321,7 @@ class Problem(
         val hangTheLampions = Problem(
             "2.1.1 \uD83C\uDFEE",
             "hangTheLampions",
+            Level.WHILE,
             "Karel was assembled 10 years ago!\nTo celebrate this anniversary,\nKarel bought 10 lampions. Now all\nthat's left to do is hang them\nfrom the (irregular) ceiling.",
             "\u8009\ua104\u0001\u9101\u0002\u0005\u0001\u000a\ud106\u0006\u0003\u0001\u000a\ud10b\u0002\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -323,6 +341,7 @@ class Problem(
         val followTheSeeds = Problem(
             "2.1.2",
             "followTheSeeds",
+            Level.WHILE,
             "Karel had insomnia and decided\nto take a walk in the forest.\nFortunately, Karel was smart\nenough to leave a trail of seeds\nto find the way back...",
             "\u0001\u0005\u0008\ud100\u0002\u0008\ud100\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -336,6 +355,7 @@ class Problem(
         val cleanTheTunnels = Problem(
             "2.1.3",
             "cleanTheTunnels",
+            Level.WHILE,
             "Karel the coal miner discovers\nten tunnels of varying lengths\nfilled with valuable coal.\n(Does your solution work for\ntunnels of length 0 and 10?)",
             "\u8009\ua104\u0001\u9101\u0007\uc113\u0002\u0005\u0008\uc114\u0001\u0005\u0008\ud10a\u0003\u0001\u000a\ud10f\u0002\u0000\u0004\u0000",
             Check.EVERY_PICK_DROP,
@@ -348,6 +368,7 @@ class Problem(
         val increment = Problem(
             "2.2.1",
             "increment",
+            Level.WHILE,
             "Do you know binary numbers?\nen.wikipedia.org/wiki/Binary_number\nde.wikipedia.org/wiki/Dualsystem\nKarel wants to add 1 to a byte.\nThis is almost trivial in binary.",
             "\u0007\uc106\u0005\u0001\u0007\ud102\u0006\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -360,6 +381,7 @@ class Problem(
         val decrement = Problem(
             "2.2.2",
             "decrement",
+            Level.WHILE,
             "Karel wants to subtract 1 from\na byte. Notice any similarity\nto increment? (What happens if\nKarel decrements the byte zero?\nYou can click in Karel's world!)",
             "\u0007\ud108\u0006\u000a\uc108\u0001\u0007\uc102\u0005\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -372,6 +394,7 @@ class Problem(
         val addSlow = Problem(
             "2.2.3",
             "addSlow",
+            Level.WHILE,
             "Welcome to the slowest adding\nmachine in the world! Karel just\ndecrements the first byte\nand increments the second byte\nuntil the first byte is zero.",
             "\u0007\ud120\u0006\u000a\uc126\u0001\u0007\uc102\u0005\u0003\u0001\u000a\ud10a\u0004\u0001\u0004\u0007\uc123\u0005\u0001\u0007\ud112\u0006\u0003\u0001\u000a\ud118\u0002\u0001\u0002\u0007\uc102\u0005\u0003\ub10d\u0006\u0003\ub11b\u0005\u0000",
             Check.EVERY_PICK_DROP,
@@ -384,6 +407,7 @@ class Problem(
         val saveTheFlowers = Problem(
             "2.3.1",
             "saveTheFlowers",
+            Level.WHILE,
             "Karel climbs Mt. Everest. On the\nway up, Karel collects 4 flowers\nthat do not get enough sunlight\non the west side of the mountain.\nEast is where the sun comes up!",
             "\u8005\ub103\u0005\u0002\u0001\u000b\uc104\u0004\u0001\u9102\u8004\u0006\u0001\u0004\u0001\u000a\ud10e\u0002\u910b\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -436,6 +460,7 @@ class Problem(
         val findTeddyBear = Problem(
             "2.3.2",
             "findTeddyBear",
+            Level.WHILE,
             "In the middle of the night, Karel\nawakens from a terrible dream.\nThe teddy bear will provide\ncomfort. It should lay somewhere\nnear the edge of the bed...",
             "\u0007\ud108\u000a\uc106\u0001\ub100\u0002\ub100\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -461,6 +486,7 @@ class Problem(
         val jumpTheHurdles = Problem(
             "2.3.3",
             "jumpTheHurdles",
+            Level.WHILE,
             "Karel signs up for the Olympics\nand is allowed to participate\nin the hurdle runs. After jumping\nall the hurdles, Karel receives a\nspecial medal made of copper!",
             "\u0007\ud113\u000a\uc106\u0001\ub100\u0002\u0001\u000b\uc107\u0004\u0001\u0004\u0001\u000a\ud10d\u0002\u0007\uc102\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -481,6 +507,7 @@ class Problem(
         val solveTheMaze = Problem(
             "2.4.1",
             "solveTheMaze",
+            Level.WHILE,
             "Study the random mazes carefully.\nThey contain both crossroads and\ndead ends, but no loops. Maintain\ncontact with Karel's left wall\nand you should find the beeper!",
             "\u0007\ud11a\u0009\uc109\u0002\u0001\u0007\uc102\u0000\u000a\uc10f\u0001\u0007\uc102\u0000\u000b\uc116\u0004\u0001\u0007\uc102\u0000\u0003\u0001\u0007\uc102\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -516,6 +543,7 @@ class Problem(
         val quantizeBits = Problem(
             "2.4.2",
             "quantizeBits",
+            Level.WHILE,
             "Karel the hacker is eavesdropping\non an analog communications line\nand writes down 10 bits encoded\nas 0..5 (0) or 6..10 (1). Convert\nto always 0 (0) or always 10 (1).",
             "\u8009\ua104\u0001\u9101\u0007\uc12a\u0002\u0001\u0001\u0001\u0001\u0001\u0007\uc11f\u0008\uc115\u0001\u0008\ud110\u000a\uc119\u0001\u0006\u000a\ud115\u0003\u0001\u000a\ud11a\u0002\u0000\u0003\u0008\ud125\u0001\u0008\uc122\u0001\u0005\u0008\ud125\u0002\u0000",
             Check.EVERY_PICK_DROP,
@@ -528,6 +556,7 @@ class Problem(
         val addFast = Problem(
             "2.4.3",
             "addFast",
+            Level.WHILE,
             "Karel adds two bytes from the\n1st and 2nd row and stores the\nsum in the 4th row. The 3rd row\nis reserved for the carry bits.\n(Does \"carry the 1\" ring a bell?)",
             "\u8008\u0007\ud113\u0001\u0007\ud116\u0001\u0007\ud119\u0001\u0004\u0001\u0004\u0001\u0001\u0001\u0003\u9101\u0000\u0001\u0007\ud124\u0001\u0007\ud127\u0001\u0006\u0004\u0001\u0004\u0001\u0001\u0001\u0003\u9101\u0000\u0001\u0007\ud132\u0001\u0004\u0001\u0004\u0001\u0006\u0001\u0001\u0003\u9101\u0000\u0001\u0006\u0004\u0001\u0004\u0001\u0006\u0001\u0001\u0003\u9101\u0000",
             Check.EVERY_PICK_DROP,
@@ -540,6 +569,7 @@ class Problem(
         val partyAgain = Problem(
             "3.1.1 \uD83C\uDF88",
             "partyAgain",
+            Level.RECURSION,
             "Karel is preparing the next big\nparty. Unfortunately, the floor\nis so soaked from the last party\nthat care must be taken not to\nbreak through into the cellar!",
             "\u8009\ua104\u0001\u9101\u0002\u0005\ua109\u0002\u0000\u000a\ud10e\u0006\u0003\u0000\u0001\ua109\u0001\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -559,6 +589,7 @@ class Problem(
         val fetchTheStars = Problem(
             "3.1.2",
             "fetchTheStars",
+            Level.RECURSION,
             "Karel arranges a romantic date\nwith Taylor on a frozen lake to\n\"fetch the stars from the sky\",\nwhich is German for \"goes to\nthe ends of the world and back\".",
             "\u8009\ua104\u0001\u9101\u0002\ua109\u0006\u0002\u0000\u000a\ud10e\u0005\u0003\u0000\u0001\ua109\u0001\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -580,6 +611,7 @@ class Problem(
         val secureTheCave = Problem(
             "3.2.1",
             "secureTheCave",
+            Level.RECURSION,
             "Karel the cave explorer earns a\nliving as a tourist guide. For\nsafety measures, Karel breaks all\nstalactites from the ceiling and\nre-erects them as stalagmites.",
             "\u8009\ua104\u0001\u9101\u0002\ua109\ua10e\u0004\u0000\u0001\u000a\ud109\u0003\u0000\u0007\uc109\u0005\u0001\ua10e\u0006\u0001\u0000",
             Check.EVERY_PICK_DROP,
@@ -602,6 +634,7 @@ class Problem(
         val layAndRemoveTiles = Problem(
             "3.2.2",
             "layAndRemoveTiles",
+            Level.RECURSION,
             "Karel tries a different set of\nflagstones. But again, Taylor\nis not enamored with the result.\nHence Karel immediately removes\nthe flagstones, in reverse order.",
             "\u0007\uc104\u0003\u0000\u0006\u0008\ud10e\u000a\uc10e\u0001\ua100\u0001\u0005\u0000\u0002\u0001\ua100\u0001\u0004\u0005\u0000",
             Check.EVERY_PICK_DROP,
@@ -614,6 +647,7 @@ class Problem(
         val findShelters = Problem(
             "3.3.1",
             "findShelters",
+            Level.RECURSION,
             "Karel is part of an expedition to\nthe north pole. The first task is\nfinding storm-proof shelters.\nMark Karel's path with beepers,\nbut leave the shelters empty!",
             "\u8004\u0008\ud111\u000a\uc111\u0001\u0009\ud10c\u000a\ud10c\u000b\uc10e\u0006\ua100\u0003\u0001\u0003\u0002\u9101\u0000",
             Check.EVERY_PICK_DROP_MOVE,
@@ -635,6 +669,7 @@ class Problem(
         val addSmart = Problem(
             "3.3.2",
             "addSmart",
+            Level.RECURSION,
             "Karel adds two bytes from the\n1st and 2nd row and stores the\nsum in the 3rd row. Dropping and\nchecking carry bits is no longer\nnecessary. What a smart robot!",
             "\ub10c\u0001\u0001\u0006\u0004\u0001\u0004\u0001\u0001\u0003\u000b\uc129\u0007\ud114\u0008\ud101\u0004\u0001\u0002\ub10a\u0008\uc101\u0004\u0001\u0002\u000b\uc129\u0007\uc114\u0008\uc116\u0001\u0001\u0006\u0004\u0001\u0004\u0001\u0001\u0003\ub119\u0000",
             Check.EVERY_PICK_DROP,
@@ -647,6 +682,7 @@ class Problem(
         val computeFibonacci = Problem(
             "3.3.3",
             "computeFibonacci",
+            Level.RECURSION,
             "Given 2 Fibonacci numbers,\nKarel computes the next 8.\n\nen.wikipedia.org/wiki/Fibonacci_number\nde.wikipedia.org/wiki/Fibonacci-Folge",
             "\u8008\ub10d\u0001\u0001\u0006\u0004\u0001\u0004\u0001\u0001\u0003\u000b\uc12a\u0007\ud115\u0008\ud102\u0004\u0001\u0002\ub10b\u0008\uc102\u0004\u0001\u0002\u000b\uc12a\u0007\uc115\u0008\uc117\u0001\u0001\u0006\u0004\u0001\u0004\u0001\u0001\u0003\ub11a\u0001\u0002\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0004\u910d\u0000",
             Check.EVERY_PICK_DROP,
@@ -705,5 +741,7 @@ class Problem(
             addSmart,
             computeFibonacci,
         )
+
+        val names: Set<String> = problems.mapTo(HashSet(), Problem::name)
     }
 }
