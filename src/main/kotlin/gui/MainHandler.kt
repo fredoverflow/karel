@@ -6,11 +6,26 @@ import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.util.function.Consumer
+import javax.swing.DefaultComboBoxModel
 import javax.swing.SwingUtilities
-import kotlin.streams.asSequence
+import javax.swing.event.PopupMenuEvent
+import javax.swing.event.PopupMenuListener
 
 class MainHandler : MainFlow() {
     init {
+        val clearAndFocus = object : PopupMenuListener {
+            override fun popupMenuWillBecomeVisible(event: PopupMenuEvent) {
+            }
+
+            override fun popupMenuWillBecomeInvisible(event: PopupMenuEvent) {
+                editor.clearDiagnostics()
+                editor.requestFocusInWindow()
+            }
+
+            override fun popupMenuCanceled(event: PopupMenuEvent) {
+            }
+        }
+
         controlPanel.randomize.addActionListener {
             controlPanel.startStopReset.text = "start"
 
@@ -47,16 +62,24 @@ class MainHandler : MainFlow() {
 
             story.load(currentProblem.story)
 
-            val pattern = Regex("""\bvoid\s+(${currentProblem.name})\b""").toPattern()
+            snippetPanel.configureLevel(currentProblem.level)
 
-            tabbedEditors.stream().asSequence()
-                .minus(editor).plus(editor) // check current editor last
-                .filter { it.setCursorTo(pattern, 1) }
-                .lastOrNull()
-                ?.let(tabbedEditors::selectEditor)
+            val name = currentProblem.name
+            for (editor in tabbedEditors.stream().sorted(compareBy { it != editor })) {
+                for (matchGroup in (editor as Editor).commandMatchGroups()) {
+                    if (matchGroup.value == name) {
+                        tabbedEditors.selectEditor(editor)
+                        editor.setCursorTo(matchGroup.range.first)
+                        return@addActionListener
+                    }
+                }
+            }
 
-            editor.requestFocusInWindow()
+            if (editor.commandWithoutName()) {
+                editor.insert(name)
+            }
         }
+        controlPanel.problemPicker.addPopupMenuListener(clearAndFocus)
 
         controlPanel.startStopReset.addActionListener {
             when (controlPanel.startStopReset.text) {
@@ -162,6 +185,71 @@ class MainHandler : MainFlow() {
                 }
             }
         })
+
+        snippetPanel.undo.addActionListener {
+            editor.undo()
+
+            editor.clearDiagnostics()
+            editor.requestFocusInWindow()
+        }
+
+        snippetPanel.redo.addActionListener {
+            editor.redo()
+
+            editor.clearDiagnostics()
+            editor.requestFocusInWindow()
+        }
+
+        snippetPanel.void.addActionListener {
+            editor.void(currentProblem.name)
+
+            editor.clearDiagnostics()
+            editor.requestFocusInWindow()
+        }
+
+        snippetPanel.commands.addMouseListener(object : MouseAdapter() {
+            override fun mouseEntered(event: MouseEvent) {
+                val commands = editor.definedCommands()
+                    .filter { it !in Problem.names }
+                    .mapTo(snippetPanel.builtinCommands.toMutableList()) { Snippet(it, "$it();") }
+
+                val selectedItem = snippetPanel.commands.selectedItem
+                val model = DefaultComboBoxModel(commands.toTypedArray())
+                model.selectedItem = selectedItem
+                snippetPanel.commands.model = model
+            }
+        })
+
+        snippetPanel.commands.addActionListener {
+            val command = snippetPanel.commands.selectedItem as Snippet
+            editor.insertCommand(command.code)
+        }
+        snippetPanel.commands.addPopupMenuListener(clearAndFocus)
+
+        snippetPanel.repeats.addActionListener {
+            val snippet = snippetPanel.repeats.selectedItem as Snippet
+            editor.insertSnippet(snippet.code, ")\n{\n", "\n}")
+        }
+        snippetPanel.repeats.addPopupMenuListener(clearAndFocus)
+
+        snippetPanel.ifs.addActionListener {
+            val snippet = snippetPanel.ifs.selectedItem as Snippet
+            editor.insertSnippet("if (", ")\n{\n", snippet.code)
+        }
+        snippetPanel.ifs.addPopupMenuListener(clearAndFocus)
+
+        snippetPanel.conditions.addActionListener {
+            val condition = snippetPanel.conditions.selectedItem as Snippet
+            editor.insert(condition.code)
+        }
+        snippetPanel.conditions.addPopupMenuListener(clearAndFocus)
+
+        snippetPanel.`while`.addActionListener {
+            editor.insertSnippet("while (", ")\n{\n", "\n}")
+
+            editor.clearDiagnostics()
+            editor.requestFocusInWindow()
+        }
 
         defaultCloseOperation = EXIT_ON_CLOSE
         tabbedEditors.saveOnExit(this)

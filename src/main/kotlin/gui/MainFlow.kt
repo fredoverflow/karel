@@ -263,24 +263,19 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
     init {
         story.load(currentProblem.story)
         if (editor.length() == 0) {
-            editor.load(helloWorld)
-        }
-        editor.requestFocusInWindow()
-    }
-}
-
-const val helloWorld = """/*
-F1 = moveForward();
-F2 = turnLeft();
-F3 = turnAround();
-F4 = turnRight();
-F5 = pickBeeper();
-F6 = dropBeeper();
-*/
-
+            editor.insert(
+                """
 void karelsFirstProgram()
 {
     // your code here
     
 }
+
 """
+            )
+            editor.uncommit()
+            editor.setCursorTo(editor.length() - 4)
+        }
+        editor.requestFocusInWindow()
+    }
+}
