@@ -1,7 +1,5 @@
 package syntax.lexer
 
-import freditor.persistent.StringedValueMap
-
 enum class TokenKind(val lexeme: String) {
     VOID("void"),
     REPEAT("repeat"),
@@ -28,5 +26,6 @@ enum class TokenKind(val lexeme: String) {
         get() = lexeme.first().isLowerCase()
 }
 
-val keywords: StringedValueMap<TokenKind> = TokenKind.entries.filter(TokenKind::isKeyword)
-    .fold(StringedValueMap.empty(), StringedValueMap<TokenKind>::put)
+val keywords: Map<String, TokenKind> = TokenKind.entries
+    .filter(TokenKind::isKeyword)
+    .associateBy(TokenKind::lexeme)

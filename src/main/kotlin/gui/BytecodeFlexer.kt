@@ -1,10 +1,10 @@
 package gui
 
+import common.puts
 import freditor.FlexerState
 import freditor.FlexerState.EMPTY
 import freditor.FlexerState.THIS
 import freditor.FlexerStateBuilder
-import freditor.persistent.ChampMap
 
 object BytecodeFlexer : freditor.Flexer() {
     private val NUMBER_TAIL = FlexerState("09af", THIS)
@@ -31,12 +31,12 @@ object BytecodeFlexer : freditor.Flexer() {
         return colors[endState] ?: 0x000000
     }
 
-    private val lexemeColors = ChampMap.of(ERROR, 0x808080)
-        .put(NUMBER_HEAD, NUMBER_TAIL, 0x6400c8)
-        .put(START.read("@", "CODE", "MNEMONIC"), 0x808080)
-        .put(START.read("BEEP", "HEAD", "LCLR", "FCLR", "RCLR", "PUSH"), 0x000080)
-        .put(START.read("RET", "LOOP", "CALL", "JUMP", "ELSE", "THEN"), 0x400000)
+    private val lexemeColors = hashMapOf(ERROR to 0x808080)
+        .puts(NUMBER_HEAD, NUMBER_TAIL, 0x6400c8)
+        .puts(START.read("@", "CODE", "MNEMONIC"), 0x808080)
+        .puts(START.read("BEEP", "HEAD", "LCLR", "FCLR", "RCLR", "PUSH"), 0x000080)
+        .puts(START.read("RET", "LOOP", "CALL", "JUMP", "ELSE", "THEN"), 0x400000)
 
-    private val afterNewline = lexemeColors
-        .put(NUMBER_HEAD, NUMBER_TAIL, 0x808080)
+    private val afterNewline = HashMap(lexemeColors)
+        .puts(NUMBER_HEAD, NUMBER_TAIL, 0x808080)
 }

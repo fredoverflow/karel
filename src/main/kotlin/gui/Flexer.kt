@@ -1,10 +1,10 @@
 package gui
 
+import common.puts
 import freditor.FlexerState
 import freditor.FlexerState.EMPTY
 import freditor.FlexerState.THIS
 import freditor.FlexerStateBuilder
-import freditor.persistent.ChampMap
 
 object Flexer : freditor.Flexer() {
     private val SLASH_SLASH = FlexerState('\n', null).setDefault(THIS)
@@ -45,12 +45,11 @@ object Flexer : freditor.Flexer() {
 
     val VOID: FlexerState = START.read("void")
 
-    private val lexemeColors = ChampMap.of(ERROR, 0x808080)
-        .put(START.read("/", "&", "|"), 0x808080)
-        .put(SLASH_SLASH, SLASH_ASTERISK, SLASH_ASTERISK___ASTERISK, SLASH_ASTERISK___ASTERISK_SLASH, 0x008000)
-        .put(NUMBER_HEAD, NUMBER_TAIL, 0x6400c8)
-        .put(START.read("else", "if", "repeat", "while"), 0x0000ff)
-        .put(VOID, 0x008080)
-        .put(START.read("(", ")", "{", "}"), 0xff0000)
-        .put(START.read("!", "&&", "||"), 0x804040)
+    private val lexemeColors = hashMapOf(ERROR to 0x808080, VOID to 0x008080)
+        .puts(START.read("/", "&", "|"), 0x808080)
+        .puts(SLASH_SLASH, SLASH_ASTERISK, SLASH_ASTERISK___ASTERISK, SLASH_ASTERISK___ASTERISK_SLASH, 0x008000)
+        .puts(NUMBER_HEAD, NUMBER_TAIL, 0x6400c8)
+        .puts(START.read("else", "if", "repeat", "while"), 0x0000ff)
+        .puts(START.read("(", ")", "{", "}"), 0xff0000)
+        .puts(START.read("!", "&&", "||"), 0x804040)
 }

@@ -1,6 +1,5 @@
 package syntax.lexer
 
-import freditor.persistent.StringedValueMap
 import syntax.lexer.TokenKind.*
 
 class Lexer(input: String) : LexerBase(input) {
@@ -98,13 +97,12 @@ class Lexer(input: String) : LexerBase(input) {
                 is String -> token(IDENTIFIER, value)
 
                 else -> {
-                    identifiersOrKeywords = identifiersOrKeywords.put(lexeme)
+                    identifiersOrKeywords[lexeme] = lexeme
                     token(IDENTIFIER, lexeme)
                 }
             }
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    private var identifiersOrKeywords = keywords as StringedValueMap<Any>
+    private val identifiersOrKeywords = HashMap<String, Any>(keywords)
 }
