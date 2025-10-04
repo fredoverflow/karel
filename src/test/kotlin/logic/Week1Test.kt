@@ -4,9 +4,9 @@ import logic.Problem.Companion.EAST
 import logic.Problem.Companion.NORTH
 import logic.Problem.Companion.SOUTH
 import logic.Problem.Companion.WEST
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 
 class Week1Test : WorldTestBase() {
     @Test

@@ -1,18 +1,18 @@
 package syntax.lexer
 
 import common.Diagnostic
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.core.StringContains.containsString
-import org.junit.Assert.assertThrows
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class LexerNegativeTest {
     private fun assertDiagnostic(messageSubstring: String, input: String) {
         val lexer = Lexer(input)
-        val diagnostic = assertThrows(Diagnostic::class.java) {
+        val diagnostic = assertThrows<Diagnostic> {
             lexer.nextToken()
         }
-        assertThat(diagnostic.message, containsString(messageSubstring))
+        val message = diagnostic.message
+        assertTrue(message.contains(messageSubstring), message)
     }
 
     @Test

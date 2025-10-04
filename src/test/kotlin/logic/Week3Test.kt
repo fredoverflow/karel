@@ -4,8 +4,8 @@ import logic.Problem.Companion.EAST
 import logic.Problem.Companion.NORTH
 import logic.Problem.Companion.SOUTH
 import logic.Problem.Companion.WEST
-import org.junit.Assert.*
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 
 class Week3Test : WorldTestBase() {
     @Test

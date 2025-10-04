@@ -1,20 +1,20 @@
 package syntax.parser
 
 import common.Diagnostic
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.core.StringContains.containsString
-import org.junit.Assert.assertThrows
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import syntax.lexer.Lexer
 
 class ParserNegativeTest {
     private fun assertDiagnostic(messageSubstring: String, sourceCode: String) {
         val lexer = Lexer(sourceCode)
         val parser = Parser(lexer)
-        val diagnostic = assertThrows(Diagnostic::class.java) {
+        val diagnostic = assertThrows<Diagnostic> {
             parser.program()
         }
-        assertThat(diagnostic.message, containsString(messageSubstring))
+        val message = diagnostic.message
+        assertTrue(message.contains(messageSubstring), message)
     }
 
     @Test

@@ -1,7 +1,8 @@
 package logic
 
-import org.junit.Assert.*
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class BeeperTest {
     @Test
@@ -16,7 +17,7 @@ class BeeperTest {
     @Test
     fun dropAnotherBeeper() {
         val one = Problem.emptyWorld.dropBeeper(1, 2)
-        assertThrows(CellIsFull::class.java) {
+        assertThrows<CellIsFull> {
             one.dropBeeper(1, 2)
         }
     }
@@ -41,7 +42,7 @@ class BeeperTest {
 
     @Test
     fun pickImaginaryBeeper() {
-        assertThrows(CellIsEmpty::class.java) {
+        assertThrows<CellIsEmpty> {
             Problem.emptyWorld.pickBeeper(0, 0)
         }
     }

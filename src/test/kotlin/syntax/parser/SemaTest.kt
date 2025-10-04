@@ -1,8 +1,9 @@
 package syntax.parser
 
 import common.Diagnostic
-import org.junit.Assert.fail
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.fail
+import org.junit.jupiter.api.Test
 import syntax.lexer.Lexer
 
 class SemaTest {
@@ -13,9 +14,8 @@ class SemaTest {
             parser.program()
             fail()
         } catch (diagnostic: Diagnostic) {
-            if (!diagnostic.message.contains(messageSubstring)) {
-                fail(diagnostic.message)
-            }
+            val message = diagnostic.message
+            assertTrue(message.contains(messageSubstring), message)
         }
     }
 

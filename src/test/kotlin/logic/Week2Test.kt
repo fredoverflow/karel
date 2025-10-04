@@ -2,8 +2,8 @@ package logic
 
 import logic.Problem.Companion.EAST
 import logic.Problem.Companion.NORTH
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
 class Week2Test : WorldTestBase() {
     @Test

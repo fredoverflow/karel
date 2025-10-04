@@ -1,6 +1,6 @@
 package logic
 
-import org.junit.Assert.assertEquals
+import org.junit.jupiter.api.Assertions.assertEquals
 import vm.VirtualMachine
 
 open class WorldTestBase {
