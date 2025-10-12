@@ -6,7 +6,6 @@ import logic.World
 import java.awt.BorderLayout
 import javax.swing.Box
 import javax.swing.JFrame
-import javax.swing.JPanel
 import javax.swing.border.EmptyBorder
 
 abstract class MainDesign(world: World) : JFrame() {
@@ -39,10 +38,11 @@ abstract class MainDesign(world: World) : JFrame() {
         )
         left.border = EmptyBorder(16, 16, 16, 16)
         super.add(left, BorderLayout.WEST)
-        val center = JPanel()
-        center.layout = BorderLayout()
-        center.add(snippetPanel, BorderLayout.NORTH)
-        center.add(tabbedEditors.tabs, BorderLayout.CENTER)
+        val center = verticalBoxPanel(
+            Box.createVerticalStrut(4),
+            snippetPanel,
+            tabbedEditors.tabs,
+        )
         super.add(center, BorderLayout.CENTER)
         super.add(virtualMachinePanel, BorderLayout.EAST)
         super.pack()

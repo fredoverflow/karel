@@ -40,10 +40,10 @@ class Sema {
                 if (bestMatches.size == 1) {
                     val bestMatch = bestMatches.first()
                     val prefix = bestMatch.commonPrefixWith(call.target.lexeme)
-                    call.target.error("Did you mean $bestMatch?", prefix.length)
+                    call.target.error("Did you mean $bestMatch? Otherwise: click VOID button", prefix.length)
                 } else {
                     val commaSeparated = bestMatches.joinToString(", ")
-                    call.target.error("Did you mean $commaSeparated?")
+                    call.target.error("Did you mean $commaSeparated? Otherwise: click VOID button")
                 }
             }
         }

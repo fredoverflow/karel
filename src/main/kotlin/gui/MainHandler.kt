@@ -48,6 +48,7 @@ class MainHandler : MainFlow() {
             editor.requestFocusInWindow()
         }
 
+        controlPanel.problemPicker.addPopupMenuListener(clearAndFocus)
         controlPanel.problemPicker.addActionListener {
             controlPanel.startStopReset.text = "start"
             controlPanel.randomize.isEnabled = currentProblem.isRandom
@@ -79,7 +80,6 @@ class MainHandler : MainFlow() {
                 editor.insert(name)
             }
         }
-        controlPanel.problemPicker.addPopupMenuListener(clearAndFocus)
 
         controlPanel.startStopReset.addActionListener {
             when (controlPanel.startStopReset.text) {
@@ -207,8 +207,8 @@ class MainHandler : MainFlow() {
             editor.requestFocusInWindow()
         }
 
-        snippetPanel.commands.addMouseListener(object : MouseAdapter() {
-            override fun mouseEntered(event: MouseEvent) {
+        snippetPanel.commands.addPopupMenuListener(object : PopupMenuListener by clearAndFocus {
+            override fun popupMenuWillBecomeVisible(event: PopupMenuEvent) {
                 val commands = editor.definedCommands()
                     .filter { it !in Problem.names }
                     .mapTo(snippetPanel.builtinCommands.toMutableList()) { Snippet(it, "$it();") }
@@ -219,30 +219,28 @@ class MainHandler : MainFlow() {
                 snippetPanel.commands.model = model
             }
         })
-
         snippetPanel.commands.addActionListener {
             val command = snippetPanel.commands.selectedItem as Snippet
             editor.insertCommand(command.code)
         }
-        snippetPanel.commands.addPopupMenuListener(clearAndFocus)
 
+        snippetPanel.repeats.addPopupMenuListener(clearAndFocus)
         snippetPanel.repeats.addActionListener {
             val snippet = snippetPanel.repeats.selectedItem as Snippet
             editor.insertSnippet(snippet.code, ")\n{\n", "\n}")
         }
-        snippetPanel.repeats.addPopupMenuListener(clearAndFocus)
 
+        snippetPanel.ifs.addPopupMenuListener(clearAndFocus)
         snippetPanel.ifs.addActionListener {
             val snippet = snippetPanel.ifs.selectedItem as Snippet
             editor.insertSnippet("if (", ")\n{\n", snippet.code)
         }
-        snippetPanel.ifs.addPopupMenuListener(clearAndFocus)
 
+        snippetPanel.conditions.addPopupMenuListener(clearAndFocus)
         snippetPanel.conditions.addActionListener {
             val condition = snippetPanel.conditions.selectedItem as Snippet
             editor.insert(condition.code)
         }
-        snippetPanel.conditions.addPopupMenuListener(clearAndFocus)
 
         snippetPanel.`while`.addActionListener {
             editor.insertSnippet("while (", ")\n{\n", "\n}")

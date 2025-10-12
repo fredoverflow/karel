@@ -3,6 +3,7 @@ package gui
 import freditor.Freditor
 import freditor.FreditorUI
 import syntax.lexer.keywords
+import syntax.parser.BUILTIN_COMMANDS
 import vm.Instruction
 import vm.builtinCommands
 import java.awt.*
@@ -78,7 +79,7 @@ class Editor(freditor: Freditor) : FreditorUI(freditor, 60, 1) {
     }
 
     private fun renameCommand() {
-        val oldName = symbolNearCursor(Flexer.IDENTIFIER_TAIL)
+        val oldName = symbolNearCursor(Flexer.IDENTIFIER_HEAD, Flexer.IDENTIFIER_TAIL)
         if (oldName.isEmpty() || oldName in keywords || oldName in builtinCommands) return
 
         val newName = inputCommandName("rename command") ?: return // canceled
@@ -112,21 +113,28 @@ class Editor(freditor: Freditor) : FreditorUI(freditor, 60, 1) {
 
     fun void(currentProblemName: String) {
         val cursor = cursor()
-        val target = findTopLevelFrom(cursor)
-        if (target == cursor) {
-            // at top level, insert here
-            insertSnippet("void ", "()\n{\n    ", "\n}\n\n")
-            if (currentProblemName !in definedCommands()) {
-                insert(currentProblemName)
+        val target = findTopLevelFrom(cursor, freditor.Flexer.CLOSING_BRACE)
+        if (target <= cursor) {
+            // already at top level
+            setCursorTo(target)
+            if (currentProblemName in definedCommands()) {
+                insert("\n\nvoid ", "()\n{\n    ", "\n}")
+            } else {
+                insert("\n\nvoid $currentProblemName()\n{\n    ", "", "\n}")
             }
+            indent()
         } else if (selectionIsEmpty()) {
             // insert at next top level
+            val symbol = symbolNearCursor(Flexer.IDENTIFIER_HEAD, Flexer.IDENTIFIER_TAIL)
             setCursorTo(target)
-            insert("\n\nvoid ", "()\n{\n    ", "\n}")
-            indent()
-            if (currentProblemName !in definedCommands()) {
-                insert(currentProblemName)
+            if (symbol.isNotEmpty() && symbol !in BUILTIN_COMMANDS && symbol !in definedCommands()) {
+                insert("\n\nvoid $symbol()\n{\n    ", "", "\n}")
+            } else if (currentProblemName in definedCommands()) {
+                insert("\n\nvoid ", "()\n{\n    ", "\n}")
+            } else {
+                insert("\n\nvoid $currentProblemName()\n{\n    ", "", "\n}")
             }
+            indent()
         } else {
             // extract selected body as command
             balanceSelection()
