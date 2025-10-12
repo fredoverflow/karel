@@ -39,10 +39,11 @@ abstract class MainDesign(world: World) : JFrame() {
         )
         left.border = EmptyBorder(16, 16, 16, 16)
         super.add(left, BorderLayout.WEST)
-        val center = JPanel()
-        center.layout = BorderLayout()
-        center.add(snippetPanel, BorderLayout.NORTH)
-        center.add(tabbedEditors.tabs, BorderLayout.CENTER)
+        val center = verticalBoxPanel(
+            Box.createVerticalStrut(4),
+            snippetPanel,
+            tabbedEditors.tabs,
+        )
         super.add(center, BorderLayout.CENTER)
         super.add(virtualMachinePanel, BorderLayout.EAST)
         super.pack()
