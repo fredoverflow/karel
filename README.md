@@ -32,7 +32,7 @@ The original idea was developed in the 1970s by Richard Pattis at Stanford Unive
 ![Pattis](https://i.imgur.com/i3KWuae.jpg)
 
 > In sophisticated languages like Java, there are so many details that learning these details often becomes the focus of the course.
-> When that happens, the much more critical issues of [problem solving](PROSOL.md) tend to get lost in the shuffle.
+> When that happens, the much more critical issues of problem solving tend to get lost in the shuffle.
 > By starting with Karel, you can concentrate on solving problems from the very beginning.
 > And because Karel encourages imagination and creativity, you can have quite a lot of fun along the way.
 
@@ -51,7 +51,7 @@ Most problems stem from skipping or misunderstanding important steps.
 
 1. Visit https://adoptium.net
 
-2. Click "Latest release" button to download Java installer
+2. Click **Download Temurin**® button to download Java installer
 
 3. Wait for download to finish
 

@@ -1,4 +1,4 @@
-## How do I compile karel from source?
+## How do I compile Karel from source?
 
 ```
 git clone https://github.com/fredoverflow/freditor
@@ -14,7 +14,7 @@ The executable `karel.jar` will be located inside the `target` folder.
 
 ## How do I install IntelliJ IDEA?
 
-Download the Community Edition `zip` or `tar.gz` from https://www.jetbrains.com/idea/download and extract it wherever you like.
+Download the `zip` or `tar.gz` from https://www.jetbrains.com/idea/download and extract it wherever you like.
 Navigate to the `bin` folder and run the `idea.bat` or `idea.sh` script.
 Then follow these instructions:
 
@@ -33,10 +33,10 @@ Don't send
 Skip Remaining and Set Defaults
 ```
 
-## How do I import karel into IntelliJ IDEA?
+## How do I import Karel into IntelliJ IDEA?
 
-* If there are no projects open, pick the **Import Project** option from the *Welcome to IntelliJ IDEA* screen.
-* Otherwise, pick **File > New > Project from Existing Sources...**
+- If there are no projects open, pick the **Import Project** option from the *Welcome to IntelliJ IDEA* screen.
+- Otherwise, pick **File > New > Project from Existing Sources...**
 
 ```
 Windows: C:\Users\fred\git\karel
@@ -65,24 +65,25 @@ Tip of the Day
 Close
 ```
 
-## How do I run karel from within IntelliJ IDEA?
+## How do I run Karel from within IntelliJ IDEA?
 
 ```
 karel/src/main/kotlin/Main.kt (right-click)
 Run 'MainKt'
 ```
 
-## What IntelliJ IDEA settings do you like to change after install?
+## Which IntelliJ IDEA settings do you like to change after install?
 
 **File > Settings...**
 
-* Keymap
-  * Eclipse
-* Editor > Font
-  * Font: Fira Code (`sudo apt install fonts-firacode`)
-  * Size: 20
-* Editor > General > Code Folding
-  * [ ] One-line methods
-* Editor > General > Appearance
-  * [ ] Caret blinking
-  * [ ] Show intention bulb
+- Appearance & Behavior > Appearance
+  - Zoom: 150%
+- Keymap
+  - Eclipse
+- Editor > Font
+  - Font: Fira Code (`sudo apt install fonts-firacode`)
+- Editor > General > Code Folding
+  - [ ] One-line methods
+- Editor > General > Appearance
+  - [ ] Caret blinking
+  - [ ] Show intention bulb
