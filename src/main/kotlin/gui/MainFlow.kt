@@ -8,6 +8,8 @@ import syntax.parser.program
 import vm.*
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.ExecutorCompletionService
+import java.util.concurrent.Executors
 import javax.swing.Timer
 
 const val CHECK_TOTAL_NS = 2_000_000_000L
@@ -222,7 +224,14 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
                 val main = parser.sema.command(problem.name)!!
                 val instructions = Emitter(parser.sema, false).emit(main)
                 val goalInstructions = createGoalInstructions(problem.goal)
-                if (checkAllWorlds(problem, instructions.toTypedArray(), goalInstructions.toTypedArray())) {
+                completion.submit {
+                    checkAllWorlds(problem, instructions.toTypedArray(), goalInstructions.toTypedArray())
+                }
+            }
+            repeat(total) {
+                val result = completion.take().get()
+                report(result.message)
+                if (result.pass) {
                     ++passed
                 }
             }
@@ -233,11 +242,16 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         }
     }
 
+    private val executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
+    private val completion = ExecutorCompletionService<Result>(executor)
+
+    private class Result(val pass: Boolean, val message: String)
+
     private fun checkAllWorlds(
         problem: Problem,
         instructions: Array<Instruction>,
         goalInstructions: Array<Instruction>,
-    ): Boolean {
+    ): Result {
         val start = System.nanoTime()
 
         val worlds = problem.randomWorlds().iterator()
@@ -253,16 +267,20 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
             if (!worlds.hasNext()) {
                 val percentage = passed * 100 / worldCounter
-                report("%-18s %3d%% passed (%d/%d)%n".format(problem.name, percentage, passed, worldCounter))
-                return passed == worldCounter
+                return Result(
+                    passed == worldCounter,
+                    "%-18s %3d%% passed (%d/%d)%n".format(problem.name, percentage, passed, worldCounter),
+                )
             }
 
             val elapsed = System.nanoTime() - start
 
             if (elapsed >= CHECK_TOTAL_NS) {
                 val percentage = passed * 100 / worldCounter
-                report("%-18s %3d%% passed (%d/%d) TIMEOUT%n".format(problem.name, percentage, passed, worldCounter))
-                return passed == worldCounter
+                return Result(
+                    passed == worldCounter,
+                    "%-18s %3d%% passed (%d/%d) TIMEOUT%n".format(problem.name, percentage, passed, worldCounter),
+                )
             }
         }
     }
@@ -273,13 +291,13 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         goalInstructions: Array<Instruction>,
     ): Boolean {
         val goalWorlds = ArrayList<World>(200)
-        virtualMachine = createVirtualMachine(goalInstructions, initialWorld, goalWorlds::add)
+        var virtualMachine = createVirtualMachine(goalInstructions, initialWorld, goalWorlds::add)
         try {
             virtualMachine.executeGoalProgram()
         } catch (_: VirtualMachine.Finished) {
         }
         val finalGoalWorld = virtualMachine.world
-        index = 0
+        var index = 0
 
         virtualMachine = createVirtualMachine(instructions, initialWorld) { world ->
             if (index == goalWorlds.size) {
