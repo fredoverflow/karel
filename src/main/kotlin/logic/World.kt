@@ -75,13 +75,13 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
 
     private fun pickBeeper(input: Long, shift: Int): Long {
         val output = input.and(1L.shl(shift).inv())
-        if (output == input) throw CellIsEmpty()
+        if (output == input) throw CellIsEmpty
         return output
     }
 
     private fun dropBeeper(input: Long, shift: Int): Long {
         val output = input.or(1L.shl(shift))
-        if (output == input) throw CellIsFull()
+        if (output == input) throw CellIsFull
         return output
     }
 
@@ -197,7 +197,7 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
     }
 
     fun moveForward(): World {
-        if (!frontIsClear()) throw BlockedByWall()
+        if (!frontIsClear()) throw BlockedByWall
         return World((hi + deltaXYP[direction]).and(CLEAR_CARRY), lo, floorPlan)
     }
 

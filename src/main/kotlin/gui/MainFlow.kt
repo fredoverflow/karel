@@ -6,6 +6,8 @@ import syntax.lexer.Lexer
 import syntax.parser.Parser
 import syntax.parser.program
 import vm.*
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import javax.swing.Timer
 
 const val CHECK_TOTAL_NS = 2_000_000_000L
@@ -36,6 +38,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
     }
 
     fun checkAgainst(goal: String) {
+        tabbedEditors.selectNonReport()
         editor.isolateBraces()
         editor.indent()
         editor.saveWithBackup()
@@ -50,7 +53,8 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
                 virtualMachinePanel.setProgram(instructions)
                 virtualMachinePanel.update(null, ENTRY_POINT)
 
-                tryCheck(instructions.toTypedArray(), createGoalInstructions(goal).toTypedArray())
+                val goalInstructions = createGoalInstructions(goal)
+                tryCheck(instructions.toTypedArray(), goalInstructions.toTypedArray())
             } else {
                 editor.setCursorTo(editor.length())
                 showDiagnostic("void ${currentProblem.name}() not found")
@@ -115,7 +119,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
     private fun checkOneWorld(instructions: Array<Instruction>, goalInstructions: Array<Instruction>) {
         val goalWorlds = ArrayList<World>(200)
-        createVirtualMachine(goalInstructions, goalWorlds::add)
+        virtualMachine = createVirtualMachine(goalInstructions, initialWorld, goalWorlds::add)
         try {
             virtualMachine.executeGoalProgram()
         } catch (_: VirtualMachine.Finished) {
@@ -123,7 +127,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         val finalGoalWorld = virtualMachine.world
         index = 0
 
-        createVirtualMachine(instructions) { world ->
+        virtualMachine = createVirtualMachine(instructions, initialWorld) { world ->
             if (index == goalWorlds.size) {
                 worldPanel.antWorld = finalGoalWorld
                 virtualMachine.error("extra ${currentProblem.check.singular}\n\n$COMPARE")
@@ -152,9 +156,14 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         }
     }
 
-    private fun createVirtualMachine(instructions: Array<Instruction>, callback: (World) -> Unit) {
-        virtualMachine = VirtualMachine(
-            instructions, initialWorld,
+    private fun createVirtualMachine(
+        program: Array<Instruction>,
+        world: World,
+        callback: (World) -> Unit,
+    ): VirtualMachine {
+        return VirtualMachine(
+            program,
+            world,
             onPickDrop = callback,
             onMove = callback.takeIf { Check.EVERY_PICK_DROP_MOVE == currentProblem.check },
         )
@@ -175,7 +184,124 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         }
     }
 
+    private fun now(): String {
+        return LocalTime.now().withNano(0).format(DateTimeFormatter.ISO_LOCAL_TIME)
+    }
+
+    private fun report(message: String) {
+        tabbedEditors.selectedEditor.insert(message)
+        tabbedEditors.tabs.run {
+            paintImmediately(0, 0, width, height)
+        }
+    }
+
+    fun checkAllProblems() {
+        tabbedEditors.selectNonReport()
+        editor.isolateBraces()
+        editor.indent()
+        editor.saveWithBackup()
+        editor.clearDiagnostics()
+        try {
+            val lexer = Lexer(editor.text)
+            val parser = Parser(lexer)
+            parser.program()
+
+            val problems = Problem.problems.filter { parser.sema.command(it.name) != null }
+            val total = problems.size
+            if (total == 0) return
+            var passed = 0
+
+            tabbedEditors.selectReport()
+            tabbedEditors.selectedEditor.run {
+                load("") // clear report
+                clearDiagnostics()
+            }
+            report("${now()} START checking $total problems\n\n")
+
+            for (problem in problems) {
+                val main = parser.sema.command(problem.name)!!
+                val instructions = Emitter(parser.sema, false).emit(main)
+                val goalInstructions = createGoalInstructions(problem.goal)
+                if (checkAllWorlds(problem, instructions.toTypedArray(), goalInstructions.toTypedArray())) {
+                    ++passed
+                }
+            }
+            val percentage = passed * 100 / total
+            report("\n${now()} FINISHED, %3d%% passed (%d/%d)%n".format(percentage, passed, total))
+        } catch (diagnostic: Diagnostic) {
+            showDiagnostic(diagnostic)
+        }
+    }
+
+    private fun checkAllWorlds(
+        problem: Problem,
+        instructions: Array<Instruction>,
+        goalInstructions: Array<Instruction>,
+    ): Boolean {
+        val start = System.nanoTime()
+
+        val worlds = problem.randomWorlds().iterator()
+        var worldCounter = 0
+        var passed = 0
+
+        while (true) {
+            val initialWorld = worlds.next()
+            if (checkWorld(initialWorld, instructions, goalInstructions)) {
+                ++passed
+            }
+            ++worldCounter
+
+            if (!worlds.hasNext()) {
+                val percentage = passed * 100 / worldCounter
+                report("%-18s %3d%% passed (%d/%d)%n".format(problem.name, percentage, passed, worldCounter))
+                return passed == worldCounter
+            }
+
+            val elapsed = System.nanoTime() - start
+
+            if (elapsed >= CHECK_TOTAL_NS) {
+                val percentage = passed * 100 / worldCounter
+                report("%-18s %3d%% passed (%d/%d) TIMEOUT%n".format(problem.name, percentage, passed, worldCounter))
+                return passed == worldCounter
+            }
+        }
+    }
+
+    private fun checkWorld(
+        initialWorld: World,
+        instructions: Array<Instruction>,
+        goalInstructions: Array<Instruction>,
+    ): Boolean {
+        val goalWorlds = ArrayList<World>(200)
+        virtualMachine = createVirtualMachine(goalInstructions, initialWorld, goalWorlds::add)
+        try {
+            virtualMachine.executeGoalProgram()
+        } catch (_: VirtualMachine.Finished) {
+        }
+        val finalGoalWorld = virtualMachine.world
+        index = 0
+
+        virtualMachine = createVirtualMachine(instructions, initialWorld) { world ->
+            if (index == goalWorlds.size) {
+                throw Weltschmerz // caught below to return false
+            }
+            val goalWorld = goalWorlds[index++]
+            if (!goalWorld.equalsIgnoringDirection(world)) {
+                throw Weltschmerz // caught below to return false
+            }
+        }
+
+        try {
+            virtualMachine.executeUserProgram()
+        } catch (_: VirtualMachine.Finished) {
+        } catch (_: KarelError) {
+            return false
+        }
+        return !(index < goalWorlds.size && !finalGoalWorld.equalsIgnoringDirection(virtualMachine.world))
+    }
+
     fun parseAndExecute() {
+        tabbedEditors.selectNonReport()
         editor.isolateBraces()
         editor.indent()
         editor.saveWithBackup()
@@ -202,7 +328,8 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         tabbedEditors.tabs.isEnabled = false
         virtualMachinePanel.setProgram(instructions)
         virtualMachine = VirtualMachine(
-            instructions.toTypedArray(), initialWorld,
+            instructions.toTypedArray(),
+            initialWorld,
             onCall = editor::push.takeIf { compiledFromSource },
             onReturn = editor::pop.takeIf { compiledFromSource },
         )
