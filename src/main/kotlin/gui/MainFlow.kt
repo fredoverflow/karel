@@ -8,6 +8,8 @@ import syntax.parser.program
 import vm.*
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.ExecutorCompletionService
+import java.util.concurrent.Executors
 import javax.swing.Timer
 
 const val CHECK_TOTAL_NS = 2_000_000_000L
@@ -227,19 +229,24 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
             for (chunk in problemChunks) {
                 for (problem in chunk) {
-                    val main = parser.sema.command(problem.name)!!
-                    val instructions = Emitter(parser.sema, false).emit(main)
-                    val goalInstructions = createGoalInstructions(problem.goal)
-                    checkAllWorlds(problem, instructions.toTypedArray(), goalInstructions.toTypedArray()).run {
-                        if (passedWorlds == checkedWorlds) {
-                            ++passed
-                        }
-                        val percentage = passedWorlds * 100 / checkedWorlds
-                        report(row, "%3d%% passed (%d/%d)".format(percentage, passedWorlds, checkedWorlds))
+                    val row = row++ // capture by value
+                    completion.submit {
+                        val main = parser.sema.command(problem.name)!!
+                        val instructions = Emitter(parser.sema, false).emit(main)
+                        val goalInstructions = createGoalInstructions(problem.goal)
+                        checkAllWorlds(problem, instructions.toTypedArray(), goalInstructions.toTypedArray(), row)
                     }
-                    ++row
                 }
                 ++row
+            }
+            repeat(total) {
+                completion.take().get().run {
+                    if (passedWorlds == checkedWorlds) {
+                        ++passed
+                    }
+                    val percentage = passedWorlds * 100 / checkedWorlds
+                    report(this.row, "%3d%% passed (%d/%d)".format(percentage, passedWorlds, checkedWorlds))
+                }
             }
             val percentage = passed * 100 / total
             report(row, "\nSTOP  ${now()}  problems %3d%% passed (%d/%d)".format(percentage, passed, total))
@@ -248,12 +255,16 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         }
     }
 
-    private class Result(val passedWorlds: Int, val checkedWorlds: Int)
+    private val executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
+    private val completion = ExecutorCompletionService<Result>(executor)
+
+    private class Result(val passedWorlds: Int, val checkedWorlds: Int, val row: Int)
 
     private fun checkAllWorlds(
         problem: Problem,
         instructions: Array<Instruction>,
         goalInstructions: Array<Instruction>,
+        row: Int,
     ): Result {
         val start = System.nanoTime()
 
@@ -269,13 +280,13 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
             ++checkedWorlds
 
             if (!worlds.hasNext()) {
-                return Result(passedWorlds, checkedWorlds)
+                return Result(passedWorlds, checkedWorlds, row)
             }
 
             val elapsed = System.nanoTime() - start
 
             if (elapsed >= CHECK_TOTAL_NS) {
-                return Result(passedWorlds, checkedWorlds)
+                return Result(passedWorlds, checkedWorlds, row)
             }
         }
     }
@@ -286,13 +297,13 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         goalInstructions: Array<Instruction>,
     ): Boolean {
         val goalWorlds = ArrayList<World>(200)
-        virtualMachine = createVirtualMachine(goalInstructions, initialWorld, goalWorlds::add)
+        var virtualMachine = createVirtualMachine(goalInstructions, initialWorld, goalWorlds::add)
         try {
             virtualMachine.executeGoalProgram()
         } catch (_: VirtualMachine.Finished) {
         }
         val finalGoalWorld = virtualMachine.world
-        index = 0
+        var index = 0
 
         virtualMachine = createVirtualMachine(instructions, initialWorld) { world ->
             if (index == goalWorlds.size) {
