@@ -6,6 +6,8 @@ import syntax.lexer.Lexer
 import syntax.parser.Parser
 import syntax.parser.program
 import vm.*
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import javax.swing.Timer
 
 const val CHECK_TOTAL_NS = 2_000_000_000L
@@ -36,6 +38,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
     }
 
     fun checkAgainst(goal: String) {
+        tabbedEditors.selectNonReport()
         editor.isolateBraces()
         editor.indent()
         editor.saveWithBackup()
@@ -115,7 +118,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
     private fun checkOneWorld(instructions: Array<Instruction>, goalInstructions: Array<Instruction>) {
         val goalWorlds = ArrayList<World>(200)
-        createVirtualMachine(goalInstructions, goalWorlds::add)
+        virtualMachine = createVirtualMachine(goalInstructions, initialWorld, goalWorlds::add)
         try {
             virtualMachine.executeGoalProgram()
         } catch (_: VirtualMachine.Finished) {
@@ -123,7 +126,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         val finalGoalWorld = virtualMachine.world
         index = 0
 
-        createVirtualMachine(instructions) { world ->
+        virtualMachine = createVirtualMachine(instructions, initialWorld) { world ->
             if (index == goalWorlds.size) {
                 worldPanel.antWorld = finalGoalWorld
                 virtualMachine.error("extra ${currentProblem.check.singular}\n\n$COMPARE")
@@ -152,9 +155,14 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         }
     }
 
-    private fun createVirtualMachine(instructions: Array<Instruction>, callback: (World) -> Unit) {
-        virtualMachine = VirtualMachine(
-            instructions, initialWorld,
+    private fun createVirtualMachine(
+        program: Array<Instruction>,
+        world: World,
+        callback: (World) -> Unit,
+    ): VirtualMachine {
+        return VirtualMachine(
+            program,
+            world,
             onPickDrop = callback,
             onMove = callback.takeIf { Check.EVERY_PICK_DROP_MOVE == currentProblem.check },
         )
@@ -175,7 +183,138 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         }
     }
 
+    private fun now(): String {
+        return LocalTime.now().withNano(0).format(DateTimeFormatter.ISO_LOCAL_TIME)
+    }
+
+    private fun report(row: Int, message: String) {
+        tabbedEditors.selectedEditor.run {
+            setCursorTo(row, 25)
+            insert(message)
+        }
+        tabbedEditors.tabs.run {
+            paintImmediately(0, 0, width, height)
+        }
+    }
+
+    fun checkAllProblems() {
+        tabbedEditors.selectNonReport()
+        editor.isolateBraces()
+        editor.indent()
+        editor.saveWithBackup()
+        editor.clearDiagnostics()
+        try {
+            val lexer = Lexer(editor.text)
+            val parser = Parser(lexer)
+            parser.program()
+
+            val problemChunks = Problem.problems.goodChunks { parser.sema.command(it.name) != null }
+            val total = problemChunks.sumOf { it.size }
+            if (total == 0) return
+            var passed = 0
+
+            tabbedEditors.selectReport()
+            tabbedEditors.selectedEditor.run {
+                load("") // clear report
+                clearDiagnostics()
+            }
+            report(0, problemChunks.joinToString(prefix = "START ${now()}\n\n", separator = "\n") { chunk ->
+                chunk.joinToString(separator = "") { problem ->
+                    "%s %-18s %n".format(problem.index, problem.name)
+                }
+            })
+            var row = 2
+
+            for (chunk in problemChunks) {
+                for (problem in chunk) {
+                    val main = parser.sema.command(problem.name)!!
+                    val instructions = Emitter(parser.sema, false).emit(main)
+                    val goalInstructions = createGoalInstructions(problem.goal)
+                    checkAllWorlds(problem, instructions.toTypedArray(), goalInstructions.toTypedArray()).run {
+                        if (passedWorlds == checkedWorlds) {
+                            ++passed
+                        }
+                        val percentage = passedWorlds * 100 / checkedWorlds
+                        report(row, "%3d%% passed (%d/%d)".format(percentage, passedWorlds, checkedWorlds))
+                    }
+                    ++row
+                }
+                ++row
+            }
+            val percentage = passed * 100 / total
+            report(row, "\nSTOP  ${now()}  problems %3d%% passed (%d/%d)".format(percentage, passed, total))
+        } catch (diagnostic: Diagnostic) {
+            showDiagnostic(diagnostic)
+        }
+    }
+
+    private class Result(val passedWorlds: Int, val checkedWorlds: Int)
+
+    private fun checkAllWorlds(
+        problem: Problem,
+        instructions: Array<Instruction>,
+        goalInstructions: Array<Instruction>,
+    ): Result {
+        val start = System.nanoTime()
+
+        val worlds = problem.randomWorlds().iterator()
+        var passedWorlds = 0
+        var checkedWorlds = 0
+
+        while (true) {
+            val initialWorld = worlds.next()
+            if (checkWorld(initialWorld, instructions, goalInstructions)) {
+                ++passedWorlds
+            }
+            ++checkedWorlds
+
+            if (!worlds.hasNext()) {
+                return Result(passedWorlds, checkedWorlds)
+            }
+
+            val elapsed = System.nanoTime() - start
+
+            if (elapsed >= CHECK_TOTAL_NS) {
+                return Result(passedWorlds, checkedWorlds)
+            }
+        }
+    }
+
+    private fun checkWorld(
+        initialWorld: World,
+        instructions: Array<Instruction>,
+        goalInstructions: Array<Instruction>,
+    ): Boolean {
+        val goalWorlds = ArrayList<World>(200)
+        virtualMachine = createVirtualMachine(goalInstructions, initialWorld, goalWorlds::add)
+        try {
+            virtualMachine.executeGoalProgram()
+        } catch (_: VirtualMachine.Finished) {
+        }
+        val finalGoalWorld = virtualMachine.world
+        index = 0
+
+        virtualMachine = createVirtualMachine(instructions, initialWorld) { world ->
+            if (index == goalWorlds.size) {
+                throw Weltschmerz // caught below to return false
+            }
+            val goalWorld = goalWorlds[index++]
+            if (!goalWorld.equalsIgnoringDirection(world)) {
+                throw Weltschmerz // caught below to return false
+            }
+        }
+
+        try {
+            virtualMachine.executeUserProgram()
+        } catch (_: VirtualMachine.Finished) {
+        } catch (_: KarelError) {
+            return false
+        }
+        return !(index < goalWorlds.size && !finalGoalWorld.equalsIgnoringDirection(virtualMachine.world))
+    }
+
     fun parseAndExecute() {
+        tabbedEditors.selectNonReport()
         editor.isolateBraces()
         editor.indent()
         editor.saveWithBackup()
@@ -202,7 +341,8 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         tabbedEditors.tabs.isEnabled = false
         virtualMachinePanel.setProgram(instructions)
         virtualMachine = VirtualMachine(
-            instructions.toTypedArray(), initialWorld,
+            instructions.toTypedArray(),
+            initialWorld,
             onCall = editor::push.takeIf { compiledFromSource },
             onReturn = editor::pop.takeIf { compiledFromSource },
         )
@@ -278,4 +418,23 @@ void karelsFirstProgram()
         }
         editor.requestFocusInWindow()
     }
+}
+
+inline fun <T> Iterable<T>.goodChunks(predicate: (T) -> Boolean): List<List<T>> {
+
+    val outer = ArrayList<ArrayList<T>>()
+    var inner = ArrayList<T>()
+
+    for (element in this) {
+        if (predicate(element)) {
+            inner.add(element)
+        } else if (inner.isNotEmpty()) {
+            outer.add(inner)
+            inner = ArrayList()
+        }
+    }
+    if (inner.isNotEmpty()) {
+        outer.add(inner)
+    }
+    return outer
 }
