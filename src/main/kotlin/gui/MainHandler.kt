@@ -99,14 +99,21 @@ class MainHandler : MainFlow() {
             editor.requestFocusInWindow()
         }
 
-        controlPanel.check.addActionListener {
-            controlPanel.startStopReset.text = "reset"
-            worldPanel.antWorld = null
+        controlPanel.check.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(event: MouseEvent) {
+                if (!event.component.isEnabled) return
 
-            checkAgainst(currentProblem.goal)
+                worldPanel.antWorld = null
 
-            editor.requestFocusInWindow()
-        }
+                if (SwingUtilities.isLeftMouseButton(event)) {
+                    controlPanel.startStopReset.text = "reset"
+
+                    checkAgainst(currentProblem.goal)
+                } else if (SwingUtilities.isRightMouseButton(event)) {
+                    checkAllProblems()
+                }
+            }
+        })
 
         controlPanel.stepInto.addActionListener {
             tryStep(::stepInto)

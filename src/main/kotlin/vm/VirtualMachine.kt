@@ -130,6 +130,7 @@ class VirtualMachine(
         return program[index]
     }
 
+    @Suppress("ObjectInheritsException")
     object Finished : Exception() {
         private fun readResolve(): Any = Finished
     }
