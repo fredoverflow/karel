@@ -8,6 +8,8 @@ import syntax.parser.program
 import vm.*
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.ExecutorCompletionService
+import java.util.concurrent.Executors
 import javax.swing.Timer
 
 const val CHECK_TOTAL_NS = 2_000_000_000L
@@ -118,7 +120,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
     private fun checkOneWorld(instructions: Array<Instruction>, goalInstructions: Array<Instruction>) {
         val goalWorlds = ArrayList<World>(200)
-        virtualMachine = createVirtualMachine(goalInstructions, initialWorld, goalWorlds::add)
+        virtualMachine = createVirtualMachine(goalInstructions, currentProblem, initialWorld, goalWorlds::add)
         try {
             virtualMachine.executeGoalProgram()
         } catch (_: VirtualMachine.Finished) {
@@ -126,7 +128,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         val finalGoalWorld = virtualMachine.world
         index = 0
 
-        virtualMachine = createVirtualMachine(instructions, initialWorld) { world ->
+        virtualMachine = createVirtualMachine(instructions, currentProblem, initialWorld) { world ->
             if (index == goalWorlds.size) {
                 worldPanel.antWorld = finalGoalWorld
                 virtualMachine.error("extra ${currentProblem.check.singular}\n\n$COMPARE")
@@ -157,6 +159,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
     private fun createVirtualMachine(
         program: Array<Instruction>,
+        problem: Problem,
         world: World,
         callback: (World) -> Unit,
     ): VirtualMachine {
@@ -164,7 +167,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
             program,
             world,
             onPickDrop = callback,
-            onMove = callback.takeIf { Check.EVERY_PICK_DROP_MOVE == currentProblem.check },
+            onMove = callback.takeIf { Check.EVERY_PICK_DROP_MOVE == problem.check },
         )
     }
 
@@ -227,19 +230,24 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
             for (chunk in problemChunks) {
                 for (problem in chunk) {
-                    val main = parser.sema.command(problem.name)!!
-                    val instructions = Emitter(parser.sema, false).emit(main)
-                    val goalInstructions = createGoalInstructions(problem.goal)
-                    checkAllWorlds(problem, instructions.toTypedArray(), goalInstructions.toTypedArray()).run {
-                        if (passedWorlds == checkedWorlds) {
-                            ++passed
-                        }
-                        val percentage = passedWorlds * 100 / checkedWorlds
-                        report(row, "%3d%% passed (%d/%d)".format(percentage, passedWorlds, checkedWorlds))
+                    val row = row++ // capture by value
+                    completion.submit {
+                        val main = parser.sema.command(problem.name)!!
+                        val instructions = Emitter(parser.sema, false).emit(main)
+                        val goalInstructions = createGoalInstructions(problem.goal)
+                        checkAllWorlds(problem, instructions.toTypedArray(), goalInstructions.toTypedArray(), row)
                     }
-                    ++row
                 }
                 ++row
+            }
+            repeat(total) {
+                completion.take().get().run {
+                    if (passedWorlds == checkedWorlds) {
+                        ++passed
+                    }
+                    val percentage = passedWorlds * 100 / checkedWorlds
+                    report(this.row, "%3d%% passed (%d/%d)".format(percentage, passedWorlds, checkedWorlds))
+                }
             }
             val percentage = passed * 100 / total
             report(row, "\nSTOP  ${now()}  problems %3d%% passed (%d/%d)".format(percentage, passed, total))
@@ -248,12 +256,16 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         }
     }
 
-    private class Result(val passedWorlds: Int, val checkedWorlds: Int)
+    private val executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
+    private val completion = ExecutorCompletionService<Result>(executor)
+
+    private class Result(val passedWorlds: Int, val checkedWorlds: Int, val row: Int)
 
     private fun checkAllWorlds(
         problem: Problem,
         instructions: Array<Instruction>,
         goalInstructions: Array<Instruction>,
+        row: Int,
     ): Result {
         val start = System.nanoTime()
 
@@ -263,38 +275,39 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
         while (true) {
             val initialWorld = worlds.next()
-            if (checkWorld(initialWorld, instructions, goalInstructions)) {
+            if (checkWorld(problem, initialWorld, instructions, goalInstructions)) {
                 ++passedWorlds
             }
             ++checkedWorlds
 
             if (!worlds.hasNext()) {
-                return Result(passedWorlds, checkedWorlds)
+                return Result(passedWorlds, checkedWorlds, row)
             }
 
             val elapsed = System.nanoTime() - start
 
             if (elapsed >= CHECK_TOTAL_NS) {
-                return Result(passedWorlds, checkedWorlds)
+                return Result(passedWorlds, checkedWorlds, row)
             }
         }
     }
 
     private fun checkWorld(
+        problem: Problem,
         initialWorld: World,
         instructions: Array<Instruction>,
         goalInstructions: Array<Instruction>,
     ): Boolean {
         val goalWorlds = ArrayList<World>(200)
-        virtualMachine = createVirtualMachine(goalInstructions, initialWorld, goalWorlds::add)
+        var virtualMachine = createVirtualMachine(goalInstructions, problem, initialWorld, goalWorlds::add)
         try {
             virtualMachine.executeGoalProgram()
         } catch (_: VirtualMachine.Finished) {
         }
         val finalGoalWorld = virtualMachine.world
-        index = 0
+        var index = 0
 
-        virtualMachine = createVirtualMachine(instructions, initialWorld) { world ->
+        virtualMachine = createVirtualMachine(instructions, problem, initialWorld) { world ->
             if (index == goalWorlds.size) {
                 throw Weltschmerz // caught below to return false
             }
