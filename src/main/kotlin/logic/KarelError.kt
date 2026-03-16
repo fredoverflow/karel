@@ -18,6 +18,11 @@ object BlockedByWall : KarelError("cannot move through wall") {
 }
 
 @Suppress("ObjectInheritsException")
+object InfiniteLoop : KarelError("infinite loop detected") {
+    private fun readResolve(): Any = InfiniteLoop
+}
+
+@Suppress("ObjectInheritsException")
 object Weltschmerz : KarelError("weltschmerz") {
     private fun readResolve(): Any = Weltschmerz
 }
