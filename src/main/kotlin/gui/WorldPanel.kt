@@ -2,21 +2,38 @@ package gui
 
 import freditor.Fronts
 import logic.World
-
+import logic.WorldDiff
 import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.image.BufferedImage
-
 import javax.imageio.ImageIO
-import javax.swing.JPanel
+import javax.swing.JComponent
 import javax.swing.SwingUtilities
 
 private const val FOLDER_40 = "40"
 private const val FOLDER_64 = "64"
 
-class WorldPanel(var world: World) : JPanel() {
+class WorldPanel(initialWorld: World) : JComponent() {
+
+    var world = initialWorld
+        set(new) {
+            val old = field
+            if (old === new) return
+            field = new
+
+            if (!old.floorPlan.sameAs(new.floorPlan)) {
+                paintImmediately(0, 0, width, height)
+                return
+            }
+
+            WorldDiff(old, new, binaryLines).run {
+                if (!isEmpty()) {
+                    paintImmediately(left * tileSize, top * tileSize, width() * tileSize, height() * tileSize)
+                }
+            }
+        }
 
     private var folder: String = if (screenHeight < 1000) FOLDER_40 else FOLDER_64
 
@@ -62,37 +79,34 @@ class WorldPanel(var world: World) : JPanel() {
         maximumSize = panelSize
     }
 
-    var antWorld: World? = null
-    var showAntWorld: Boolean = false
-
     override fun paintComponent(graphics: Graphics) {
-        var world = antWorld
-        if (world == null || !showAntWorld) {
-            world = this.world
-        }
+        val bounds = graphics.clipBounds
+        val left = bounds.x / tileSize
+        val right = (bounds.x + bounds.width - 1) / tileSize
+        val top = bounds.y / tileSize
+        val bottom = (bounds.y + bounds.height - 1) / tileSize
 
-        graphics.drawWallsAndBeepers(world)
-        graphics.drawKarel(world)
-        graphics.drawNumbers(world)
+        graphics.drawWallsAndBeepers(left, right, top, bottom)
+        graphics.drawKarel()
+        graphics.drawNumbers(left, right, top, bottom)
 
         flushGraphicsBuffers()
     }
 
-    private fun Graphics.drawWallsAndBeepers(world: World) {
-        var position = 0
-        for (y in 0 until 10) {
-            for (x in 0 until 10) {
+    private fun Graphics.drawWallsAndBeepers(left: Int, right: Int, top: Int, bottom: Int) {
+        for (y in top..bottom) {
+            for (x in left..right) {
+                val position = y * 10 + x
                 var index = world.floorPlan.wallsAt(position)
                 if (world.beeperAt(position)) {
                     index += 16
                 }
                 drawTile(x, y, wallsAndBeepers[index])
-                ++position
             }
         }
     }
 
-    private fun Graphics.drawKarel(world: World) {
+    private fun Graphics.drawKarel() {
         drawTile(world.x, world.y, karels[world.direction])
     }
 
@@ -102,25 +116,25 @@ class WorldPanel(var world: World) : JPanel() {
 
     var binaryLines = 0
 
-    private fun Graphics.drawNumbers(world: World) {
+    private fun Graphics.drawNumbers(left: Int, right: Int, top: Int, bottom: Int) {
+        if (binaryLines == 0) return
+
+        val drawSum = (left == 0)
+        val left = left.coerceAtLeast(2)
+        val bytes = world.allBytes()
         val shift = if (world.beeperAt(0, 9)) 24 else 0
-        var y = 0
-        var lines = binaryLines
-        while (lines != 0) {
-            var totalValue = 0
-            var beeperValue = 1
-            for (x in 9 downTo 2) {
-                if (world.beeperAt(x, y)) {
-                    drawNumber(x, y, beeperValue, 0x000000)
-                    totalValue += beeperValue
+
+        for (y in top..bottom) {
+            if (binaryLines ushr y and 1 != 0) {
+                if (drawSum) {
+                    drawNumber(0, y, bytes[y] shl shift shr shift, 0x008000)
                 }
-                beeperValue = beeperValue.shl(shift + 1).shr(shift)
+                for (x in left..right) {
+                    if (world.beeperAt(x, y)) {
+                        drawNumber(x, y, 512 ushr x shl shift shr shift, 0x000000)
+                    }
+                }
             }
-            if (lines.and(1) != 0) {
-                drawNumber(0, y, totalValue, 0x008000)
-            }
-            lines = lines.shr(1)
-            ++y
         }
     }
 
@@ -130,32 +144,25 @@ class WorldPanel(var world: World) : JPanel() {
         Fronts.front.drawIntRight(this, (x + 1) * tileSize - rightPad, y * tileSize, value, color)
     }
 
+    var leftWorld: World? = null
+    var rightWorld: World? = null
+
     private fun listenToMouse() {
         addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(event: MouseEvent) {
                 if (!event.component.isEnabled) return
 
                 if (SwingUtilities.isLeftMouseButton(event)) {
-                    if (antWorld != null) {
-                        showAntWorld = !showAntWorld
+                    leftWorld?.let {
+                        world = it
+                        return
                     }
                 } else if (SwingUtilities.isRightMouseButton(event)) {
+                    rightWorld?.let {
+                        world = it
+                        return
+                    }
                     switchTileSize()
-                }
-                repaint()
-            }
-
-            override fun mouseEntered(event: MouseEvent) {
-                showAntWorld = true
-                if (antWorld != null) {
-                    repaint()
-                }
-            }
-
-            override fun mouseExited(event: MouseEvent) {
-                showAntWorld = false
-                if (antWorld != null) {
-                    repaint()
                 }
             }
         })
