@@ -15,7 +15,10 @@ import javax.swing.Timer
 const val CHECK_TOTAL_NS = 2_000_000_000L
 const val CHECK_REPAINT_NS = 100_000_000L
 
-const val COMPARE = "mouse enter/exit (or click) world to compare"
+const val COMPARE = """ · click world to compare
+
+right-click: goal world
+ left-click: your world"""
 
 abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
@@ -110,7 +113,6 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
             if (elapsed >= nextRepaint) {
                 worldPanel.world = initialWorld
-                worldPanel.paintImmediately(0, 0, worldPanel.width, worldPanel.height)
                 nextRepaint += CHECK_REPAINT_NS
             }
         }
@@ -130,13 +132,15 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
         virtualMachine = createVirtualMachine(instructions, initialWorld) { world ->
             if (index == goalWorlds.size) {
-                worldPanel.antWorld = finalGoalWorld
-                virtualMachine.error("extra ${currentProblem.check.singular}\n\n$COMPARE")
+                worldPanel.leftWorld = world
+                worldPanel.rightWorld = finalGoalWorld
+                virtualMachine.error("extra ${currentProblem.check.singular}$COMPARE")
             }
             val goalWorld = goalWorlds[index++]
             if (!goalWorld.equalsIgnoringDirection(world)) {
-                worldPanel.antWorld = goalWorld
-                virtualMachine.error("wrong ${currentProblem.check.singular}\n\n$COMPARE")
+                worldPanel.leftWorld = world
+                worldPanel.rightWorld = goalWorld
+                virtualMachine.error("wrong ${currentProblem.check.singular}$COMPARE")
             }
         }
 
@@ -147,12 +151,13 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
             virtualMachine.error(error.message)
         }
         if (index < goalWorlds.size && !finalGoalWorld.equalsIgnoringDirection(virtualMachine.world)) {
-            worldPanel.antWorld = finalGoalWorld
+            worldPanel.leftWorld = virtualMachine.world
+            worldPanel.rightWorld = finalGoalWorld
             if (currentProblem.numWorlds == ONE) {
                 val missing = goalWorlds.size - index
-                virtualMachine.error("missing $missing ${currentProblem.check.numerus(missing)}\n\n$COMPARE")
+                virtualMachine.error("missing $missing ${currentProblem.check.numerus(missing)}$COMPARE")
             } else {
-                virtualMachine.error("missing ${currentProblem.check.plural}\n\n$COMPARE")
+                virtualMachine.error("missing ${currentProblem.check.plural}$COMPARE")
             }
         }
     }
@@ -380,7 +385,6 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         }
         virtualMachinePanel.update(virtualMachine.stack, virtualMachine.pc)
         worldPanel.world = virtualMachine.world
-        worldPanel.repaint()
     }
 
     fun stepInto() {

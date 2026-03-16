@@ -58,16 +58,16 @@ class Problem(
             return world
         }
 
-        private fun randomByte(rng: WorldEntropy): World {
-            var world = FloorPlan.binary.world()
+        private fun randomByte(index: Int, rng: WorldEntropy): World {
+            var world = FloorPlan.binary[index].world()
 
             world = world.withBeepers(0, rng.nextInt(256).shl(2).toLong())
 
             return world.withKarelAt(9, 0, WEST)
         }
 
-        private fun randomBytes(rng: WorldEntropy, direction: Int): World {
-            var world = FloorPlan.binary.world()
+        private fun randomBytes(index: Int, rng: WorldEntropy, direction: Int): World {
+            var world = FloorPlan.binary[index].world()
 
             world = world.withBeepers(0, (rng.nextInt(256).shl(2) + rng.nextInt(256).shl(12)).toLong())
 
@@ -398,7 +398,7 @@ class Problem(
             0b1,
             TWO.pow(8),
         ) { id ->
-            randomByte(WorldEntropy(id))
+            randomByte(0, WorldEntropy(id))
         }
 
         val decrement = Problem(
@@ -412,7 +412,7 @@ class Problem(
             0b1,
             TWO.pow(8),
         ) { id ->
-            randomByte(WorldEntropy(id))
+            randomByte(1, WorldEntropy(id))
         }
 
         val addSlow = Problem(
@@ -426,7 +426,7 @@ class Problem(
             0b11,
             TWO.pow(16),
         ) { id ->
-            randomBytes(WorldEntropy(id), WEST)
+            randomBytes(2, WorldEntropy(id), WEST)
         }
 
         val saveTheFlowers = Problem(
@@ -594,7 +594,7 @@ class Problem(
             0b1011,
             TWO.pow(16),
         ) { id ->
-            randomBytes(WorldEntropy(id), SOUTH)
+            randomBytes(3, WorldEntropy(id), SOUTH)
         }
 
         val partyAgain = Problem(
@@ -713,7 +713,7 @@ class Problem(
             0b111,
             TWO.pow(16),
         ) { id ->
-            randomBytes(WorldEntropy(id), SOUTH)
+            randomBytes(4, WorldEntropy(id), SOUTH)
         }
 
         val computeFibonacci = Problem(
@@ -727,7 +727,7 @@ class Problem(
             0b1111111111,
             5.toBigInteger(),
         ) { id ->
-            val world = FloorPlan.binary.world().withKarelAt(9, 0, SOUTH)
+            val world = FloorPlan.binary[5].world().withKarelAt(9, 0, SOUTH)
             when (id % 5) {
                 0 -> world.dropBeeper(9, 1) // 0 1
                 1 -> world.dropBeeper(9, 0).dropBeeper(9, 1) // 1 1

@@ -32,14 +32,15 @@ class MainHandler : MainFlow() {
             initialWorld = currentProblem.randomWorld()
             virtualMachine.world = initialWorld
             worldPanel.world = initialWorld
-            worldPanel.antWorld = null
-            worldPanel.repaint()
+            worldPanel.leftWorld = null
+            worldPanel.rightWorld = null
 
             editor.requestFocusInWindow()
         }
 
         controlPanel.goal.addActionListener {
-            worldPanel.antWorld = null
+            worldPanel.leftWorld = null
+            worldPanel.rightWorld = null
 
             executeGoal(currentProblem.goal)
             controlPanel.stepOver.isEnabled = false
@@ -56,10 +57,10 @@ class MainHandler : MainFlow() {
 
             initialWorld = currentProblem.randomWorld()
             virtualMachine.world = initialWorld
-            worldPanel.world = initialWorld
-            worldPanel.antWorld = null
             worldPanel.binaryLines = currentProblem.binaryLines
-            worldPanel.repaint()
+            worldPanel.world = initialWorld
+            worldPanel.leftWorld = null
+            worldPanel.rightWorld = null
 
             story.load(currentProblem.story)
 
@@ -92,8 +93,8 @@ class MainHandler : MainFlow() {
 
                     virtualMachine.world = initialWorld
                     worldPanel.world = initialWorld
-                    worldPanel.antWorld = null
-                    worldPanel.repaint()
+                    worldPanel.leftWorld = null
+                    worldPanel.rightWorld = null
                 }
             }
             editor.requestFocusInWindow()
@@ -103,7 +104,8 @@ class MainHandler : MainFlow() {
             override fun mouseClicked(event: MouseEvent) {
                 if (!event.component.isEnabled) return
 
-                worldPanel.antWorld = null
+                worldPanel.leftWorld = null
+                worldPanel.rightWorld = null
 
                 if (SwingUtilities.isLeftMouseButton(event)) {
                     controlPanel.startStopReset.text = "reset"
@@ -180,14 +182,13 @@ class MainHandler : MainFlow() {
                 if (!event.component.isEnabled) return
 
                 if (SwingUtilities.isLeftMouseButton(event)) {
-                    if (worldPanel.antWorld == null) {
+                    if (worldPanel.leftWorld == null) {
                         val x = event.x / worldPanel.tileSize
                         val y = event.y / worldPanel.tileSize
+
                         val world = virtualMachine.world.toggleBeeper(x, y)
                         virtualMachine.world = world
-
                         worldPanel.world = world
-                        worldPanel.repaint()
                     }
                 }
             }

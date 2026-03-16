@@ -51,6 +51,9 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
     val position: Int
         get() = hi.ushr(P_SHIFT).toInt()
 
+    val karel: Long
+        get() = hi.ushr(D_SHIFT)
+
     fun equalsIgnoringDirection(that: World): Boolean {
         return this.lo == that.lo && this.hi.and(IGNORING_DIRECTION) == that.hi.and(IGNORING_DIRECTION)
     }
