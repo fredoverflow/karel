@@ -1,5 +1,6 @@
 package vm
 
+import logic.InfiniteLoop
 import logic.World
 
 // If "step over" or "step return" do not finish within 1 second,
@@ -67,7 +68,7 @@ class VirtualMachine(
             executeOneInstruction()
         }
         if (callDepth > targetDepth) {
-            error("infinite loop detected")
+            throw InfiniteLoop
         }
     }
 
@@ -78,7 +79,7 @@ class VirtualMachine(
                 executeOneInstruction()
             }
         }
-        error("infinite loop detected")
+        throw InfiniteLoop
     }
 
     fun executeGoalProgram() {
