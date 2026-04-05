@@ -22,16 +22,6 @@ private const val BEEPERS_HI = 0x0000000fffffffffL
 private const val CLEAR_CARRY = 0x7f0f0f3fffffffffL
 private const val IGNORING_DIRECTION = 3L.shl(D_SHIFT).inv()
 
-//                              E  N   W  S
-private val deltaX = intArrayOf(1, 0, -1, 0)
-private val deltaY = intArrayOf(0, -1, 0, 1)
-private val deltaXYP = longArrayOf(
-    1L.shl(X_SHIFT) + 1L.shl(P_SHIFT),
-    15L.shl(Y_SHIFT) + 118L.shl(P_SHIFT),
-    15L.shl(X_SHIFT) + 127L.shl(P_SHIFT),
-    1L.shl(Y_SHIFT) + 10L.shl(P_SHIFT),
-)
-
 class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan) {
     val beepersLo: Long
         get() = lo
@@ -63,10 +53,12 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
     }
 
     fun withKarelAt(x: Int, y: Int, direction: Int): World {
+
         val coordinates = (y * 10 + x).toLong().shl(P_SHIFT) or
                 y.toLong().shl(Y_SHIFT) or
                 x.toLong().shl(X_SHIFT) or
                 direction.toLong().shl(D_SHIFT)
+
         return World(hi.and(BEEPERS_HI).or(coordinates), lo, floorPlan)
     }
 
@@ -201,7 +193,17 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
 
     fun moveForward(): World {
         if (!frontIsClear()) throw BlockedByWall
-        return World((hi + deltaXYP[direction]).and(CLEAR_CARRY), lo, floorPlan)
+
+        val hiDelta = when (direction) {
+            //      p y x
+            0 -> 0x0100010000000000L
+            1 -> 0x760f000000000000L
+            2 -> 0x7f000f0000000000L
+            3 -> 0x0a01000000000000L
+
+            else -> error(direction)
+        }
+        return World((hi + hiDelta).and(CLEAR_CARRY), lo, floorPlan)
     }
 
     fun turn(delta: Int): World {
@@ -224,14 +226,14 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
         return beeperAt(position)
     }
 
-    fun beeperAhead(): Boolean {
-        val x = this.x + deltaX[direction]
-        val y = this.y + deltaY[direction]
-        return isInsideWorld(x, y) && beeperAt(x, y)
-    }
+    fun beeperAhead(): Boolean = when (direction) {
 
-    fun isInsideWorld(x: Int, y: Int): Boolean {
-        return (0 <= x && x < 10) && (0 <= y && y < 10)
+        0 -> (x < 9) && beeperAt(position + 1)
+        1 -> (0 < y) && beeperAt(position - 10)
+        2 -> (0 < x) && beeperAt(position - 1)
+        3 -> (y < 9) && beeperAt(position + 10)
+
+        else -> error(direction)
     }
 
     fun pickBeeper(): World {
