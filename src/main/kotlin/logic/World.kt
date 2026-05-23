@@ -20,7 +20,6 @@ private const val P_SHIFT = 56
 
 private const val BEEPERS_HI = 0x0000000fffffffffL
 private const val CLEAR_CARRY = 0x7f0f0f3fffffffffL
-private const val IGNORING_DIRECTION = 3L.shl(D_SHIFT).inv()
 
 class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan) {
     val beepersLo: Long
@@ -43,10 +42,6 @@ class World(private val hi: Long, private val lo: Long, val floorPlan: FloorPlan
 
     val karel: Long
         get() = hi.ushr(D_SHIFT)
-
-    fun equalsIgnoringDirection(that: World): Boolean {
-        return this.lo == that.lo && this.hi.and(IGNORING_DIRECTION) == that.hi.and(IGNORING_DIRECTION)
-    }
 
     fun withBeepers(hi: Long, lo: Long): World {
         return World(hi, lo, floorPlan)

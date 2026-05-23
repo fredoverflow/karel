@@ -3,10 +3,6 @@ package vm
 import logic.InfiniteLoop
 import logic.World
 
-// If "step over" or "step return" do not finish within 1 second,
-// we assume the code contains an infinite loop.
-const val TIMEOUT = 1_000_000_000L
-
 // The first instruction starts at address 256.
 // This makes it easier to distinguish addresses
 // from truth values and loop counters on the stack.
@@ -15,11 +11,10 @@ const val ENTRY_POINT = 256
 class VirtualMachine(
     private val program: Array<Instruction>,
     var world: World,
+    private val ignoreMove: Boolean = false,
     // callbacks
     private val onCall: ((Instruction, Instruction) -> Unit)? = null,
     private val onReturn: (() -> Unit)? = null,
-    private val onPickDrop: ((World) -> Unit)? = null,
-    private val onMove: ((World) -> Unit)? = null,
 ) {
 
     var pc: Int = ENTRY_POINT
@@ -27,6 +22,9 @@ class VirtualMachine(
 
     val currentInstruction: Instruction
         get() = program[pc]
+
+    val previousInstruction: Instruction
+        get() = program[pc - 1]
 
     var stack: Stack? = null
         private set
@@ -62,24 +60,12 @@ class VirtualMachine(
     }
 
     private fun stepUntil(targetDepth: Int) {
-        val start = System.nanoTime()
         stepInto(false)
-        while ((callDepth > targetDepth) && (System.nanoTime() - start < TIMEOUT)) {
+        var budget = 1_000_000
+        while (callDepth > targetDepth) {
             executeOneInstruction()
+            if (--budget == 0) throw InfiniteLoop
         }
-        if (callDepth > targetDepth) {
-            throw InfiniteLoop
-        }
-    }
-
-    fun executeUserProgram() {
-        val start = System.nanoTime()
-        while (System.nanoTime() - start < TIMEOUT) {
-            repeat(1000) {
-                executeOneInstruction()
-            }
-        }
-        throw InfiniteLoop
     }
 
     fun executeGoalProgram() {
@@ -88,10 +74,25 @@ class VirtualMachine(
         }
     }
 
-    private fun executeOneInstruction() {
+    fun executeGoalPickDropMove() {
+        while (executeOneInstruction()) {
+            // intentionally empty
+        }
+    }
+
+    fun executeUserPickDropMove() {
+        var budget = 1000
+        while (executeOneInstruction()) {
+            if (--budget == 0) {
+                throw InfiniteLoop
+            }
+        }
+    }
+
+    private fun executeOneInstruction(): Boolean {
         with(currentInstruction) {
             when (category shr 12) {
-                NORM shr 12 -> executeBasicInstruction(bytecode)
+                NORM shr 12 -> return executeBasicInstruction(bytecode)
 
                 PUSH shr 12 -> executePush()
                 LOOP shr 12 -> executeLoop()
@@ -100,6 +101,7 @@ class VirtualMachine(
 
                 else -> throw IllegalBytecode(bytecode)
             }
+            return true
         }
     }
 
@@ -143,16 +145,16 @@ class VirtualMachine(
         --callDepth
     }
 
-    private fun executeBasicInstruction(bytecode: Int) {
+    private fun executeBasicInstruction(bytecode: Int): Boolean {
         when (bytecode) {
             RETURN -> executeReturn()
 
-            MOVE_FORWARD -> world.moveForward().let { world = it; onMove?.invoke(it); ++pc }
+            MOVE_FORWARD -> world.moveForward().let { world = it; ++pc; return ignoreMove }
             TURN_LEFT -> world.turnLeft().let { world = it; ++pc }
             TURN_AROUND -> world.turnAround().let { world = it; ++pc }
             TURN_RIGHT -> world.turnRight().let { world = it; ++pc }
-            PICK_BEEPER -> world.pickBeeper().let { world = it; onPickDrop?.invoke(it); ++pc }
-            DROP_BEEPER -> world.dropBeeper().let { world = it; onPickDrop?.invoke(it); ++pc }
+            PICK_BEEPER -> world.pickBeeper().let { world = it; ++pc; return false }
+            DROP_BEEPER -> world.dropBeeper().let { world = it; ++pc; return false }
 
             ON_BEEPER -> {
                 val status = world.onBeeper()
@@ -317,9 +319,14 @@ class VirtualMachine(
 
             else -> throw IllegalBytecode(bytecode)
         }
+        return true
     }
 }
 
-fun VirtualMachine.error(message: String) {
+fun VirtualMachine.errorCurrent(message: String) {
     currentInstruction.error(message)
+}
+
+fun VirtualMachine.errorPrevious(message: String) {
+    previousInstruction.error(message)
 }

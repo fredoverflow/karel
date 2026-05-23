@@ -90,7 +90,11 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
         while (true) {
             initialWorld = worlds.next()
-            checkOneWorld(instructions, goalInstructions)
+            try {
+                checkOneWorld(instructions, goalInstructions)
+            } catch (error: KarelError) {
+                virtualMachine.errorCurrent(error.message)
+            }
             ++worldCounter
 
             if (!worlds.hasNext()) {
@@ -118,46 +122,60 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         }
     }
 
-    private var index = 0
-
     private fun checkOneWorld(instructions: Array<Instruction>, goalInstructions: Array<Instruction>) {
-        val goalWorlds = ArrayList<World>(200)
-        virtualMachine = createVirtualMachine(goalInstructions, currentProblem, initialWorld, goalWorlds::add)
-        try {
-            virtualMachine.executeGoalProgram()
-        } catch (_: VirtualMachine.Finished) {
-        }
-        val finalGoalWorld = virtualMachine.world
-        index = 0
 
-        virtualMachine = createVirtualMachine(instructions, currentProblem, initialWorld) { world ->
-            if (index == goalWorlds.size) {
-                worldPanel.leftWorld = world
-                worldPanel.rightWorld = finalGoalWorld
-                virtualMachine.error("extra ${currentProblem.check.singular}$COMPARE")
-            }
-            val goalWorld = goalWorlds[index++]
-            if (!goalWorld.equalsIgnoringDirection(world)) {
-                worldPanel.leftWorld = world
-                worldPanel.rightWorld = goalWorld
-                virtualMachine.error("wrong ${currentProblem.check.singular}$COMPARE")
-            }
-        }
+        val goalMachine = createVirtualMachine(goalInstructions, currentProblem, initialWorld)
+        val userMachine = createVirtualMachine(instructions, currentProblem, initialWorld)
+        virtualMachine = userMachine
 
-        try {
-            virtualMachine.executeUserProgram()
-        } catch (_: VirtualMachine.Finished) {
-        } catch (error: KarelError) {
-            virtualMachine.error(error.message)
-        }
-        if (index < goalWorlds.size && !finalGoalWorld.equalsIgnoringDirection(virtualMachine.world)) {
-            worldPanel.leftWorld = virtualMachine.world
-            worldPanel.rightWorld = finalGoalWorld
-            if (currentProblem.numWorlds == ONE) {
-                val missing = goalWorlds.size - index
-                virtualMachine.error("missing $missing ${currentProblem.check.numerus(missing)}$COMPARE")
-            } else {
-                virtualMachine.error("missing ${currentProblem.check.plural}$COMPARE")
+        while (true) {
+            try {
+                goalMachine.executeGoalPickDropMove()
+                try {
+                    userMachine.executeUserPickDropMove()
+
+                    if (goalMachine.world.position != userMachine.world.position) {
+
+                        worldPanel.leftWorld = userMachine.world
+                        worldPanel.rightWorld = goalMachine.world
+                        userMachine.errorPrevious("wrong ${currentProblem.check.singular}$COMPARE")
+                    }
+                } catch (_: VirtualMachine.Finished) {
+                    // user machine finished early
+
+                    if (currentProblem.dropsOptional256() && goalMachine.world.position == 1) {
+                        return
+                    }
+
+                    var missing = 1
+                    try {
+                        while (true) {
+                            goalMachine.executeGoalPickDropMove()
+                            ++missing
+                        }
+                    } catch (_: VirtualMachine.Finished) {
+                    }
+
+                    worldPanel.leftWorld = userMachine.world
+                    worldPanel.rightWorld = goalMachine.world
+                    if (currentProblem.numWorlds == ONE) {
+                        userMachine.errorCurrent("missing $missing ${currentProblem.check.numerus(missing)}$COMPARE")
+                    } else {
+                        userMachine.errorCurrent("missing ${currentProblem.check.plural}$COMPARE")
+                    }
+                }
+            } catch (_: VirtualMachine.Finished) {
+                // goal machine finished
+                try {
+                    userMachine.executeUserPickDropMove()
+
+                    worldPanel.leftWorld = userMachine.world
+                    worldPanel.rightWorld = goalMachine.world
+                    userMachine.errorPrevious("extra ${currentProblem.check.singular}$COMPARE")
+                } catch (_: VirtualMachine.Finished) {
+                    // both machines finished
+                    return
+                }
             }
         }
     }
@@ -166,13 +184,11 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         program: Array<Instruction>,
         problem: Problem,
         world: World,
-        callback: (World) -> Unit,
     ): VirtualMachine {
         return VirtualMachine(
             program,
             world,
-            onPickDrop = callback,
-            onMove = callback.takeIf { Check.EVERY_PICK_DROP_MOVE == problem.check },
+            ignoreMove = (Check.EVERY_PICK_DROP == problem.check),
         )
     }
 
@@ -280,8 +296,11 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
         while (true) {
             val initialWorld = worlds.next()
-            if (checkWorld(problem, initialWorld, instructions, goalInstructions)) {
-                ++passedWorlds
+            try {
+                if (checkWorld(problem, initialWorld, instructions, goalInstructions)) {
+                    ++passedWorlds
+                }
+            } catch (_: KarelError) {
             }
             ++checkedWorlds
 
@@ -303,32 +322,33 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         instructions: Array<Instruction>,
         goalInstructions: Array<Instruction>,
     ): Boolean {
-        val goalWorlds = ArrayList<World>(200)
-        var virtualMachine = createVirtualMachine(goalInstructions, problem, initialWorld, goalWorlds::add)
-        try {
-            virtualMachine.executeGoalProgram()
-        } catch (_: VirtualMachine.Finished) {
-        }
-        val finalGoalWorld = virtualMachine.world
-        var index = 0
+        val goalMachine = createVirtualMachine(goalInstructions, problem, initialWorld)
+        val userMachine = createVirtualMachine(instructions, problem, initialWorld)
 
-        virtualMachine = createVirtualMachine(instructions, problem, initialWorld) { world ->
-            if (index == goalWorlds.size) {
-                throw Weltschmerz // caught below to return false
-            }
-            val goalWorld = goalWorlds[index++]
-            if (!goalWorld.equalsIgnoringDirection(world)) {
-                throw Weltschmerz // caught below to return false
-            }
-        }
+        while (true) {
+            try {
+                goalMachine.executeGoalPickDropMove()
+                try {
+                    userMachine.executeUserPickDropMove()
 
-        try {
-            virtualMachine.executeUserProgram()
-        } catch (_: VirtualMachine.Finished) {
-        } catch (_: KarelError) {
-            return false
+                    if (goalMachine.world.position != userMachine.world.position) {
+                        return false
+                    }
+                } catch (_: VirtualMachine.Finished) {
+                    // user machine finished early
+                    return problem.dropsOptional256() && goalMachine.world.position == 1
+                }
+            } catch (_: VirtualMachine.Finished) {
+                // goal machine finished
+                try {
+                    userMachine.executeUserPickDropMove()
+                    return false
+                } catch (_: VirtualMachine.Finished) {
+                    // both machines finished
+                    return true
+                }
+            }
         }
-        return !(index < goalWorlds.size && !finalGoalWorld.equalsIgnoringDirection(virtualMachine.world))
     }
 
     fun parseAndExecute() {

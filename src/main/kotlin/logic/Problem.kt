@@ -782,4 +782,8 @@ class Problem(
 
         val names: Set<String> = problems.mapTo(HashSet(), Problem::name)
     }
+
+    fun dropsOptional256(): Boolean {
+        return this === decrement || this === addSlow
+    }
 }
