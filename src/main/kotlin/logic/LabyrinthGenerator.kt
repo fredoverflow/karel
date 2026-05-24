@@ -120,7 +120,7 @@ object LabyrinthGenerator {
                 val west = labyrinth[position + WEST].code and 4
                 val south = labyrinth[position + SOUTH].code and 8
 
-                walls[i++] = (south).or(west).or(north).or(east).toByte()
+                walls[i++] = (south or west or north or east).toByte()
 
                 position += NEIGHBOUR_X
             }

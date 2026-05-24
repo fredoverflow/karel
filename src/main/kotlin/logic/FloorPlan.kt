@@ -8,16 +8,11 @@ value class FloorPlan(private val walls: ByteArray) {
     }
 
     fun isClear(position: Int, direction: Int): Boolean {
-        return walls[position].toInt().and(1 shl direction) == 0
+        return walls[position].toInt() ushr direction and 1 == 0
     }
 
     fun wallsAt(position: Int): Int {
-        return walls[position].toInt().and(WALL_ALL)
-    }
-
-    fun numberOfWallsAt(position: Int): Int {
-        val shift = wallsAt(position).shl(2)
-        return 0x4332_3221_3221_2110L.ushr(shift).toInt().and(7)
+        return walls[position].toInt()
     }
 
     fun builder(): FloorBuilder {
@@ -29,14 +24,10 @@ value class FloorPlan(private val walls: ByteArray) {
     }
 
     companion object {
-        const val WALL_NONE = 0
-
         const val WALL_EAST = 1
         const val WALL_NORTH = 2
         const val WALL_WEST = 4
         const val WALL_SOUTH = 8
-
-        const val WALL_ALL = 15
 
         operator fun invoke(vararg walls: Byte): FloorPlan {
             require(walls.size == 100) { walls.size }
@@ -167,11 +158,11 @@ value class FloorBuilder(private val walls: ByteArray) {
     fun buildHorizontalWall(x: Int, y: Int): FloorBuilder {
         var position = y * 10 + x
         if (position < 100) {
-            walls[position] = walls[position].toInt().or(FloorPlan.WALL_NORTH).toByte()
+            walls[position] = (walls[position].toInt() or FloorPlan.WALL_NORTH).toByte()
         }
         position -= 10
         if (position >= 0) {
-            walls[position] = walls[position].toInt().or(FloorPlan.WALL_SOUTH).toByte()
+            walls[position] = (walls[position].toInt() or FloorPlan.WALL_SOUTH).toByte()
         }
         return this
     }
@@ -179,16 +170,16 @@ value class FloorBuilder(private val walls: ByteArray) {
     fun buildVerticalWall(x: Int, y: Int): FloorBuilder {
         val position = y * 10 + x
         if (x < 10) {
-            walls[position] = walls[position].toInt().or(FloorPlan.WALL_WEST).toByte()
+            walls[position] = (walls[position].toInt() or FloorPlan.WALL_WEST).toByte()
         }
         if (x > 0) {
-            walls[position - 1] = walls[position - 1].toInt().or(FloorPlan.WALL_EAST).toByte()
+            walls[position - 1] = (walls[position - 1].toInt() or FloorPlan.WALL_EAST).toByte()
         }
         return this
     }
 
     fun tearDownWall(position: Int, direction: Int): FloorBuilder {
-        walls[position] = walls[position].toInt().and(1.shl(direction).inv()).toByte()
+        walls[position] = (walls[position].toInt() and (1 shl direction).inv()).toByte()
         return this
     }
 

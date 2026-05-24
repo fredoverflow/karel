@@ -74,8 +74,14 @@ class Week3Test : WorldTestBase() {
 
         // remove beepers from shelters
         for (position in 0 until 100) {
-            if (floodWorld.beeperAt(position) && floorPlan.numberOfWallsAt(position) >= 3) {
-                floodWorld = floodWorld.pickBeeper(position)
+            if (floodWorld.beeperAt(position)) {
+                when (floorPlan.wallsAt(position)) {
+                    0b1111,
+                    0b0111,
+                    0b1011,
+                    0b1101,
+                    0b1110 -> floodWorld = floodWorld.pickBeeper(position)
+                }
             }
         }
 
@@ -89,7 +95,7 @@ class Week3Test : WorldTestBase() {
         val one = initialWorld.firstByte()
         val two = initialWorld.secondByte()
         val sum = world.thirdByte()
-        assertEquals((one + two).and(255), sum)
+        assertEquals((one + two) and 255, sum)
     }
 
     @Test
