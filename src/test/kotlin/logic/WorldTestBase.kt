@@ -3,14 +3,15 @@ package logic
 import org.junit.jupiter.api.Assertions.assertEquals
 import vm.VirtualMachine
 
-open class WorldTestBase {
-    protected var initialWorld: World = Problem.emptyWorld
-    protected var world: World = Problem.emptyWorld
+abstract class WorldTestBase {
+
+    protected var initialWorld: World = FloorPlan.empty.world()
+    protected var world: World = FloorPlan.empty.world()
 
     protected fun executeGoal(problem: Problem) {
         val instructions = vm.createGoalInstructions(problem.goal)
         initialWorld = problem.randomWorld()
-        val virtualMachine = VirtualMachine(instructions.toTypedArray(), initialWorld)
+        val virtualMachine = VirtualMachine(instructions.toTypedArray(), initialWorld.clone())
         try {
             virtualMachine.executeGoalProgram()
         } catch (_: VirtualMachine.Finished) {
@@ -25,9 +26,11 @@ open class WorldTestBase {
     }
 
     protected fun assertSoleBeeperAt(x: Int, y: Int) {
-        val expected = Problem.emptyWorld.dropBeeper(x, y)
-        assertEquals(expected.beepersHi, world.beepersHi)
-        assertEquals(expected.beepersLo, world.beepersLo)
+        FloorPlan.empty.world().apply {
+            dropBeeper(x, y)
+            assertEquals(beepersLo, world.beepersLo)
+            assertEquals(beepersHi, world.beepersHi)
+        }
     }
 
     protected fun assertSoleBeeperAtKarel() {
@@ -35,8 +38,8 @@ open class WorldTestBase {
     }
 
     protected fun assertNoBeepers() {
-        assertEquals(0, world.beepersHi)
         assertEquals(0, world.beepersLo)
+        assertEquals(0, world.beepersHi)
     }
 
     protected fun assertNumberOfBeepers(expected: Int) {

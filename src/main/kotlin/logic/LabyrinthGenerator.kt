@@ -140,7 +140,9 @@ object LabyrinthGenerator : Generator() {
         val y = destination / NEIGHBOUR_Y
         val x = destination % NEIGHBOUR_Y / NEIGHBOUR_X
 
-        return FloorPlan(walls()).world().dropBeeper(x - 1, y - 1)
+        return FloorPlan(walls()).world().apply {
+            dropBeeper(x - 1, y - 1)
+        }
     }
 
     private fun isUncharted(position: Int): Boolean {
@@ -280,7 +282,9 @@ object MazeGenerator : Generator() {
         val x = random.nextInt(10)
         val y = random.nextInt(10)
 
-        return FloorPlan(walls()).world().dropBeeper(x, y)
+        return FloorPlan(walls()).world().apply {
+            dropBeeper(x, y)
+        }
     }
 
     private fun generate(position: Int) {

@@ -10,7 +10,7 @@ const val ENTRY_POINT = 256
 
 class VirtualMachine(
     private val program: Array<Instruction>,
-    var world: World,
+    val world: World,
     private val ignoreMove: Boolean = false,
     // callbacks
     private val onCall: ((Instruction, Instruction) -> Unit)? = null,
@@ -149,12 +149,38 @@ class VirtualMachine(
         when (bytecode) {
             RETURN -> executeReturn()
 
-            MOVE_FORWARD -> world.moveForward().let { world = it; ++pc; return ignoreMove }
-            TURN_LEFT -> world.turnLeft().let { world = it; ++pc }
-            TURN_AROUND -> world.turnAround().let { world = it; ++pc }
-            TURN_RIGHT -> world.turnRight().let { world = it; ++pc }
-            PICK_BEEPER -> world.pickBeeper().let { world = it; ++pc; return false }
-            DROP_BEEPER -> world.dropBeeper().let { world = it; ++pc; return false }
+            MOVE_FORWARD -> {
+                world.moveForward()
+                ++pc
+                return ignoreMove
+            }
+
+            TURN_LEFT -> {
+                world.turnLeft()
+                ++pc
+            }
+
+            TURN_AROUND -> {
+                world.turnAround()
+                ++pc
+            }
+
+            TURN_RIGHT -> {
+                world.turnRight()
+                ++pc
+            }
+
+            PICK_BEEPER -> {
+                world.pickBeeper()
+                ++pc
+                return false
+            }
+
+            DROP_BEEPER -> {
+                world.dropBeeper()
+                ++pc
+                return false
+            }
 
             ON_BEEPER -> {
                 val status = world.onBeeper()
