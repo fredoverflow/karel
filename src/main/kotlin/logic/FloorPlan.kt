@@ -3,10 +3,6 @@ package logic
 @JvmInline
 value class FloorPlan(private val walls: ByteArray) {
 
-    fun sameAs(that: FloorPlan): Boolean {
-        return this.walls === that.walls
-    }
-
     fun isClear(position: Int, direction: Int): Boolean {
         return walls[position].toInt() ushr direction and 1 == 0
     }
@@ -20,7 +16,7 @@ value class FloorPlan(private val walls: ByteArray) {
     }
 
     fun world(): World {
-        return World(0, 0, this)
+        return World(this)
     }
 
     companion object {
@@ -105,7 +101,7 @@ value class FloorPlan(private val walls: ByteArray) {
             C, 9, C, 8, 8, 8, 8, 8, 9, D,
         )
 
-        val binary: Array<FloorPlan> = byteArrayOf(
+        val binary = FloorPlan(
             0, 6, 2, 2, 2, 2, 2, 2, 2, 3,
             0, 4, 0, 0, 0, 0, 0, 0, 0, 1,
             0, 4, 0, 0, 0, 0, 0, 0, 0, 1,
@@ -116,12 +112,7 @@ value class FloorPlan(private val walls: ByteArray) {
             0, 4, 0, 0, 0, 0, 0, 0, 0, 1,
             0, 4, 0, 0, 0, 0, 0, 0, 0, 1,
             0, C, 8, 8, 8, 8, 8, 8, 8, 9,
-        ).let { walls ->
-            Array(6) {
-                // clone ensures sum repaint when switching between binary problems
-                FloorPlan(walls.clone())
-            }
-        }
+        )
 
         val trap = FloorPlan(
             6, 2, 2, 2, 2, 2, 2, 2, 2, 3,

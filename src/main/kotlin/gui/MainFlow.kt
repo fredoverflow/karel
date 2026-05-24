@@ -30,9 +30,9 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         return if (logarithm < 0) logarithm else 1.shl(logarithm)
     }
 
-    var initialWorld: World = worldPanel.world
+    var initialWorld: World = worldPanel.world.clone()
 
-    var virtualMachine = VirtualMachine(emptyArray(), initialWorld)
+    var virtualMachine = VirtualMachine(emptyArray(), worldPanel.world)
 
     val timer = Timer(delay()) {
         tryStep(::stepInto)
@@ -187,7 +187,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
     ): VirtualMachine {
         return VirtualMachine(
             program,
-            world,
+            world.clone(),
             ignoreMove = (Check.EVERY_PICK_DROP == problem.check),
         )
     }
@@ -380,7 +380,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         virtualMachinePanel.setProgram(instructions)
         virtualMachine = VirtualMachine(
             instructions.toTypedArray(),
-            initialWorld,
+            initialWorld.clone(),
             onCall = editor::push.takeIf { compiledFromSource },
             onReturn = editor::pop.takeIf { compiledFromSource },
         )

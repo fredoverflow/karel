@@ -30,8 +30,7 @@ class MainHandler : MainFlow() {
             controlPanel.startStopReset.text = "start"
 
             initialWorld = currentProblem.randomWorld()
-            virtualMachine.world = initialWorld
-            worldPanel.world = initialWorld
+            worldPanel.world = initialWorld.clone()
             worldPanel.leftWorld = null
             worldPanel.rightWorld = null
 
@@ -56,9 +55,8 @@ class MainHandler : MainFlow() {
             controlPanel.check.toolTipText = "check every ${currentProblem.check.singular}"
 
             initialWorld = currentProblem.randomWorld()
-            virtualMachine.world = initialWorld
             worldPanel.binaryLines = currentProblem.binaryLines
-            worldPanel.world = initialWorld
+            worldPanel.world = initialWorld.clone()
             worldPanel.leftWorld = null
             worldPanel.rightWorld = null
 
@@ -91,8 +89,7 @@ class MainHandler : MainFlow() {
                 "reset" -> {
                     controlPanel.startStopReset.text = "start"
 
-                    virtualMachine.world = initialWorld
-                    worldPanel.world = initialWorld
+                    worldPanel.world = initialWorld.clone()
                     worldPanel.leftWorld = null
                     worldPanel.rightWorld = null
                 }
@@ -177,23 +174,6 @@ class MainHandler : MainFlow() {
                 }
             }
         }
-
-        worldPanel.addMouseListener(object : MouseAdapter() {
-            override fun mouseClicked(event: MouseEvent) {
-                if (!event.component.isEnabled) return
-
-                if (SwingUtilities.isLeftMouseButton(event)) {
-                    if (worldPanel.leftWorld == null) {
-                        val x = event.x / worldPanel.tileSize
-                        val y = event.y / worldPanel.tileSize
-
-                        val world = virtualMachine.world.toggleBeeper(x, y)
-                        virtualMachine.world = world
-                        worldPanel.world = world
-                    }
-                }
-            }
-        })
 
         snippetPanel.undo.addActionListener {
             editor.undo()

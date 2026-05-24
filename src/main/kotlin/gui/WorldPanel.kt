@@ -2,7 +2,6 @@ package gui
 
 import freditor.Fronts
 import logic.World
-import logic.WorldDiff
 import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.event.MouseAdapter
@@ -19,20 +18,8 @@ class WorldPanel(initialWorld: World) : JComponent() {
 
     var world = initialWorld
         set(new) {
-            val old = field
-            if (old === new) return
             field = new
-
-            if (!old.floorPlan.sameAs(new.floorPlan)) {
-                paintImmediately(0, 0, width, height)
-                return
-            }
-
-            WorldDiff(old, new, binaryLines).run {
-                if (!isEmpty()) {
-                    paintImmediately(left * tileSize, top * tileSize, width() * tileSize, height() * tileSize)
-                }
-            }
+            paintImmediately(0, 0, width, height)
         }
 
     private var folder: String = if (screenHeight < 1000) FOLDER_40 else FOLDER_64
@@ -153,6 +140,23 @@ class WorldPanel(initialWorld: World) : JComponent() {
                 if (!event.component.isEnabled) return
 
                 if (SwingUtilities.isLeftMouseButton(event)) {
+                    if (leftWorld == null) {
+                        val x = event.x / tileSize
+                        val y = event.y / tileSize
+                        world.toggleBeeper(x, y)
+
+                        if (binaryLines == 0) {
+                            // just paint cell
+                            paintImmediately(x * tileSize, y * tileSize, tileSize, tileSize)
+                        } else if (x != 0 || y != 9) {
+                            // paint sum to cell
+                            paintImmediately(0, y * tileSize, (x + 1) * tileSize, tileSize)
+                        } else {
+                            // paint sums and 128s
+                            paintImmediately(0, 0, 3 * tileSize, height)
+                        }
+                        return
+                    }
                     leftWorld?.let {
                         world = it
                         return

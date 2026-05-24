@@ -48,45 +48,45 @@ class Week3Test : WorldTestBase() {
     @Test
     fun findShelters() {
         executeGoal(Problem.findShelters)
-        var floodWorld = initialWorld
-        val floorPlan = floodWorld.floorPlan
+        initialWorld.clone().apply {
+            // mark reachable positions with beepers
+            fun floodFill(position: Int) {
+                if (beeperAt(position)) return
 
-        // mark reachable positions with beepers
-        fun floodFill(position: Int) {
-            if (floodWorld.beeperAt(position)) return
+                dropBeeper(position)
 
-            floodWorld = floodWorld.dropBeeper(position)
-
-            if (floorPlan.isClear(position, EAST)) {
-                floodFill(position + 1)
-            }
-            if (floorPlan.isClear(position, NORTH)) {
-                floodFill(position - 10)
-            }
-            if (floorPlan.isClear(position, WEST)) {
-                floodFill(position - 1)
-            }
-            if (floorPlan.isClear(position, SOUTH)) {
-                floodFill(position + 10)
-            }
-        }
-        floodFill(world.position)
-
-        // remove beepers from shelters
-        for (position in 0 until 100) {
-            if (floodWorld.beeperAt(position)) {
-                when (floorPlan.wallsAt(position)) {
-                    0b1111,
-                    0b0111,
-                    0b1011,
-                    0b1101,
-                    0b1110 -> floodWorld = floodWorld.pickBeeper(position)
+                if (floorPlan.isClear(position, EAST)) {
+                    floodFill(position + 1)
+                }
+                if (floorPlan.isClear(position, NORTH)) {
+                    floodFill(position - 10)
+                }
+                if (floorPlan.isClear(position, WEST)) {
+                    floodFill(position - 1)
+                }
+                if (floorPlan.isClear(position, SOUTH)) {
+                    floodFill(position + 10)
                 }
             }
-        }
 
-        assertEquals(floodWorld.beepersHi, world.beepersHi)
-        assertEquals(floodWorld.beepersLo, world.beepersLo)
+            floodFill(position)
+
+            // remove beepers from shelters
+            for (position in 0 until 100) {
+                if (beeperAt(position)) {
+                    when (floorPlan.wallsAt(position)) {
+                        0b1111,
+                        0b0111,
+                        0b1011,
+                        0b1101,
+                        0b1110 -> pickBeeper(position)
+                    }
+                }
+            }
+
+            assertEquals(beepersLo, world.beepersLo)
+            assertEquals(beepersHi, world.beepersHi)
+        }
     }
 
     @Test
