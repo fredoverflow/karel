@@ -58,18 +58,18 @@ class Problem(
             return world
         }
 
-        private fun randomByte(index: Int, rng: WorldEntropy): World {
+        private fun randomByte(index: Int, entropy: WorldEntropy): World {
             var world = FloorPlan.binary[index].world()
 
-            world = world.withBeepers(0, rng.nextInt(256).shl(2).toLong())
+            world = world.withBeepers(0, entropy.nextByte().shl(2).toLong())
 
             return world.withKarelAt(9, 0, WEST)
         }
 
-        private fun randomBytes(index: Int, rng: WorldEntropy, direction: Int): World {
+        private fun randomBytes(index: Int, entropy: WorldEntropy, direction: Int): World {
             var world = FloorPlan.binary[index].world()
 
-            world = world.withBeepers(0, (rng.nextInt(256).shl(2) + rng.nextInt(256).shl(12)).toLong())
+            world = world.withBeepers(0, (entropy.nextByte().shl(2) + entropy.nextByte().shl(12)).toLong())
 
             return world.withKarelAt(9, 0, direction)
         }
@@ -245,11 +245,11 @@ class Problem(
             0,
             TWO.pow(10),
         ) { id ->
-            val rng = WorldEntropy(id)
+            val entropy = WorldEntropy(id)
             val builder = FloorPlan.empty.builder()
 
             for (x in 0..9) {
-                if (rng.nextBoolean()) {
+                if (entropy.nextBoolean()) {
                     builder.buildHorizontalWall(x, 9)
                 } else {
                     builder.buildVerticalWall(x, 9)
@@ -348,11 +348,11 @@ class Problem(
             0,
             3.toBigInteger().pow(10),
         ) { id ->
-            val rng = WorldEntropy(id)
+            val entropy = WorldEntropy(id)
             val builder = FloorPlan.empty.builder()
 
             for (x in 0..9) {
-                builder.buildHorizontalWall(x, 1 + rng.nextInt(3))
+                builder.buildHorizontalWall(x, 1 + entropy.nextInt(3))
             }
             val world = builder.world().withBeepers(1023L.shl(90 - 64), 0L)
             world.withKarelAt(0, 9, EAST)
@@ -440,12 +440,12 @@ class Problem(
             0,
             3920.toBigInteger(),
         ) { id ->
-            val rng = WorldEntropy(id)
+            val entropy = WorldEntropy(id)
             val builder = FloorPlan.empty.builder()
 
             val upPermutations =
                 "5432643265326542654374327532754275437632764276437652765376548432853285428543863286428643865286538654873287428743875287538754876287638764876594329532954295439632964296439652965396549732974297439752975397549762976397649765983298429843985298539854986298639864986598729873987498759876"
-            val up = rng.nextInt(upPermutations.length / 4) * 4
+            val up = entropy.nextInt(upPermutations.length / 4) * 4
             val y1 = upPermutations[up] - '0'
             val y2 = upPermutations[up + 1] - '0'
             val y3 = upPermutations[up + 2] - '0'
@@ -465,7 +465,7 @@ class Problem(
 
             val downPermutations =
                 "234235236237238239245246247248249256257258259267268269278279289345346347348349356357358359367368369378379389456457458459467468469478479489567568569578579589678679689789"
-            val down = rng.nextInt(downPermutations.length / 3) * 3
+            val down = entropy.nextInt(downPermutations.length / 3) * 3
             val y5 = downPermutations[down] - '0'
             val y6 = downPermutations[down + 1] - '0'
             val y7 = downPermutations[down + 2] - '0'
@@ -494,19 +494,19 @@ class Problem(
             0,
             14400.toBigInteger(),
         ) { id ->
-            val rng = WorldEntropy(id)
+            val entropy = WorldEntropy(id)
             var world = emptyWorld
 
-            val zeroToEight = rng.nextInt(9)
-            when (rng.nextInt(4)) {
+            val zeroToEight = entropy.nextInt(9)
+            when (entropy.nextDirection()) {
                 NORTH -> world = world.dropBeeper(zeroToEight, 0)
                 EAST -> world = world.dropBeeper(9, zeroToEight)
                 SOUTH -> world = world.dropBeeper(9 - zeroToEight, 9)
                 WEST -> world = world.dropBeeper(0, 9 - zeroToEight)
             }
-            val x = rng.nextInt(10)
-            val y = rng.nextInt(10)
-            val dir = rng.nextInt(4)
+            val x = entropy.nextInt(10)
+            val y = entropy.nextInt(10)
+            val dir = entropy.nextDirection()
             world.withKarelAt(x, y, dir)
         }
 
@@ -608,11 +608,11 @@ class Problem(
             0,
             3.toBigInteger().pow(10),
         ) { id ->
-            val rng = WorldEntropy(id)
+            val entropy = WorldEntropy(id)
             val builder = FloorPlan.trap.builder()
 
             for (x in 0..9) {
-                builder.buildHorizontalWall(x, 1 + rng.nextInt(3))
+                builder.buildHorizontalWall(x, 1 + entropy.nextInt(3))
             }
             val world = builder.world().withBeepers(1023L.shl(80 - 64), 0L)
             world.withKarelAt(0, 8, EAST)
@@ -629,12 +629,12 @@ class Problem(
             0,
             3.toBigInteger().pow(10),
         ) { id ->
-            val rng = WorldEntropy(id)
+            val entropy = WorldEntropy(id)
             val builder = FloorPlan.trap.builder()
             var world = builder.world()
 
             for (x in 0..9) {
-                val y = 1 + rng.nextInt(3)
+                val y = 1 + entropy.nextInt(3)
                 builder.buildHorizontalWall(x, y)
                 world = world.dropBeeper(x, y)
             }
