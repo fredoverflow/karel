@@ -1,7 +1,6 @@
 package logic
 
 import java.math.BigInteger
-import kotlin.random.Random
 
 val UNKNOWN = 0.toBigInteger()
 val ONE = 1.toBigInteger()
@@ -27,14 +26,17 @@ class Problem(
     val isRandom: Boolean
         get() = numWorlds != ONE
 
+    private val random = KnuthRandom()
+
     fun randomWorld(): World {
-        return createWorld(Random.nextInt().ushr(1))
+        return createWorld(random.nextIntBits(16))
     }
 
     fun randomWorlds(): Sequence<World> = when (numWorlds) {
+
         ONE -> sequenceOf(createWorld(0))
 
-        in SHUFFLE -> (0 until numWorlds.toInt()).asSequence().shuffled().map(createWorld)
+        in SHUFFLE -> random.shuffle(numWorlds.toInt()).asSequence().map(createWorld)
 
         else -> generateSequence { createWorld(0) }
     }
@@ -47,11 +49,11 @@ class Problem(
 
         val emptyWorld: World = FloorPlan.empty.world()
 
-        private fun pillars(): World {
+        private fun pillars(random: KnuthRandom): World {
             var world = emptyWorld
 
             for (x in 0..9) {
-                for (y in Random.nextInt(11)..9) {
+                for (y in random.nextInt(11)..9) {
                     world = world.dropBeeper(x, y)
                 }
             }
@@ -259,7 +261,7 @@ class Problem(
             builder.world().withKarelAt(0, 8, EAST)
         }
 
-        val cleanTheRoom = Problem(
+        val cleanTheRoom: Problem = Problem(
             "1.3.3",
             "",
             "cleanTheRoom",
@@ -270,9 +272,10 @@ class Problem(
             0,
             TWO.pow(100),
         ) {
+            val random = cleanTheRoom.random
             var world = emptyWorld
 
-            world = world.withBeepers(Random.nextLong(), Random.nextLong())
+            world = world.withBeepers(random.nextLongBits(36), random.nextLong())
 
             world.withKarelAt(0, 9, EAST)
         }
@@ -373,7 +376,7 @@ class Problem(
             world.withKarelAt(5, 4, WEST)
         }
 
-        val cleanTheTunnels = Problem(
+        val cleanTheTunnels: Problem = Problem(
             "2.1.3",
             "",
             "cleanTheTunnels",
@@ -384,7 +387,7 @@ class Problem(
             0,
             11.toBigInteger().pow(10),
         ) {
-            pillars().withKarelAt(0, 9, EAST)
+            pillars(cleanTheTunnels.random).withKarelAt(0, 9, EAST)
         }
 
         val increment = Problem(
@@ -510,7 +513,7 @@ class Problem(
             world.withKarelAt(x, y, dir)
         }
 
-        val jumpTheHurdles = Problem(
+        val jumpTheHurdles: Problem = Problem(
             "2.3.3",
             "",
             "jumpTheHurdles",
@@ -521,18 +524,19 @@ class Problem(
             0,
             1111100000.toBigInteger(),
         ) {
-            val xBeeper = 5 + Random.nextInt(5)
+            val random = jumpTheHurdles.random
+            val xBeeper = 5 + random.nextInt(5)
             val builder = FloorPlan.empty.builder()
 
             for (x in 1..xBeeper) {
-                for (y in 0 until Random.nextInt(10)) {
+                for (y in 0 until random.nextInt(10)) {
                     builder.buildVerticalWall(x, 9 - y)
                 }
             }
             builder.world().dropBeeper(xBeeper, 9).withKarelAt(0, 9, EAST)
         }
 
-        val solveTheMaze = Problem(
+        val solveTheMaze: Problem = Problem(
             "2.4.1",
             "",
             "solveTheMaze",
@@ -543,11 +547,12 @@ class Problem(
             0,
             UNKNOWN,
         ) {
+            val random = solveTheMaze.random
             val builder = FloorPlan.maze.builder()
             var world = builder.world().fillWithBeepers()
 
             fun generateMaze() {
-                val angle = Random.nextInt(4)
+                val angle = random.nextIntBits(2)
                 world = world.pickBeeper().turn(angle)
                 repeat(4) {
                     if (world.beeperAhead()) {
@@ -564,12 +569,12 @@ class Problem(
             }
 
             generateMaze()
-            val x = Random.nextInt(10)
-            val y = Random.nextInt(10)
+            val x = random.nextInt(10)
+            val y = random.nextInt(10)
             world.dropBeeper(x, y).withKarelAt(0, 0, EAST)
         }
 
-        val quantizeBits = Problem(
+        val quantizeBits: Problem = Problem(
             "2.4.2",
             "",
             "quantizeBits",
@@ -580,7 +585,7 @@ class Problem(
             0,
             11.toBigInteger().pow(10),
         ) {
-            pillars().withKarelAt(0, 9, EAST)
+            pillars(quantizeBits.random).withKarelAt(0, 9, EAST)
         }
 
         val addFast = Problem(
@@ -641,7 +646,7 @@ class Problem(
             world.withKarelAt(0, 8, EAST)
         }
 
-        val secureTheCave = Problem(
+        val secureTheCave: Problem = Problem(
             "3.2.1",
             "",
             "secureTheCave",
@@ -652,13 +657,14 @@ class Problem(
             0,
             9.toBigInteger().pow(10),
         ) {
+            val random = secureTheCave.random
             val builder = FloorPlan.empty.builder()
             var world = builder.world()
 
             for (x in 0..9) {
-                val y = 1 + Random.nextInt(3)
+                val y = 1 + random.nextInt(3)
                 builder.buildHorizontalWall(x, y)
-                for (a in y..y + Random.nextInt(3)) {
+                for (a in y..y + random.nextInt(3)) {
                     world = world.dropBeeper(x, a)
                 }
             }
@@ -679,7 +685,7 @@ class Problem(
             emptyWorld.withKarelAt(0, 9, EAST)
         }
 
-        val findShelters = Problem(
+        val findShelters: Problem = Problem(
             "3.3.1",
             "",
             "findShelters",
@@ -690,15 +696,16 @@ class Problem(
             0,
             UNKNOWN,
         ) {
+            val random = findShelters.random
             val builder = FloorPlan.empty.builder()
 
             repeat(25) {
-                builder.buildHorizontalWall(Random.nextInt(10), 1 + Random.nextInt(9))
-                builder.buildVerticalWall(1 + Random.nextInt(9), Random.nextInt(10))
+                builder.buildHorizontalWall(random.nextInt(10), 1 + random.nextInt(9))
+                builder.buildVerticalWall(1 + random.nextInt(9), random.nextInt(10))
             }
-            val x = Random.nextInt(10)
-            val y = Random.nextInt(10)
-            val dir = Random.nextInt(4)
+            val x = random.nextInt(10)
+            val y = random.nextInt(10)
+            val dir = random.nextIntBits(2)
             builder.world().withKarelAt(x, y, dir)
         }
 

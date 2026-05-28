@@ -84,8 +84,10 @@ private val permutationsOfDirections = intArrayOf(
     0x18ffe801,         // SOUTH, WEST, NORTH, EAST,
 )
 
+private val random = KnuthRandom()
+
 private inline fun forEachDirection(block: (Int) -> Unit) {
-    val directions = permutationsOfDirections[kotlin.random.Random.nextInt(24)]
+    val directions = permutationsOfDirections[random.nextInt(24)]
 
     block(directions shr 24)
     block(directions shl 8 shr 24)
