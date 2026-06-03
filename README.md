@@ -59,7 +59,7 @@ Most problems stem from skipping or misunderstanding important steps.
 
 5. Click Next, Next, Install, Finish
 
-6. Click [karel.jar](https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar) to download Karel<br>
+6. Click [karel.jar](https://raw.githubusercontent.com/fredoverflow/fredoverflow.github.io/master/karel/karel.jar) to download Karel<br>
 **If Karel fails to download**, continue with ⚠️ Troubleshooting *Windows*, or ⚠️ Troubleshooting *macOS*
 
 7. Open the `Downloads` folder and double-click `karel.jar` to start Karel<br>
@@ -75,7 +75,7 @@ Steps 1 through 5 (install Java) worked, but steps 6 (download Karel) or 7 (star
 ```cmd
 cd Downloads
 if exist karel.jar.zip erase karel.jar.zip
-curl -o karel.jar https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar
+curl -o karel.jar https://raw.githubusercontent.com/fredoverflow/fredoverflow.github.io/master/karel/karel.jar
 echo java -version > karel.cmd
 echo java -jar karel.jar >> karel.cmd
 karel.cmd
@@ -98,7 +98,7 @@ Steps 1 through 5 (install Java) worked, but steps 6 (download Karel) or 7 (star
 - Click that button to copy the script
 ```sh
 cd Downloads
-curl -o karel.jar https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar
+curl -o karel.jar https://raw.githubusercontent.com/fredoverflow/fredoverflow.github.io/master/karel/karel.jar
 chmod +x karel.jar
 echo java -version > karel.sh
 echo java -jar karel.jar >> karel.sh
@@ -119,7 +119,7 @@ Feel free to move `karel.jar` and `karel.sh` to the Desktop or any other folder 
 ```sh
 sudo apt install default-jdk
 cd Downloads
-curl -o karel.jar https://raw.githubusercontent.com/fredoverflow/karel/release/karel.jar
+curl -o karel.jar https://raw.githubusercontent.com/fredoverflow/fredoverflow.github.io/master/karel/karel.jar
 chmod +x karel.jar
 echo java -version > karel.sh
 echo java -jar -Dsun.java2d.opengl=True karel.jar >> karel.sh
