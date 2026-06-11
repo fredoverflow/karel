@@ -95,20 +95,10 @@ private inline fun forEachDirection(block: (Int) -> Unit) {
     block(directions shl 24 shr 24)
 }
 
-private const val BACKTRACK = 0
-private const val BACKTRACK_BUDGET_EXHAUSTED = -1
+abstract class Generator {
+    protected var labyrinth = logic.labyrinth
 
-object LabyrinthGenerator {
-    private var labyrinth = logic.labyrinth
-    private var backtrackBudget = 0
-
-    fun generateLabyrinth(): World {
-        var destination: Int
-        do {
-            labyrinth = logic.labyrinth.clone()
-            backtrackBudget = 1000
-            destination = destinationOpen(ORIGIN, EAST, 99)
-        } while (destination == BACKTRACK_BUDGET_EXHAUSTED)
+    protected fun walls(): ByteArray {
 
         val walls = ByteArray(100)
         var i = 0
@@ -128,11 +118,29 @@ object LabyrinthGenerator {
             }
             position += NEIGHBOUR_Y - 10 * NEIGHBOUR_X
         }
+        return walls
+    }
+}
+
+private const val BACKTRACK = 0
+private const val BACKTRACK_BUDGET_EXHAUSTED = -1
+
+object LabyrinthGenerator : Generator() {
+
+    private var backtrackBudget = 0
+
+    fun generateLabyrinth(): World {
+        var destination: Int
+        do {
+            labyrinth = logic.labyrinth.clone()
+            backtrackBudget = 1000
+            destination = destinationOpen(ORIGIN, EAST, 99)
+        } while (destination == BACKTRACK_BUDGET_EXHAUSTED)
 
         val y = destination / NEIGHBOUR_Y
         val x = destination % NEIGHBOUR_Y / NEIGHBOUR_X
 
-        return FloorPlan(walls).world().dropBeeper(x - 1, y - 1)
+        return FloorPlan(walls()).world().dropBeeper(x - 1, y - 1)
     }
 
     private fun isUncharted(position: Int): Boolean {
@@ -259,5 +267,32 @@ object LabyrinthGenerator {
         labyrinth[position + NEIGHBOUR_Y]++
 
         return BACKTRACK
+    }
+}
+
+object MazeGenerator : Generator() {
+
+    fun generateMaze(): World {
+        labyrinth = logic.labyrinth.clone()
+
+        generate(ORIGIN)
+
+        val x = random.nextInt(10)
+        val y = random.nextInt(10)
+
+        return FloorPlan(walls()).world().dropBeeper(x, y)
+    }
+
+    private fun generate(position: Int) {
+        labyrinth[position] = CHARTED
+
+        forEachDirection { dir ->
+            val neighbour = position + 2 * dir
+            if (labyrinth[neighbour] != CHARTED) {
+                val wall = position + dir
+                labyrinth[wall] = FREE
+                generate(neighbour)
+            }
+        }
     }
 }

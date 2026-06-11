@@ -536,7 +536,7 @@ class Problem(
             builder.world().dropBeeper(xBeeper, 9).withKarelAt(0, 9, EAST)
         }
 
-        val solveTheMaze: Problem = Problem(
+        val solveTheMaze = Problem(
             "2.4.1",
             "",
             "solveTheMaze",
@@ -547,31 +547,7 @@ class Problem(
             0,
             UNKNOWN,
         ) {
-            val random = solveTheMaze.random
-            val builder = FloorPlan.maze.builder()
-            var world = builder.world().fillWithBeepers()
-
-            fun generateMaze() {
-                val angle = random.nextIntBits(2)
-                world = world.pickBeeper().turn(angle)
-                repeat(4) {
-                    if (world.beeperAhead()) {
-                        builder.tearDownWall(world.position, world.direction)
-                        world = world.moveForward()
-                        generateMaze()
-                        world = world.turnAround()
-                        builder.tearDownWall(world.position, world.direction)
-                        world = world.moveForward().turnAround()
-                    }
-                    world = world.turnLeft()
-                }
-                world = world.turn(4 - angle)
-            }
-
-            generateMaze()
-            val x = random.nextInt(10)
-            val y = random.nextInt(10)
-            world.dropBeeper(x, y).withKarelAt(0, 0, EAST)
+            MazeGenerator.generateMaze()
         }
 
         val quantizeBits: Problem = Problem(
