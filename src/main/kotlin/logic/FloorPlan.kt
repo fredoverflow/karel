@@ -39,7 +39,6 @@ value class FloorPlan(private val walls: ByteArray) {
         private const val C: Byte = 12
         private const val D: Byte = 13
         private const val E: Byte = 14
-        private const val F: Byte = 15
 
         val empty = FloorPlan(
             6, 2, 2, 2, 2, 2, 2, 2, 2, 3,
@@ -106,19 +105,6 @@ value class FloorPlan(private val walls: ByteArray) {
             C, 9, C, 8, 8, 8, 8, 8, 9, D,
         )
 
-        val maze = FloorPlan(
-            F, F, F, F, F, F, F, F, F, F,
-            F, F, F, F, F, F, F, F, F, F,
-            F, F, F, F, F, F, F, F, F, F,
-            F, F, F, F, F, F, F, F, F, F,
-            F, F, F, F, F, F, F, F, F, F,
-            F, F, F, F, F, F, F, F, F, F,
-            F, F, F, F, F, F, F, F, F, F,
-            F, F, F, F, F, F, F, F, F, F,
-            F, F, F, F, F, F, F, F, F, F,
-            F, F, F, F, F, F, F, F, F, F,
-        )
-
         val binary: Array<FloorPlan> = byteArrayOf(
             0, 6, 2, 2, 2, 2, 2, 2, 2, 3,
             0, 4, 0, 0, 0, 0, 0, 0, 0, 1,
@@ -175,11 +161,6 @@ value class FloorBuilder(private val walls: ByteArray) {
         if (x > 0) {
             walls[position - 1] = (walls[position - 1].toInt() or FloorPlan.WALL_EAST).toByte()
         }
-        return this
-    }
-
-    fun tearDownWall(position: Int, direction: Int): FloorBuilder {
-        walls[position] = (walls[position].toInt() and (1 shl direction).inv()).toByte()
         return this
     }
 
