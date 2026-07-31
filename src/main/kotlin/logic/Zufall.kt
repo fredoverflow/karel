@@ -28,16 +28,4 @@ class Zufall {
     fun nextInt(bound: Int): Int {
         return ((next() ushr 16) * bound ushr -16).toInt()
     }
-
-    fun shuffle(size: Int): IntArray {
-        val a = IntArray(size) { index -> index }
-        var n = size
-        while (n > 1) {
-            val i = nextInt(n--)
-            val temp = a[i]
-            a[i] = a[n]
-            a[n] = temp
-        }
-        return a
-    }
 }

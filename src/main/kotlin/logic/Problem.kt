@@ -36,9 +36,24 @@ class Problem(
 
         ONE -> sequenceOf(createWorld(0))
 
-        in SHUFFLE -> random.shuffle(numWorlds.toInt()).asSequence().map(createWorld)
+        in SHUFFLE -> shuffledWorlds()
 
         else -> generateSequence { createWorld(0) }
+    }
+
+    private fun shuffledWorlds(): Sequence<World> {
+
+        var n = numWorlds.toInt()
+        val a = IntArray(n) { index -> index }
+
+        return generateSequence {
+            if (n == 0) return@generateSequence null
+
+            val i = random.nextInt(n)
+            val world = createWorld(a[i])
+            a[i] = a[--n]
+            world
+        }
     }
 
     companion object {
