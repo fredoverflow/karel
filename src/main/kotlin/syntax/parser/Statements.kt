@@ -62,6 +62,7 @@ fun Parser.statement(): Statement = when (current) {
         accept(),
         parenthesized { expect(NUMBER).toInt(2 until 256) },
         block(),
+        optional(BETWEEN, ::block),
     )
 
     WHILE -> While(

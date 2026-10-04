@@ -45,10 +45,11 @@ class SnippetPanel : JPanel() {
             Snippet("repeat 10", "repeat (10)"),
             Snippet("repeat 99", "repeat (99)"),
             Snippet("repeat 100", "repeat (100)"),
+            Snippet("... between", "between"),
         )
     ).sansSerif().apply {
         maximumSize = minimumSize
-        maximumRowCount = 11
+        maximumRowCount = 12
     }
 
     val ifs = JComboBox(
