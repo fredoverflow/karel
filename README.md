@@ -209,27 +209,58 @@ Deciding when a sequence of commands is worth extracting and choosing a good nam
 
 Instead of writing the same sequence of commands multiple times:
 ```
-void dance()
+moveForward();
+turnLeft();
+
+moveForward();
+turnLeft();
+
+moveForward();
+turnLeft();
+
+moveForward();
+turnLeft();
+```
+you can use `repeat` and only write it once:
+```
+repeat (4)
 {
-    moveForward();
-    turnLeft();
-    moveForward();
-    turnLeft();
-    moveForward();
-    turnLeft();
     moveForward();
     turnLeft();
 }
 ```
-you can use `repeat` and only write it once:
+
+### Between
+
+Have you ever seen this pattern in your code?
 ```
-void dance()
+repeat (9)
 {
-    repeat (4)
+    solveColumn();     // solve columns 1..9
+    moveForward();     // move between columns
+}
+solveColumn();         // solve column 10
+```
+Or this pattern?
+```
+repeat (10)
+{
+    solveColumn();     // solve columns 1..10
+    if (frontIsClear())
     {
-        moveForward();
-        turnLeft();
+        moveForward(); // move between columns
     }
+}
+```
+Since October 2026, these patterns are no longer necessary!
+```
+repeat (10)
+{
+    solveColumn(); // 10 times
+}
+between
+{
+    moveForward(); //  9 times
 }
 ```
 

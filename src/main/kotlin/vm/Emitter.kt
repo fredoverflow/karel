@@ -72,9 +72,19 @@ class Emitter(private val sema: Sema, instrument: Boolean) {
 
             is Repeat -> {
                 emitInstruction(PUSH + times, repeat)
-                val back = pc
-                body.emit()
-                emitInstruction(LOOP + back, body.closingBrace)
+                if (between == null) {
+                    val back = pc
+                    body.emit()
+                    emitInstruction(LOOP + back, body.closingBrace)
+                } else {
+                    val bodyLabel = Label()
+                    emitInstruction(JUMP, body.openingBrace).label = bodyLabel
+                    val back = pc
+                    between.emit()
+                    bodyLabel.address = pc
+                    body.emit()
+                    emitInstruction(LOOP + back, body.closingBrace)
+                }
             }
 
             is While -> {

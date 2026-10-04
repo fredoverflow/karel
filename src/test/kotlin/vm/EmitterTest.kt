@@ -125,6 +125,60 @@ class EmitterTest {
     }
 
     @Test
+    fun between() {
+        assertBytecode(
+            """
+            void main() {
+                repeat (7) {
+                    moveForward();
+                } between {
+                    pickBeeper();
+                }
+            }
+            """,
+            PUSH + 7,
+            JUMP + 0x103,
+            PICK_BEEPER,
+            MOVE_FORWARD,
+            LOOP + 0x102,
+            RETURN,
+        )
+    }
+
+    @Test
+    fun nestedBetween() {
+        assertBytecode(
+            """
+            void main() {
+                repeat (2) {
+                    repeat (7) {
+                        moveForward();
+                    } between {
+                        pickBeeper();
+                    }
+                } between {
+                    turnLeft();
+                    moveForward();
+                    turnLeft();
+                }
+            }
+            """,
+            PUSH + 2,
+            JUMP + 0x105,
+            TURN_LEFT,
+            MOVE_FORWARD,
+            TURN_LEFT,
+            PUSH + 7,
+            JUMP + 0x108,
+            PICK_BEEPER,
+            MOVE_FORWARD,
+            LOOP + 0x107,
+            LOOP + 0x102,
+            RETURN,
+        )
+    }
+
+    @Test
     fun ifThenTrue() {
         assertBytecode(
             """

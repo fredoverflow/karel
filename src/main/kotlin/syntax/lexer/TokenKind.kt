@@ -3,6 +3,7 @@ package syntax.lexer
 enum class TokenKind(val lexeme: String) {
     VOID("void"),
     REPEAT("repeat"),
+    BETWEEN("between"),
     IF("if"),
     ELSE("else"),
     WHILE("while"),
