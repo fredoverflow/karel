@@ -34,20 +34,21 @@ class SnippetPanel : JPanel() {
 
     val repeats = JComboBox(
         arrayOf(
-            Snippet("repeat 2", "repeat (2"),
-            Snippet("repeat 3", "repeat (3"),
-            Snippet("repeat 4", "repeat (4"),
-            Snippet("repeat 5", "repeat (5"),
-            Snippet("repeat 6", "repeat (6"),
-            Snippet("repeat 8", "repeat (8"),
-            Snippet("repeat 9", "repeat (9"),
-            Snippet("repeat 10", "repeat (10"),
-            Snippet("repeat 99", "repeat (99"),
-            Snippet("repeat 100", "repeat (100"),
+            Snippet("repeat 2", "repeat (2)"),
+            Snippet("repeat 3", "repeat (3)"),
+            Snippet("repeat 4", "repeat (4)"),
+            Snippet("repeat 5", "repeat (5)"),
+            Snippet("repeat 6", "repeat (6)"),
+            Snippet("repeat 7", "repeat (7)"),
+            Snippet("repeat 8", "repeat (8)"),
+            Snippet("repeat 9", "repeat (9)"),
+            Snippet("repeat 10", "repeat (10)"),
+            Snippet("repeat 99", "repeat (99)"),
+            Snippet("repeat 100", "repeat (100)"),
         )
     ).sansSerif().apply {
         maximumSize = minimumSize
-        maximumRowCount = 10
+        maximumRowCount = 11
     }
 
     val ifs = JComboBox(

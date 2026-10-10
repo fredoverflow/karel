@@ -53,7 +53,7 @@ class Editor(freditor: Freditor) : FreditorUI(freditor, 60, 1) {
         }
     }
 
-    fun insertSnippet(beforeCursor: String, beforeSelection: String, afterSelection: String) {
+    fun insertSnippet(beforeCursor: String, beforeSelection: String, afterSelection: String, staticHeader: Boolean) {
         if (selectionIsEmpty()) {
             if (lineIsBlankBefore(selectionStart())) {
                 insert(beforeCursor, beforeSelection, afterSelection)
@@ -61,6 +61,9 @@ class Editor(freditor: Freditor) : FreditorUI(freditor, 60, 1) {
                 simulateEnter()
                 insert(beforeCursor, beforeSelection, afterSelection)
                 uncommit()
+            }
+            if (staticHeader) {
+                setCursorTo(cursor() + beforeSelection.length)
             }
         } else {
             balanceSelection()

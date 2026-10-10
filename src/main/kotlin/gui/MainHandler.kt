@@ -216,13 +216,13 @@ class MainHandler : MainFlow() {
         snippetPanel.repeats.addPopupMenuListener(clearAndFocus)
         snippetPanel.repeats.addActionListener {
             val snippet = snippetPanel.repeats.selectedItem as Snippet
-            editor.insertSnippet(snippet.code, ")\n{\n", "\n}")
+            editor.insertSnippet(snippet.code, "\n{\n", "\n}", true)
         }
 
         snippetPanel.ifs.addPopupMenuListener(clearAndFocus)
         snippetPanel.ifs.addActionListener {
             val snippet = snippetPanel.ifs.selectedItem as Snippet
-            editor.insertSnippet("if (", ")\n{\n", snippet.code)
+            editor.insertSnippet("if (", ")\n{\n", snippet.code, false)
         }
 
         snippetPanel.conditions.addPopupMenuListener(clearAndFocus)
@@ -232,7 +232,7 @@ class MainHandler : MainFlow() {
         }
 
         snippetPanel.`while`.addActionListener {
-            editor.insertSnippet("while (", ")\n{\n", "\n}")
+            editor.insertSnippet("while (", ")\n{\n", "\n}", false)
 
             editor.clearDiagnostics()
             editor.requestFocusInWindow()
