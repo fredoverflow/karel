@@ -78,14 +78,15 @@ class Emitter(private val sema: Sema, instrument: Boolean) {
             }
 
             is While -> {
-                val thenLabel = Label()
-                val elseLabel = Label()
-                val back = pc
-                condition.emitPositive(thenLabel, elseLabel, ELSE, elseLabel, whi1e)
-                thenLabel.address = pc
+                val bodyLabel = Label()
+                val checkLabel = Label()
+                val doneLabel = Label()
+                emitInstruction(JUMP, whi1e).label = checkLabel
+                bodyLabel.address = pc
                 body.emit()
-                emitInstruction(JUMP + back, body.closingBrace)
-                elseLabel.address = pc
+                checkLabel.address = pc
+                condition.emitPositive(bodyLabel, doneLabel, THEN, bodyLabel, whi1e)
+                doneLabel.address = pc
             }
 
             is IfThenElse -> emit()

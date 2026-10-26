@@ -339,10 +339,10 @@ class EmitterTest {
                 }
             }
             """,
-            BEEPER_AHEAD, ELSE + 0x105,
+            JUMP + 0x103,
             MOVE_FORWARD,
             PICK_BEEPER,
-            JUMP + 0x100,
+            BEEPER_AHEAD, THEN + 0x101,
             RETURN,
         )
     }

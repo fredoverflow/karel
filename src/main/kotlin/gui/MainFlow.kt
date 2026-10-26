@@ -32,7 +32,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
     var initialWorld: World = worldPanel.world.clone()
 
-    var virtualMachine = VirtualMachine(emptyArray(), worldPanel.world)
+    var virtualMachine = VirtualMachine(createGoalInstructions("karelsFirstProgram").toTypedArray(), worldPanel.world)
 
     val timer = Timer(delay()) {
         tryStep(::stepInto)

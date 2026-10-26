@@ -17,7 +17,9 @@ class VirtualMachine(
     private val onReturn: (() -> Unit)? = null,
 ) {
 
-    var pc: Int = ENTRY_POINT
+    var pc: Int = with(program[ENTRY_POINT]) {
+        if (category == JUMP) target else ENTRY_POINT
+    }
         private set
 
     val currentInstruction: Instruction
