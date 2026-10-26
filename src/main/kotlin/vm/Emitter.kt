@@ -14,6 +14,10 @@ class Emitter(private val sema: Sema, instrument: Boolean) {
     private val pc: Int
         get() = program.size
 
+    private val labels = ArrayList<Label>()
+
+    private fun label() = Label().also(labels::add)
+
     private fun emitInstruction(bytecode: Int, token: Token): Instruction {
         val instruction = Instruction(bytecode, token.start)
         program.add(instruction)
@@ -25,16 +29,26 @@ class Emitter(private val sema: Sema, instrument: Boolean) {
         emitInstruction(branch, control).label = label
     }
 
+    private fun inlineJumps() {
+        for (label in labels) {
+            val instruction = program[label.address]
+            if (instruction.category == JUMP) {
+                label.address = instruction.label!!.address
+            }
+        }
+    }
+
     private fun resolveLabels() {
         program.subList(ENTRY_POINT).forEach(Instruction::resolveLabel)
     }
 
     fun emit(main: Command): List<Instruction> {
-        commandLabels[main] = Label()
+        commandLabels[main] = label()
         main.emit()
         while (toEmit.isNotEmpty()) {
             toEmit.removeFirst().emit()
         }
+        inlineJumps()
         resolveLabels()
         return program
     }
@@ -65,22 +79,23 @@ class Emitter(private val sema: Sema, instrument: Boolean) {
                     val command = sema.command(target.lexeme)!!
                     emitInstruction(CALL, target).label = commandLabels.getOrPut(command) {
                         toEmit.addLast(command)
-                        Label()
+                        label()
                     }
                 }
             }
 
             is Repeat -> {
+                val bodyLabel = label()
                 emitInstruction(PUSH + times, repeat)
-                val back = pc
+                bodyLabel.address = pc
                 body.emit()
-                emitInstruction(LOOP + back, body.closingBrace)
+                emitInstruction(LOOP, body.closingBrace).label = bodyLabel
             }
 
             is While -> {
-                val bodyLabel = Label()
-                val checkLabel = Label()
-                val doneLabel = Label()
+                val bodyLabel = label()
+                val checkLabel = label()
+                val doneLabel = label()
                 emitInstruction(JUMP, whi1e).label = checkLabel
                 bodyLabel.address = pc
                 body.emit()
@@ -95,16 +110,16 @@ class Emitter(private val sema: Sema, instrument: Boolean) {
 
     private fun IfThenElse.emit() {
         if (e1se == null) {
-            val thenLabel = Label()
-            val elseLabel = Label()
+            val thenLabel = label()
+            val elseLabel = label()
             condition.emitPositive(thenLabel, elseLabel, ELSE, elseLabel, iF)
             thenLabel.address = pc
             th3n.emit()
             elseLabel.address = pc
         } else {
-            val thenLabel = Label()
-            val elseLabel = Label()
-            val doneLabel = Label()
+            val thenLabel = label()
+            val elseLabel = label()
+            val doneLabel = label()
             condition.emitPositive(thenLabel, elseLabel, ELSE, elseLabel, iF)
             thenLabel.address = pc
             th3n.emit()
@@ -134,14 +149,14 @@ class Emitter(private val sema: Sema, instrument: Boolean) {
             is Not -> p.emitNegative(thenLabel, elseLabel, branch xor (ELSE xor THEN), label, control)
 
             is Conjunction -> { // left && right
-                val right = Label()
+                val right = label()
                 p.emitPositive(right, elseLabel, ELSE, elseLabel, and)
                 right.address = pc
                 q.emitPositive(thenLabel, elseLabel, branch, label, control)
             }
 
             is Disjunction -> { // left || right
-                val right = Label()
+                val right = label()
                 p.emitPositive(thenLabel, right, THEN, thenLabel, or)
                 right.address = pc
                 q.emitPositive(thenLabel, elseLabel, branch, label, control)
@@ -152,14 +167,14 @@ class Emitter(private val sema: Sema, instrument: Boolean) {
     private fun Condition.emitNegative(thenLabel: Label, elseLabel: Label, branch: Int, label: Label, control: Token) {
         when (this) {
             is Disjunction -> { // !(left || right) = !left && !right
-                val right = Label()
+                val right = label()
                 p.emitNegative(right, elseLabel, THEN, elseLabel, or)
                 right.address = pc
                 q.emitNegative(thenLabel, elseLabel, branch, label, control)
             }
 
             is Conjunction -> { // !(left && right) = !left || !right
-                val right = Label()
+                val right = label()
                 p.emitNegative(thenLabel, right, ELSE, thenLabel, and)
                 right.address = pc
                 q.emitNegative(thenLabel, elseLabel, branch, label, control)

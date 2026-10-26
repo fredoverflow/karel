@@ -348,6 +348,86 @@ class EmitterTest {
     }
 
     @Test
+    fun nestedWhile() {
+        assertBytecode(
+            """
+            void main() {
+                while (onBeeper()) {
+                    pickBeeper();
+                    while (frontIsClear()) {
+                        moveForward();
+                    }
+                    turnLeft();
+                }
+            }
+            """,
+            JUMP + 0x107,
+            PICK_BEEPER,
+            JUMP + 0x104,
+            MOVE_FORWARD,
+            FRONT_IS_CLEAR, THEN + 0x103,
+            TURN_LEFT,
+            ON_BEEPER,
+            THEN + 0x101,
+            RETURN,
+        )
+    }
+
+    @Test
+    fun callWhile() {
+        assertBytecode(
+            """
+            void main() {
+                moveToWall();
+            }
+            
+            void moveToWall() {
+                while (frontIsClear()) {
+                    moveForward();
+                }
+            }
+            """,
+            CALL + 0x104,
+            RETURN,
+            JUMP + 0x104,
+            MOVE_FORWARD,
+            FRONT_IS_CLEAR, THEN + 0x103,
+            RETURN,
+        )
+    }
+
+    @Test
+    fun ifWhile() {
+        assertBytecode(
+            """
+            void main() {
+                if (onBeeper()) {
+                    pickBeeper();
+                } else {
+                    while (frontIsClear()) {
+                        moveForward();
+                    }
+                }
+                while (frontIsClear()) {
+                    moveForward();
+                }
+            }
+            """,
+            ON_BEEPER,
+            ELSE + 0x106,
+            PICK_BEEPER,
+            JUMP + 0x10a,
+            JUMP + 0x106,
+            MOVE_FORWARD,
+            FRONT_IS_CLEAR, THEN + 0x105,
+            JUMP + 0x10a,
+            MOVE_FORWARD,
+            FRONT_IS_CLEAR, THEN + 0x109,
+            RETURN,
+        )
+    }
+
+    @Test
     fun recursion() {
         assertBytecode(
             """
