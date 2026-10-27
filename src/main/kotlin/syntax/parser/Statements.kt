@@ -48,15 +48,27 @@ fun Parser.command(): Command {
 }
 
 fun Parser.block(): Block {
-    return Block(expect(OPENING_BRACE), list0Until(CLOSING_BRACE, ::statement), accept())
+    return Block(
+        expect(OPENING_BRACE),
+        list0Until(CLOSING_BRACE, ::statement),
+        accept(),
+    )
 }
 
 fun Parser.statement(): Statement = when (current) {
     IDENTIFIER -> sema(Call(accept().emptyParens()).semicolon())
 
-    REPEAT -> Repeat(accept(), parenthesized { expect(NUMBER).toInt(2 until 256) }, block())
+    REPEAT -> Repeat(
+        accept(),
+        parenthesized { expect(NUMBER).toInt(2 until 256) },
+        block(),
+    )
 
-    WHILE -> While(accept(), parenthesized(::disjunction), block())
+    WHILE -> While(
+        accept(),
+        parenthesized(::disjunction),
+        block(),
+    )
 
     IF -> ifThenElse()
 
@@ -76,13 +88,18 @@ fun Parser.statement(): Statement = when (current) {
 }
 
 fun Parser.ifThenElse(): IfThenElse {
-    return IfThenElse(expect(IF), parenthesized(::disjunction), block(), optional(ELSE) {
-        when (current) {
-            OPENING_BRACE -> block()
+    return IfThenElse(
+        accept(),
+        parenthesized(::disjunction),
+        block(),
+        optional(ELSE) {
+            when (current) {
+                OPENING_BRACE -> block()
 
-            IF -> ifThenElse()
+                IF -> ifThenElse()
 
-            else -> previous.error("else must be followed by { or if")
-        }
-    })
+                else -> previous.error("else must be followed by { or if")
+            }
+        },
+    )
 }
