@@ -1,11 +1,11 @@
 package vm
 
 import logic.InfiniteLoop
+import logic.StackOverflow
 import logic.World
 
-// The first instruction starts at address 256.
-// This makes it easier to distinguish addresses
-// from truth values and loop counters on the stack.
+// The first instruction starts at address 256
+// to distinguish addresses from loop counters on the stack.
 const val ENTRY_POINT = 256
 
 class VirtualMachine(
@@ -28,15 +28,15 @@ class VirtualMachine(
     val previousInstruction: Instruction
         get() = program[pc - 1]
 
-    var stack: Stack? = null
-        private set
+    private val stack = Stack(STACK_SIZE)
+
+    private var stackPointer = STACK_SIZE
 
     private var callDepth: Int = 0
 
-    private fun pop(): Int {
-        val stack = this.stack!!
-        this.stack = stack.tail
-        return stack.head
+    fun copyUsedStack(): Stack {
+        val sp = stackPointer
+        return if (sp < STACK_SIZE) stack.copyOfRange(sp, STACK_SIZE) else EMPTY_STACK
     }
 
     fun stepInto(virtualMachineVisible: Boolean) {
@@ -96,37 +96,42 @@ class VirtualMachine(
             when (category shr 12) {
                 NORM shr 12 -> return executeBasicInstruction(bytecode)
 
-                PUSH shr 12 -> executePush()
-                LOOP shr 12 -> executeLoop()
-                CALL shr 12 -> executeCall()
-                JUMP shr 12 -> pc = target
+                PUSH shr 12 -> {
+                    val sp = stackPointer - 1
+                    if (sp < 0) throw StackOverflow
+                    stack[sp] = target
+                    stackPointer = sp
+                    ++pc
+                }
+
+                LOOP shr 12 -> {
+                    val sp = stackPointer
+                    if (--stack[sp] > 0) {
+                        pc = target
+                    } else {
+                        stackPointer = sp + 1
+                        ++pc
+                    }
+                }
+
+                CALL shr 12 -> {
+                    val sp = stackPointer - 1
+                    if (sp < 0) throw StackOverflow
+                    stack[sp] = pc
+                    stackPointer = sp
+                    pc = target
+                    ++callDepth
+                    onCall?.invoke(this, findReturnInstructionAfter(target))
+                }
+
+                JUMP shr 12 -> {
+                    pc = target
+                }
 
                 else -> throw IllegalBytecode(bytecode)
             }
             return true
         }
-    }
-
-    private fun Instruction.executePush() {
-        stack = Stack.LoopCounter(target, stack)
-        ++pc
-    }
-
-    private fun Instruction.executeLoop() {
-        val remaining = pop() - 1
-        if (remaining > 0) {
-            stack = Stack.LoopCounter(remaining, stack)
-            pc = target
-        } else {
-            ++pc
-        }
-    }
-
-    private fun Instruction.executeCall() {
-        onCall?.invoke(this, findReturnInstructionAfter(target))
-        stack = Stack.ReturnAddress(pc, stack)
-        ++callDepth
-        pc = target
     }
 
     private fun findReturnInstructionAfter(start: Int): Instruction {
@@ -140,16 +145,16 @@ class VirtualMachine(
         private fun readResolve(): Any = Finished
     }
 
-    private fun executeReturn() {
-        if (stack == null) throw Finished
-        onReturn?.invoke()
-        pc = pop() + 1
-        --callDepth
-    }
-
     private fun executeBasicInstruction(bytecode: Int): Boolean {
         when (bytecode) {
-            RETURN -> executeReturn()
+            RETURN -> {
+                val sp = stackPointer
+                if (sp >= STACK_SIZE) throw Finished
+                pc = stack[sp] + 1
+                stackPointer = sp + 1
+                --callDepth
+                onReturn?.invoke()
+            }
 
             MOVE_FORWARD -> {
                 world.moveForward()

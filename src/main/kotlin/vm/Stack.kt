@@ -1,22 +1,7 @@
 package vm
 
-sealed class Stack(@JvmField val head: Int, @JvmField val tail: Stack?) {
+typealias Stack = IntArray
 
-    class ReturnAddress(head: Int, tail: Stack?) : Stack(head, tail)
+val EMPTY_STACK = Stack(0) // reusable
 
-    class LoopCounter(head: Int, tail: Stack?) : Stack(head, tail)
-
-    @JvmField
-    val size: Int = tail.size + 1
-}
-
-val Stack?.size: Int
-    get() = this?.size ?: 0
-
-inline fun Stack?.forEach(action: (Stack) -> Unit) {
-    var stack = this
-    while (stack != null) {
-        action(stack)
-        stack = stack.tail
-    }
-}
+const val STACK_SIZE = 200 // findShelters worst case
