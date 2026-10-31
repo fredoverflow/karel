@@ -22,7 +22,7 @@ class VirtualMachinePanel : JPanel() {
         bytecodeTable.setProgram(program)
     }
 
-    fun update(stack: Stack?, pc: Int) {
+    fun update(stack: Stack, pc: Int) {
         stackTable.setStack(stack)
         bytecodeTable.highlightLine(pc)
     }
