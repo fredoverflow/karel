@@ -1,6 +1,6 @@
 package gui
 
-import vm.Instruction
+import vm.Instructions
 import vm.Stack
 import javax.swing.Box
 import javax.swing.BoxLayout
@@ -9,21 +9,21 @@ import javax.swing.JPanel
 class VirtualMachinePanel : JPanel() {
 
     private val stackTable = StackTable()
-    private val bytecodeTable = BytecodeTable()
+    private val instructionTable = InstructionTable()
 
     init {
         layout = BoxLayout(this, BoxLayout.X_AXIS)
         add(verticalBoxPanel(Box.createVerticalGlue(), stackTable))
-        add(bytecodeTable)
+        add(instructionTable)
         isVisible = false
     }
 
-    fun setProgram(program: List<Instruction>) {
-        bytecodeTable.setProgram(program)
+    fun setInstructions(instructions: Instructions) {
+        instructionTable.setInstructions(instructions)
     }
 
     fun update(stack: Stack, pc: Int) {
         stackTable.setStack(stack)
-        bytecodeTable.highlightLine(pc)
+        instructionTable.highlightLine(pc)
     }
 }

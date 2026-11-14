@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test
 
 class Week1Test : WorldTestBase() {
     @Test
-    fun karelsFirstProgram() {
-        executeGoal(Problem.karelsFirstProgram)
+    fun introduction() {
+        executeGoal(Problem.introduction)
         assertKarelAt(4, 8, EAST)
         assertSoleBeeperAt(3, 8)
     }

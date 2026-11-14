@@ -4,12 +4,8 @@ import logic.InfiniteLoop
 import logic.StackOverflow
 import logic.World
 
-// The first instruction starts at address 256
-// to distinguish addresses from loop counters on the stack.
-const val ENTRY_POINT = 256
-
 class VirtualMachine(
-    private val program: Array<Instruction>,
+    private val instructions: Instructions,
     val world: World,
     private val ignoreMove: Boolean = false,
     // callbacks
@@ -17,16 +13,14 @@ class VirtualMachine(
     private val onReturn: (() -> Unit)? = null,
 ) {
 
-    var pc: Int = with(program[ENTRY_POINT]) {
-        if (category == JUMP) target else ENTRY_POINT
-    }
+    var pc: Int = with(instructions[0]) { if (operation == JUMP) operand else 0 }
         private set
 
     val currentInstruction: Instruction
-        get() = program[pc]
+        get() = instructions[pc]
 
     val previousInstruction: Instruction
-        get() = program[pc - 1]
+        get() = instructions[pc - 1]
 
     private val stack = Stack(STACK_SIZE)
 
@@ -70,7 +64,7 @@ class VirtualMachine(
         }
     }
 
-    fun executeGoalProgram() {
+    fun executeGoal() {
         while (true) {
             executeOneInstruction()
         }
@@ -93,42 +87,243 @@ class VirtualMachine(
 
     private fun executeOneInstruction(): Boolean {
         with(currentInstruction) {
-            when (category shr 12) {
-                NORM shr 12 -> return executeBasicInstruction(bytecode)
-
-                PUSH shr 12 -> {
+            when (+operation) {
+                +PUSH -> {
                     val sp = stackPointer - 1
                     if (sp < 0) throw StackOverflow
-                    stack[sp] = target
+                    stack[sp] = -operand
                     stackPointer = sp
                     ++pc
                 }
 
-                LOOP shr 12 -> {
+                +LOOP -> {
                     val sp = stackPointer
-                    if (--stack[sp] > 0) {
-                        pc = target
+                    if (++stack[sp] < 0) {
+                        pc = operand
                     } else {
                         stackPointer = sp + 1
                         ++pc
                     }
                 }
 
-                CALL shr 12 -> {
+                +CALL -> {
                     val sp = stackPointer - 1
                     if (sp < 0) throw StackOverflow
                     stack[sp] = pc
                     stackPointer = sp
-                    pc = target
+                    pc = operand
                     ++callDepth
-                    onCall?.invoke(this, findReturnInstructionAfter(target))
+                    onCall?.invoke(this, findReturnInstructionAfter(operand))
                 }
 
-                JUMP shr 12 -> {
-                    pc = target
+                +JUMP -> {
+                    pc = operand
                 }
 
-                else -> throw IllegalBytecode(bytecode)
+                +RETURN -> {
+                    val sp = stackPointer
+                    if (sp >= STACK_SIZE) throw Finished
+                    pc = stack[sp] + 1
+                    stackPointer = sp + 1
+                    --callDepth
+                    onReturn?.invoke()
+                }
+
+                +MOVE_FORWARD -> {
+                    world.moveForward()
+                    ++pc
+                    return ignoreMove
+                }
+
+                +TURN_LEFT -> {
+                    world.turnLeft()
+                    ++pc
+                }
+
+                +TURN_AROUND -> {
+                    world.turnAround()
+                    ++pc
+                }
+
+                +TURN_RIGHT -> {
+                    world.turnRight()
+                    ++pc
+                }
+
+                +PICK_BEEPER -> {
+                    world.pickBeeper()
+                    ++pc
+                    return false
+                }
+
+                +DROP_BEEPER -> {
+                    world.dropBeeper()
+                    ++pc
+                    return false
+                }
+
+                +ON_BEEPER -> {
+                    val status = world.onBeeper()
+                    with(instructions[pc + 1]) {
+                        pc = if (status == (operation == THEN)) operand else pc + 2
+                    }
+                }
+
+                +BEEPER_AHEAD -> {
+                    val status = world.beeperAhead()
+                    with(instructions[pc + 1]) {
+                        pc = if (status == (operation == THEN)) operand else pc + 2
+                    }
+                }
+
+                +LEFT_IS_CLEAR -> {
+                    val status = world.leftIsClear()
+                    with(instructions[pc + 1]) {
+                        pc = if (status == (operation == THEN)) operand else pc + 2
+                    }
+                }
+
+                +FRONT_IS_CLEAR -> {
+                    val status = world.frontIsClear()
+                    with(instructions[pc + 1]) {
+                        pc = if (status == (operation == THEN)) operand else pc + 2
+                    }
+                }
+
+                +RIGHT_IS_CLEAR -> {
+                    val status = world.rightIsClear()
+                    with(instructions[pc + 1]) {
+                        pc = if (status == (operation == THEN)) operand else pc + 2
+                    }
+                }
+
+                // INSTRUMENT
+
+                +ON_BEEPER_INSTRUMENT -> {
+                    val status = world.onBeeper()
+                    currentInstruction.operation = if (status) ON_BEEPER_TRUE else ON_BEEPER_FALSE
+                    with(instructions[pc + 1]) {
+                        pc = if (status == (operation == THEN)) operand else pc + 2
+                    }
+                }
+
+                +BEEPER_AHEAD_INSTRUMENT -> {
+                    val status = world.beeperAhead()
+                    currentInstruction.operation = if (status) BEEPER_AHEAD_TRUE else BEEPER_AHEAD_FALSE
+                    with(instructions[pc + 1]) {
+                        pc = if (status == (operation == THEN)) operand else pc + 2
+                    }
+                }
+
+                +LEFT_IS_CLEAR_INSTRUMENT -> {
+                    val status = world.leftIsClear()
+                    currentInstruction.operation = if (status) LEFT_IS_CLEAR_TRUE else LEFT_IS_CLEAR_FALSE
+                    with(instructions[pc + 1]) {
+                        pc = if (status == (operation == THEN)) operand else pc + 2
+                    }
+                }
+
+                +FRONT_IS_CLEAR_INSTRUMENT -> {
+                    val status = world.frontIsClear()
+                    currentInstruction.operation = if (status) FRONT_IS_CLEAR_TRUE else FRONT_IS_CLEAR_FALSE
+                    with(instructions[pc + 1]) {
+                        pc = if (status == (operation == THEN)) operand else pc + 2
+                    }
+                }
+
+                +RIGHT_IS_CLEAR_INSTRUMENT -> {
+                    val status = world.rightIsClear()
+                    currentInstruction.operation = if (status) RIGHT_IS_CLEAR_TRUE else RIGHT_IS_CLEAR_FALSE
+                    with(instructions[pc + 1]) {
+                        pc = if (status == (operation == THEN)) operand else pc + 2
+                    }
+                }
+
+                // FALSE
+
+                +ON_BEEPER_FALSE -> {
+                    val status = world.onBeeper()
+                    if (status) currentInstruction.operation = ON_BEEPER
+                    with(instructions[pc + 1]) {
+                        pc = if (status == (operation == THEN)) operand else pc + 2
+                    }
+                }
+
+                +BEEPER_AHEAD_FALSE -> {
+                    val status = world.beeperAhead()
+                    if (status) currentInstruction.operation = BEEPER_AHEAD
+                    with(instructions[pc + 1]) {
+                        pc = if (status == (operation == THEN)) operand else pc + 2
+                    }
+                }
+
+                +LEFT_IS_CLEAR_FALSE -> {
+                    val status = world.leftIsClear()
+                    if (status) currentInstruction.operation = LEFT_IS_CLEAR
+                    with(instructions[pc + 1]) {
+                        pc = if (status == (operation == THEN)) operand else pc + 2
+                    }
+                }
+
+                +FRONT_IS_CLEAR_FALSE -> {
+                    val status = world.frontIsClear()
+                    if (status) currentInstruction.operation = FRONT_IS_CLEAR
+                    with(instructions[pc + 1]) {
+                        pc = if (status == (operation == THEN)) operand else pc + 2
+                    }
+                }
+
+                +RIGHT_IS_CLEAR_FALSE -> {
+                    val status = world.rightIsClear()
+                    if (status) currentInstruction.operation = RIGHT_IS_CLEAR
+                    with(instructions[pc + 1]) {
+                        pc = if (status == (operation == THEN)) operand else pc + 2
+                    }
+                }
+
+                // TRUE
+
+                +ON_BEEPER_TRUE -> {
+                    val status = world.onBeeper()
+                    if (!status) currentInstruction.operation = ON_BEEPER
+                    with(instructions[pc + 1]) {
+                        pc = if (status == (operation == THEN)) operand else pc + 2
+                    }
+                }
+
+                +BEEPER_AHEAD_TRUE -> {
+                    val status = world.beeperAhead()
+                    if (!status) currentInstruction.operation = BEEPER_AHEAD
+                    with(instructions[pc + 1]) {
+                        pc = if (status == (operation == THEN)) operand else pc + 2
+                    }
+                }
+
+                +LEFT_IS_CLEAR_TRUE -> {
+                    val status = world.leftIsClear()
+                    if (!status) currentInstruction.operation = LEFT_IS_CLEAR
+                    with(instructions[pc + 1]) {
+                        pc = if (status == (operation == THEN)) operand else pc + 2
+                    }
+                }
+
+                +FRONT_IS_CLEAR_TRUE -> {
+                    val status = world.frontIsClear()
+                    if (!status) currentInstruction.operation = FRONT_IS_CLEAR
+                    with(instructions[pc + 1]) {
+                        pc = if (status == (operation == THEN)) operand else pc + 2
+                    }
+                }
+
+                +RIGHT_IS_CLEAR_TRUE -> {
+                    val status = world.rightIsClear()
+                    if (!status) currentInstruction.operation = RIGHT_IS_CLEAR
+                    with(instructions[pc + 1]) {
+                        pc = if (status == (operation == THEN)) operand else pc + 2
+                    }
+                }
+
+                else -> throw IllegalOperation(operation)
             }
             return true
         }
@@ -136,223 +331,13 @@ class VirtualMachine(
 
     private fun findReturnInstructionAfter(start: Int): Instruction {
         var index = start
-        while (program[index].bytecode != RETURN) ++index
-        return program[index]
+        while (instructions[index].operation != RETURN) ++index
+        return instructions[index]
     }
 
     @Suppress("ObjectInheritsException")
     object Finished : Exception() {
         private fun readResolve(): Any = Finished
-    }
-
-    private fun executeBasicInstruction(bytecode: Int): Boolean {
-        when (bytecode) {
-            RETURN -> {
-                val sp = stackPointer
-                if (sp >= STACK_SIZE) throw Finished
-                pc = stack[sp] + 1
-                stackPointer = sp + 1
-                --callDepth
-                onReturn?.invoke()
-            }
-
-            MOVE_FORWARD -> {
-                world.moveForward()
-                ++pc
-                return ignoreMove
-            }
-
-            TURN_LEFT -> {
-                world.turnLeft()
-                ++pc
-            }
-
-            TURN_AROUND -> {
-                world.turnAround()
-                ++pc
-            }
-
-            TURN_RIGHT -> {
-                world.turnRight()
-                ++pc
-            }
-
-            PICK_BEEPER -> {
-                world.pickBeeper()
-                ++pc
-                return false
-            }
-
-            DROP_BEEPER -> {
-                world.dropBeeper()
-                ++pc
-                return false
-            }
-
-            ON_BEEPER -> {
-                val status = world.onBeeper()
-                with(program[pc + 1]) {
-                    pc = if (status == (category == THEN)) target else pc + 2
-                }
-            }
-
-            BEEPER_AHEAD -> {
-                val status = world.beeperAhead()
-                with(program[pc + 1]) {
-                    pc = if (status == (category == THEN)) target else pc + 2
-                }
-            }
-
-            LEFT_IS_CLEAR -> {
-                val status = world.leftIsClear()
-                with(program[pc + 1]) {
-                    pc = if (status == (category == THEN)) target else pc + 2
-                }
-            }
-
-            FRONT_IS_CLEAR -> {
-                val status = world.frontIsClear()
-                with(program[pc + 1]) {
-                    pc = if (status == (category == THEN)) target else pc + 2
-                }
-            }
-
-            RIGHT_IS_CLEAR -> {
-                val status = world.rightIsClear()
-                with(program[pc + 1]) {
-                    pc = if (status == (category == THEN)) target else pc + 2
-                }
-            }
-
-            // INSTRUMENT
-
-            ON_BEEPER_INSTRUMENT -> {
-                val status = world.onBeeper()
-                currentInstruction.bytecode = if (status) ON_BEEPER_TRUE else ON_BEEPER_FALSE
-                with(program[pc + 1]) {
-                    pc = if (status == (category == THEN)) target else pc + 2
-                }
-            }
-
-            BEEPER_AHEAD_INSTRUMENT -> {
-                val status = world.beeperAhead()
-                currentInstruction.bytecode = if (status) BEEPER_AHEAD_TRUE else BEEPER_AHEAD_FALSE
-                with(program[pc + 1]) {
-                    pc = if (status == (category == THEN)) target else pc + 2
-                }
-            }
-
-            LEFT_IS_CLEAR_INSTRUMENT -> {
-                val status = world.leftIsClear()
-                currentInstruction.bytecode = if (status) LEFT_IS_CLEAR_TRUE else LEFT_IS_CLEAR_FALSE
-                with(program[pc + 1]) {
-                    pc = if (status == (category == THEN)) target else pc + 2
-                }
-            }
-
-            FRONT_IS_CLEAR_INSTRUMENT -> {
-                val status = world.frontIsClear()
-                currentInstruction.bytecode = if (status) FRONT_IS_CLEAR_TRUE else FRONT_IS_CLEAR_FALSE
-                with(program[pc + 1]) {
-                    pc = if (status == (category == THEN)) target else pc + 2
-                }
-            }
-
-            RIGHT_IS_CLEAR_INSTRUMENT -> {
-                val status = world.rightIsClear()
-                currentInstruction.bytecode = if (status) RIGHT_IS_CLEAR_TRUE else RIGHT_IS_CLEAR_FALSE
-                with(program[pc + 1]) {
-                    pc = if (status == (category == THEN)) target else pc + 2
-                }
-            }
-
-            // FALSE
-
-            ON_BEEPER_FALSE -> {
-                val status = world.onBeeper()
-                if (status) currentInstruction.bytecode = ON_BEEPER
-                with(program[pc + 1]) {
-                    pc = if (status == (category == THEN)) target else pc + 2
-                }
-            }
-
-            BEEPER_AHEAD_FALSE -> {
-                val status = world.beeperAhead()
-                if (status) currentInstruction.bytecode = BEEPER_AHEAD
-                with(program[pc + 1]) {
-                    pc = if (status == (category == THEN)) target else pc + 2
-                }
-            }
-
-            LEFT_IS_CLEAR_FALSE -> {
-                val status = world.leftIsClear()
-                if (status) currentInstruction.bytecode = LEFT_IS_CLEAR
-                with(program[pc + 1]) {
-                    pc = if (status == (category == THEN)) target else pc + 2
-                }
-            }
-
-            FRONT_IS_CLEAR_FALSE -> {
-                val status = world.frontIsClear()
-                if (status) currentInstruction.bytecode = FRONT_IS_CLEAR
-                with(program[pc + 1]) {
-                    pc = if (status == (category == THEN)) target else pc + 2
-                }
-            }
-
-            RIGHT_IS_CLEAR_FALSE -> {
-                val status = world.rightIsClear()
-                if (status) currentInstruction.bytecode = RIGHT_IS_CLEAR
-                with(program[pc + 1]) {
-                    pc = if (status == (category == THEN)) target else pc + 2
-                }
-            }
-
-            // TRUE
-
-            ON_BEEPER_TRUE -> {
-                val status = world.onBeeper()
-                if (!status) currentInstruction.bytecode = ON_BEEPER
-                with(program[pc + 1]) {
-                    pc = if (status == (category == THEN)) target else pc + 2
-                }
-            }
-
-            BEEPER_AHEAD_TRUE -> {
-                val status = world.beeperAhead()
-                if (!status) currentInstruction.bytecode = BEEPER_AHEAD
-                with(program[pc + 1]) {
-                    pc = if (status == (category == THEN)) target else pc + 2
-                }
-            }
-
-            LEFT_IS_CLEAR_TRUE -> {
-                val status = world.leftIsClear()
-                if (!status) currentInstruction.bytecode = LEFT_IS_CLEAR
-                with(program[pc + 1]) {
-                    pc = if (status == (category == THEN)) target else pc + 2
-                }
-            }
-
-            FRONT_IS_CLEAR_TRUE -> {
-                val status = world.frontIsClear()
-                if (!status) currentInstruction.bytecode = FRONT_IS_CLEAR
-                with(program[pc + 1]) {
-                    pc = if (status == (category == THEN)) target else pc + 2
-                }
-            }
-
-            RIGHT_IS_CLEAR_TRUE -> {
-                val status = world.rightIsClear()
-                if (!status) currentInstruction.bytecode = RIGHT_IS_CLEAR
-                with(program[pc + 1]) {
-                    pc = if (status == (category == THEN)) target else pc + 2
-                }
-            }
-
-            else -> throw IllegalBytecode(bytecode)
-        }
-        return true
     }
 }
 

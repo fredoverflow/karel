@@ -41,7 +41,7 @@ class MainHandler : MainFlow() {
             worldPanel.leftWorld = null
             worldPanel.rightWorld = null
 
-            executeGoal(currentProblem.goal)
+            start(currentProblem.goal)
             controlPanel.stepOver.isEnabled = false
             controlPanel.stepReturn.isEnabled = false
 
@@ -50,6 +50,7 @@ class MainHandler : MainFlow() {
 
         controlPanel.problemPicker.addPopupMenuListener(clearAndFocus)
         controlPanel.problemPicker.addActionListener {
+            currentProblem = controlPanel.problemPicker.selectedItem as Problem
             controlPanel.startStopReset.text = "start"
             controlPanel.randomize.isEnabled = currentProblem.isRandom
             controlPanel.check.toolTipText = "check every ${currentProblem.check.singular}"
@@ -108,7 +109,7 @@ class MainHandler : MainFlow() {
                 if (SwingUtilities.isLeftMouseButton(event)) {
                     controlPanel.startStopReset.text = "reset"
 
-                    checkAgainst(currentProblem.goal)
+                    checkCurrentProblem()
                 } else if (SwingUtilities.isRightMouseButton(event)) {
                     checkAllProblems()
                 }

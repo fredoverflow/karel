@@ -1,6 +1,5 @@
 package vm
 
-import common.subList
 import syntax.lexer.Token
 import syntax.parser.Sema
 import syntax.tree.*
@@ -9,40 +8,40 @@ class Emitter(private val sema: Sema, instrument: Boolean) {
 
     private val instrumentOffset: Int = if (instrument) ON_BEEPER_INSTRUMENT - ON_BEEPER else 0
 
-    private val program: MutableList<Instruction> = createInstructionBuffer()
+    private var instructions = ArrayList<Instruction>()
 
     private val pc: Int
-        get() = program.size
+        get() = instructions.size
 
     private val labels = ArrayList<Label>()
 
     private fun label() = Label().also(labels::add)
 
-    private fun emitInstruction(bytecode: Int, token: Token): Instruction {
-        val instruction = Instruction(bytecode, token.start)
-        program.add(instruction)
+    private fun emitInstruction(operation: Byte, token: Token): Instruction {
+        val instruction = Instruction(operation, 0, token.start)
+        instructions.add(instruction)
         return instruction
     }
 
-    private fun emitBranch(predicate: Int, token: Token, branch: Int, label: Label, control: Token) {
-        emitInstruction(predicate + instrumentOffset, token)
+    private fun emitBranch(predicate: Byte, token: Token, branch: Byte, label: Label, control: Token) {
+        emitInstruction((predicate + instrumentOffset).toByte(), token)
         emitInstruction(branch, control).label = label
     }
 
     private fun inlineJumps() {
         for (label in labels) {
-            val instruction = program[label.address]
-            if (instruction.category == JUMP) {
+            val instruction = instructions[label.address]
+            if (instruction.operation == JUMP) {
                 label.address = instruction.label!!.address
             }
         }
     }
 
     private fun resolveLabels() {
-        program.subList(ENTRY_POINT).forEach(Instruction::resolveLabel)
+        instructions.forEach(Instruction::resolveLabel)
     }
 
-    fun emit(main: Command): List<Instruction> {
+    fun emit(main: Command): Instructions {
         commandLabels[main] = label()
         main.emit()
         while (toEmit.isNotEmpty()) {
@@ -50,7 +49,7 @@ class Emitter(private val sema: Sema, instrument: Boolean) {
         }
         inlineJumps()
         resolveLabels()
-        return program
+        return instructions.toTypedArray()
     }
 
     private val commandLabels = HashMap<Command, Label>()
@@ -86,7 +85,7 @@ class Emitter(private val sema: Sema, instrument: Boolean) {
 
             is Repeat -> {
                 val bodyLabel = label()
-                emitInstruction(PUSH + times, repeat)
+                emitInstruction(PUSH, repeat).operand = times
                 bodyLabel.address = pc
                 body.emit()
                 emitInstruction(LOOP, body.closingBrace).label = bodyLabel
@@ -138,7 +137,7 @@ class Emitter(private val sema: Sema, instrument: Boolean) {
         }
     }
 
-    private fun Condition.emitPositive(thenLabel: Label, elseLabel: Label, branch: Int, label: Label, control: Token) {
+    private fun Condition.emitPositive(thenLabel: Label, elseLabel: Label, branch: Byte, label: Label, control: Token) {
         when (this) {
             is OnBeeper -> emitBranch(ON_BEEPER, onBeeper, branch, label, control)
             is BeeperAhead -> emitBranch(BEEPER_AHEAD, beeperAhead, branch, label, control)
@@ -146,7 +145,7 @@ class Emitter(private val sema: Sema, instrument: Boolean) {
             is FrontIsClear -> emitBranch(FRONT_IS_CLEAR, frontIsClear, branch, label, control)
             is RightIsClear -> emitBranch(RIGHT_IS_CLEAR, rightIsClear, branch, label, control)
 
-            is Not -> p.emitNegative(thenLabel, elseLabel, branch xor (ELSE xor THEN), label, control)
+            is Not -> p.emitNegative(thenLabel, elseLabel, (THEN + ELSE - branch).toByte(), label, control)
 
             is Conjunction -> { // left && right
                 val right = label()
@@ -164,7 +163,7 @@ class Emitter(private val sema: Sema, instrument: Boolean) {
         }
     }
 
-    private fun Condition.emitNegative(thenLabel: Label, elseLabel: Label, branch: Int, label: Label, control: Token) {
+    private fun Condition.emitNegative(thenLabel: Label, elseLabel: Label, branch: Byte, label: Label, control: Token) {
         when (this) {
             is Disjunction -> { // !(left || right) = !left && !right
                 val right = label()
@@ -180,7 +179,7 @@ class Emitter(private val sema: Sema, instrument: Boolean) {
                 q.emitNegative(thenLabel, elseLabel, branch, label, control)
             }
 
-            is Not -> p.emitPositive(thenLabel, elseLabel, branch xor (ELSE xor THEN), label, control)
+            is Not -> p.emitPositive(thenLabel, elseLabel, (THEN + ELSE - branch).toByte(), label, control)
 
             is OnBeeper -> emitBranch(ON_BEEPER, onBeeper, branch, label, control)
             is BeeperAhead -> emitBranch(BEEPER_AHEAD, beeperAhead, branch, label, control)

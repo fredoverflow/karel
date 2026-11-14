@@ -49,7 +49,7 @@ value class FloorPlan(private val walls: ByteArray) {
             C, 8, 8, 8, 8, 8, 8, 8, 8, 9,
         )
 
-        val first = FloorPlan(
+        val introduction = FloorPlan(
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

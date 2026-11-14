@@ -9,11 +9,10 @@ abstract class WorldTestBase {
     protected var world: World = FloorPlan.empty.world()
 
     protected fun executeGoal(problem: Problem) {
-        val instructions = vm.createGoalInstructions(problem.goal)
         initialWorld = problem.randomWorld()
-        val virtualMachine = VirtualMachine(instructions.toTypedArray(), initialWorld.clone())
+        val virtualMachine = VirtualMachine(problem.goal, initialWorld.clone())
         try {
-            virtualMachine.executeGoalProgram()
+            virtualMachine.executeGoal()
         } catch (_: VirtualMachine.Finished) {
         }
         world = virtualMachine.world

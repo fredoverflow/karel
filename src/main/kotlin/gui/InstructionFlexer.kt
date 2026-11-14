@@ -6,7 +6,7 @@ import freditor.FlexerState.EMPTY
 import freditor.FlexerState.THIS
 import freditor.FlexerStateBuilder
 
-object BytecodeFlexer : freditor.Flexer() {
+object InstructionFlexer : freditor.Flexer() {
     private val NUMBER_TAIL = FlexerState("09af", THIS)
     private val NUMBER_HEAD = NUMBER_TAIL.head()
 
@@ -16,7 +16,7 @@ object BytecodeFlexer : freditor.Flexer() {
         .set("09af", NUMBER_HEAD)
         .build()
         .verbatim(
-            EMPTY, "@", "CODE", "MNEMONIC",
+            EMPTY, "@", "INSTRUCT",
             "RET",
             "MOVE", "TRNL", "TRNA", "TRNR", "PICK", "DROP",
             "BEEP", "HEAD", "LCLR", "FCLR", "RCLR",
@@ -33,7 +33,7 @@ object BytecodeFlexer : freditor.Flexer() {
 
     private val lexemeColors = hashMapOf(ERROR to 0x808080)
         .puts(NUMBER_HEAD, NUMBER_TAIL, 0x6400c8)
-        .puts(START.read("@", "CODE", "MNEMONIC"), 0x808080)
+        .puts(START.read("@", "INSTRUCT"), 0x808080)
         .puts(START.read("BEEP", "HEAD", "LCLR", "FCLR", "RCLR", "PUSH"), 0x000080)
         .puts(START.read("RET", "LOOP", "CALL", "JUMP", "ELSE", "THEN"), 0x400000)
 

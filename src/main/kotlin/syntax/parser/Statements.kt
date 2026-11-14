@@ -2,7 +2,6 @@ package syntax.parser
 
 import syntax.lexer.TokenKind.*
 import syntax.tree.*
-import vm.ENTRY_POINT
 
 const val EXPECTED_VOID = """Command definitions look like this:
 
@@ -55,7 +54,7 @@ fun Parser.block(): Block {
 fun Parser.statement(): Statement = when (current) {
     IDENTIFIER -> sema(Call(accept().emptyParens()).semicolon())
 
-    REPEAT -> Repeat(accept(), parenthesized { expect(NUMBER).toInt(2 until ENTRY_POINT) }, block())
+    REPEAT -> Repeat(accept(), parenthesized { expect(NUMBER).toInt(2 until 256) }, block())
 
     WHILE -> While(accept(), parenthesized(::disjunction), block())
 

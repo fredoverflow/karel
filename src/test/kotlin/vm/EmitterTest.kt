@@ -1,25 +1,19 @@
 package vm
 
-import common.subList
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Test
 import syntax.lexer.Lexer
 import syntax.parser.Parser
 import syntax.parser.program
 
 class EmitterTest {
-    private fun compile(sourceCode: String): List<Instruction> {
+    private fun assertBytecode(sourceCode: String, vararg bytecode: Byte) {
         val lexer = Lexer(sourceCode)
         val parser = Parser(lexer)
         val program = parser.program()
         val main = program.commands.first()
-        return Emitter(parser.sema, false).emit(main)
-    }
-
-    private fun assertBytecode(sourceCode: String, vararg bytecodes: Int) {
-        val expected = bytecodes.map { bytecode -> "%x".format(bytecode) }
-        val actual = compile(sourceCode).subList(ENTRY_POINT).map { instruction -> "%x".format(instruction.bytecode) }
-        assertEquals(expected, actual)
+        val instructions = Emitter(parser.sema, false).emit(main)
+        assertArrayEquals(bytecode, instructions.toBytecode())
     }
 
     @Test
@@ -69,9 +63,9 @@ class EmitterTest {
             }
             """,
             MOVE_FORWARD,
-            CALL + 0x106,
+            CALL, 0x06,
             MOVE_FORWARD,
-            CALL + 0x10a,
+            CALL, 0x0a,
             MOVE_FORWARD,
             RETURN,
 
@@ -96,9 +90,9 @@ class EmitterTest {
                 }
             }
             """,
-            PUSH + 9,
+            PUSH, 9,
             MOVE_FORWARD,
-            LOOP + 0x101,
+            LOOP, 0x01,
             RETURN,
         )
     }
@@ -115,12 +109,12 @@ class EmitterTest {
                 }
             }
             """,
-            PUSH + 4,
-            PUSH + 9,
+            PUSH, 4,
+            PUSH, 9,
             MOVE_FORWARD,
-            LOOP + 0x102,
-            LOOP + 0x101,
-            RETURN
+            LOOP, 0x02,
+            LOOP, 0x01,
+            RETURN,
         )
     }
 
@@ -134,7 +128,7 @@ class EmitterTest {
                 }
             }
             """,
-            ON_BEEPER, ELSE + 0x103,
+            ON_BEEPER, ELSE, 0x03,
             PICK_BEEPER,
             RETURN,
         )
@@ -150,7 +144,7 @@ class EmitterTest {
                 }
             }
             """,
-            ON_BEEPER, THEN + 0x103,
+            ON_BEEPER, THEN, 0x03,
             DROP_BEEPER,
             RETURN,
         )
@@ -168,9 +162,9 @@ class EmitterTest {
                 }
             }
             """,
-            ON_BEEPER, ELSE + 0x104,
+            ON_BEEPER, ELSE, 0x04,
             PICK_BEEPER,
-            JUMP + 0x105,
+            JUMP, 0x05,
             DROP_BEEPER,
             RETURN,
         )
@@ -188,9 +182,9 @@ class EmitterTest {
                 }
             }
             """,
-            ON_BEEPER, THEN + 0x104,
+            ON_BEEPER, THEN, 0x04,
             DROP_BEEPER,
-            JUMP + 0x105,
+            JUMP, 0x05,
             PICK_BEEPER,
             RETURN,
         )
@@ -211,14 +205,14 @@ class EmitterTest {
                 }
             }
             """,
-            LEFT_IS_CLEAR, ELSE + 0x104,
+            LEFT_IS_CLEAR, ELSE, 0x04,
             TURN_LEFT,
-            JUMP + 0x10c,
-            FRONT_IS_CLEAR, ELSE + 0x107,
-            JUMP + 0x10c,
-            RIGHT_IS_CLEAR, ELSE + 0x10b,
+            JUMP, 0x0c,
+            FRONT_IS_CLEAR, ELSE, 0x07,
+            JUMP, 0x0c,
+            RIGHT_IS_CLEAR, ELSE, 0x0b,
             TURN_RIGHT,
-            JUMP + 0x10c,
+            JUMP, 0x0c,
             TURN_AROUND,
             RETURN,
         )
@@ -234,8 +228,8 @@ class EmitterTest {
                 }
             }
             """,
-            FRONT_IS_CLEAR, ELSE + 0x104,
-            BEEPER_AHEAD, ELSE + 0x105,
+            FRONT_IS_CLEAR, ELSE, 0x04,
+            BEEPER_AHEAD, ELSE, 0x05,
             TURN_LEFT,
             RETURN,
         )
@@ -251,8 +245,8 @@ class EmitterTest {
                 }
             }
             """,
-            BEEPER_AHEAD, THEN + 0x104,
-            FRONT_IS_CLEAR, THEN + 0x105,
+            BEEPER_AHEAD, THEN, 0x04,
+            FRONT_IS_CLEAR, THEN, 0x05,
             TURN_LEFT,
             RETURN,
         )
@@ -268,8 +262,8 @@ class EmitterTest {
                 }
             }
             """,
-            ON_BEEPER, THEN + 0x105,
-            FRONT_IS_CLEAR, ELSE + 0x105,
+            ON_BEEPER, THEN, 0x05,
+            FRONT_IS_CLEAR, ELSE, 0x05,
             MOVE_FORWARD,
             RETURN,
         )
@@ -285,8 +279,8 @@ class EmitterTest {
                 }
             }
             """,
-            FRONT_IS_CLEAR, ELSE + 0x105,
-            ON_BEEPER, THEN + 0x105,
+            FRONT_IS_CLEAR, ELSE, 0x05,
+            ON_BEEPER, THEN, 0x05,
             MOVE_FORWARD,
             RETURN,
         )
@@ -302,9 +296,9 @@ class EmitterTest {
                 }
             }
             """,
-            LEFT_IS_CLEAR, THEN + 0x107,
-            FRONT_IS_CLEAR, THEN + 0x107,
-            RIGHT_IS_CLEAR, THEN + 0x107,
+            LEFT_IS_CLEAR, THEN, 0x07,
+            FRONT_IS_CLEAR, THEN, 0x07,
+            RIGHT_IS_CLEAR, THEN, 0x07,
             TURN_AROUND,
             RETURN,
         )
@@ -320,9 +314,9 @@ class EmitterTest {
                 }
             }
             """,
-            LEFT_IS_CLEAR, THEN + 0x107,
-            FRONT_IS_CLEAR, THEN + 0x107,
-            RIGHT_IS_CLEAR, THEN + 0x107,
+            LEFT_IS_CLEAR, THEN, 0x07,
+            FRONT_IS_CLEAR, THEN, 0x07,
+            RIGHT_IS_CLEAR, THEN, 0x07,
             TURN_AROUND,
             RETURN,
         )
@@ -339,10 +333,10 @@ class EmitterTest {
                 }
             }
             """,
-            JUMP + 0x103,
+            JUMP, 0x03,
             MOVE_FORWARD,
             PICK_BEEPER,
-            BEEPER_AHEAD, THEN + 0x101,
+            BEEPER_AHEAD, THEN, 0x01,
             RETURN,
         )
     }
@@ -361,14 +355,14 @@ class EmitterTest {
                 }
             }
             """,
-            JUMP + 0x107,
+            JUMP, 0x07,
             PICK_BEEPER,
-            JUMP + 0x104,
+            JUMP, 0x04,
             MOVE_FORWARD,
-            FRONT_IS_CLEAR, THEN + 0x103,
+            FRONT_IS_CLEAR, THEN, 0x03,
             TURN_LEFT,
             ON_BEEPER,
-            THEN + 0x101,
+            THEN, 0x01,
             RETURN,
         )
     }
@@ -387,11 +381,11 @@ class EmitterTest {
                 }
             }
             """,
-            CALL + 0x104,
+            CALL, 0x04,
             RETURN,
-            JUMP + 0x104,
+            JUMP, 0x04,
             MOVE_FORWARD,
-            FRONT_IS_CLEAR, THEN + 0x103,
+            FRONT_IS_CLEAR, THEN, 0x03,
             RETURN,
         )
     }
@@ -414,15 +408,15 @@ class EmitterTest {
             }
             """,
             ON_BEEPER,
-            ELSE + 0x106,
+            ELSE, 0x06,
             PICK_BEEPER,
-            JUMP + 0x10a,
-            JUMP + 0x106,
+            JUMP, 0x0a,
+            JUMP, 0x06,
             MOVE_FORWARD,
-            FRONT_IS_CLEAR, THEN + 0x105,
-            JUMP + 0x10a,
+            FRONT_IS_CLEAR, THEN, 0x05,
+            JUMP, 0x0a,
             MOVE_FORWARD,
-            FRONT_IS_CLEAR, THEN + 0x109,
+            FRONT_IS_CLEAR, THEN, 0x09,
             RETURN,
         )
     }
@@ -441,11 +435,11 @@ class EmitterTest {
                 }
             }
             """,
-            FRONT_IS_CLEAR, THEN + 0x104,
+            FRONT_IS_CLEAR, THEN, 0x04,
             TURN_AROUND,
-            JUMP + 0x107,
+            JUMP, 0x07,
             MOVE_FORWARD,
-            CALL + 0x100,
+            CALL, 0x00,
             MOVE_FORWARD,
             RETURN,
         )
@@ -461,7 +455,7 @@ class EmitterTest {
                 }
             }
             """,
-            ON_BEEPER, THEN + 0x103,
+            ON_BEEPER, THEN, 0x03,
             DROP_BEEPER,
             RETURN,
         )
@@ -477,7 +471,7 @@ class EmitterTest {
                 }
             }
             """,
-            FRONT_IS_CLEAR, ELSE + 0x103,
+            FRONT_IS_CLEAR, ELSE, 0x03,
             MOVE_FORWARD,
             RETURN,
         )
@@ -490,8 +484,8 @@ class EmitterTest {
             void f() { g(); }
             void g() { f(); }
             """,
-            CALL + 0x102, RETURN,
-            CALL + 0x100, RETURN,
+            CALL, 0x02, RETURN,
+            CALL, 0x00, RETURN,
         )
     }
 
@@ -503,9 +497,9 @@ class EmitterTest {
             void g() { h(); }
             void h() { f(); }
             """,
-            CALL + 0x102, RETURN,
-            CALL + 0x104, RETURN,
-            CALL + 0x100, RETURN,
+            CALL, 0x02, RETURN,
+            CALL, 0x04, RETURN,
+            CALL, 0x00, RETURN,
         )
     }
 }

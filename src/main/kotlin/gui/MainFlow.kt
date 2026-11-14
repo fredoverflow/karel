@@ -20,10 +20,9 @@ const val COMPARE = """ · click world to compare
 right-click: goal world
  left-click: your world"""
 
-abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
+abstract class MainFlow : MainDesign(Problem.introduction.randomWorld()) {
 
-    val currentProblem: Problem
-        get() = controlPanel.problemPicker.selectedItem as Problem
+    var currentProblem = Problem.introduction
 
     fun delay(): Int {
         val logarithm = controlPanel.delayLogarithm()
@@ -32,17 +31,13 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
     var initialWorld: World = worldPanel.world.clone()
 
-    var virtualMachine = VirtualMachine(createGoalInstructions("karelsFirstProgram").toTypedArray(), worldPanel.world)
+    var virtualMachine = VirtualMachine(Problem.introduction.goal, worldPanel.world)
 
     val timer = Timer(delay()) {
         tryStep(::stepInto)
     }
 
-    fun executeGoal(goal: String) {
-        start(createGoalInstructions(goal))
-    }
-
-    fun checkAgainst(goal: String) {
+    fun checkCurrentProblem() {
         tabbedEditors.selectNonReport()
         editor.isolateBraces()
         editor.indent()
@@ -55,10 +50,10 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
             val main = parser.sema.command(currentProblem.name)
             if (main != null) {
                 val instructions = Emitter(parser.sema, true).emit(main)
-                virtualMachinePanel.setProgram(instructions)
-                virtualMachinePanel.update(EMPTY_STACK, ENTRY_POINT)
+                virtualMachinePanel.setInstructions(instructions)
+                virtualMachinePanel.update(EMPTY_STACK, 0)
 
-                tryCheck(instructions.toTypedArray(), createGoalInstructions(goal).toTypedArray())
+                tryCheck(instructions)
             } else {
                 editor.setCursorTo(editor.length())
                 showDiagnostic("void ${currentProblem.name}() not found")
@@ -68,10 +63,10 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         }
     }
 
-    private fun tryCheck(instructions: Array<Instruction>, goalInstructions: Array<Instruction>) {
+    private fun tryCheck(instructions: Instructions) {
         try {
-            val successMessage = check(instructions, goalInstructions)
-            reportFirstRedundantCondition(instructions)
+            val successMessage = check(instructions)
+            checkForRedundantCondition(instructions)
             update()
             showDiagnostic(successMessage)
         } catch (diagnostic: Diagnostic) {
@@ -80,7 +75,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         }
     }
 
-    private fun check(instructions: Array<Instruction>, goalInstructions: Array<Instruction>): String {
+    private fun check(instructions: Instructions): String {
 
         val start = System.nanoTime()
         var nextRepaint = CHECK_REPAINT_NS
@@ -91,7 +86,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         while (true) {
             initialWorld = worlds.next()
             try {
-                checkOneWorld(instructions, goalInstructions)
+                checkOneWorld(instructions)
             } catch (error: KarelError) {
                 virtualMachine.errorCurrent(error.message)
             }
@@ -122,10 +117,10 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         }
     }
 
-    private fun checkOneWorld(instructions: Array<Instruction>, goalInstructions: Array<Instruction>) {
+    private fun checkOneWorld(instructions: Instructions) {
 
-        val goalMachine = createVirtualMachine(goalInstructions, currentProblem, initialWorld)
-        val userMachine = createVirtualMachine(instructions, currentProblem, initialWorld)
+        val goalMachine = createVirtualMachine(currentProblem, initialWorld, currentProblem.goal)
+        val userMachine = createVirtualMachine(currentProblem, initialWorld, instructions)
         virtualMachine = userMachine
 
         while (true) {
@@ -180,27 +175,22 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         }
     }
 
-    private fun createVirtualMachine(
-        program: Array<Instruction>,
-        problem: Problem,
-        world: World,
-    ): VirtualMachine {
+    private fun createVirtualMachine(problem: Problem, world: World, instructions: Instructions): VirtualMachine {
         return VirtualMachine(
-            program,
+            instructions,
             world.clone(),
             ignoreMove = (Check.EVERY_PICK_DROP == problem.check),
         )
     }
 
-    private fun reportFirstRedundantCondition(instructions: Array<Instruction>) {
-        for (index in ENTRY_POINT until instructions.size) {
-            val instruction = instructions[index]
-            when (instruction.bytecode) {
-                ON_BEEPER_FALSE, BEEPER_AHEAD_FALSE, LEFT_IS_CLEAR_FALSE, FRONT_IS_CLEAR_FALSE, RIGHT_IS_CLEAR_FALSE -> {
+    private fun checkForRedundantCondition(instructions: Instructions) {
+        for (instruction in instructions) {
+            when (+instruction.operation) {
+                +ON_BEEPER_FALSE, +BEEPER_AHEAD_FALSE, +LEFT_IS_CLEAR_FALSE, +FRONT_IS_CLEAR_FALSE, +RIGHT_IS_CLEAR_FALSE -> {
                     instruction.error("condition was always false")
                 }
 
-                ON_BEEPER_TRUE, BEEPER_AHEAD_TRUE, LEFT_IS_CLEAR_TRUE, FRONT_IS_CLEAR_TRUE, RIGHT_IS_CLEAR_TRUE -> {
+                +ON_BEEPER_TRUE, +BEEPER_AHEAD_TRUE, +LEFT_IS_CLEAR_TRUE, +FRONT_IS_CLEAR_TRUE, +RIGHT_IS_CLEAR_TRUE -> {
                     instruction.error("condition was always true")
                 }
             }
@@ -255,8 +245,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
                     completion.submit {
                         val main = parser.sema.command(problem.name)!!
                         val instructions = Emitter(parser.sema, false).emit(main)
-                        val goalInstructions = createGoalInstructions(problem.goal)
-                        checkAllWorlds(problem, instructions.toTypedArray(), goalInstructions.toTypedArray(), row)
+                        checkAllWorlds(problem, instructions, row)
                     }
                 }
                 ++row
@@ -282,12 +271,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
 
     private class Result(val passedWorlds: Int, val checkedWorlds: Int, val row: Int)
 
-    private fun checkAllWorlds(
-        problem: Problem,
-        instructions: Array<Instruction>,
-        goalInstructions: Array<Instruction>,
-        row: Int,
-    ): Result {
+    private fun checkAllWorlds(problem: Problem, instructions: Instructions, row: Int): Result {
         val start = System.nanoTime()
 
         val worlds = problem.randomWorlds().iterator()
@@ -297,7 +281,7 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         while (true) {
             val initialWorld = worlds.next()
             try {
-                if (checkWorld(problem, initialWorld, instructions, goalInstructions)) {
+                if (checkWorld(problem, initialWorld, instructions)) {
                     ++passedWorlds
                 }
             } catch (_: KarelError) {
@@ -316,14 +300,10 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         }
     }
 
-    private fun checkWorld(
-        problem: Problem,
-        initialWorld: World,
-        instructions: Array<Instruction>,
-        goalInstructions: Array<Instruction>,
-    ): Boolean {
-        val goalMachine = createVirtualMachine(goalInstructions, problem, initialWorld)
-        val userMachine = createVirtualMachine(instructions, problem, initialWorld)
+    private fun checkWorld(problem: Problem, initialWorld: World, instructions: Instructions): Boolean {
+
+        val goalMachine = createVirtualMachine(problem, initialWorld, problem.goal)
+        val userMachine = createVirtualMachine(problem, initialWorld, instructions)
 
         while (true) {
             try {
@@ -374,12 +354,12 @@ abstract class MainFlow : MainDesign(Problem.karelsFirstProgram.randomWorld()) {
         }
     }
 
-    fun start(instructions: List<Instruction>) {
-        val compiledFromSource = instructions[ENTRY_POINT].compiledFromSource
+    fun start(instructions: Instructions) {
+        val compiledFromSource = instructions[0].compiledFromSource
         tabbedEditors.tabs.isEnabled = false
-        virtualMachinePanel.setProgram(instructions)
+        virtualMachinePanel.setInstructions(instructions)
         virtualMachine = VirtualMachine(
-            instructions.toTypedArray(),
+            instructions,
             initialWorld.clone(),
             onCall = editor::push.takeIf { compiledFromSource },
             onReturn = editor::pop.takeIf { compiledFromSource },

@@ -2,7 +2,6 @@ package gui
 
 import freditor.Fronts
 import vm.EMPTY_STACK
-import vm.ENTRY_POINT
 import vm.Stack
 import java.awt.Color
 import java.awt.Dimension
@@ -10,6 +9,7 @@ import java.awt.Graphics
 import javax.swing.JComponent
 
 class StackTable : JComponent() {
+
     private var stack = EMPTY_STACK
 
     init {
@@ -43,8 +43,8 @@ class StackTable : JComponent() {
         val frontRight = 4 * Fronts.front.width
 
         for (number in stack) {
-            if (number >= ENTRY_POINT) {
-                Fronts.front.drawHexRight(graphics, frontRight, y, number, 0x808080)
+            if (number >= 0) {
+                Fronts.front.drawHexRight2(graphics, frontRight, y, number, 0x808080)
             } else {
                 Fronts.front.drawIntRight(graphics, frontRight, y, number, 0x6400c8)
             }
